@@ -2,12 +2,17 @@
 @inherits ConnectionsBase
 
 <NavLink href="connection">
-    <span class="glyphicon glyphicon-plus"></span> New Connection
+    <span class="oi oi-plus"></span> New Connection
 </NavLink>
 
 <h1>Available Connections</h1>
 
 @foreach (var connection in connections)
 {
-    <div>@connection.Name</div>
+    <div>
+        @connection.Name
+        <NavLink href="connection">
+            <span class="oi oi-cog"></span>
+        </NavLink>
+    </div>
 }
