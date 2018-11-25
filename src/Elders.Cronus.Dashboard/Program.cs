@@ -1,6 +1,6 @@
 ﻿using Microsoft.AspNetCore.Blazor.Hosting;
 
-namespace Elders.Cronus.UI.Blazor
+namespace Elders.Cronus.Dashboard
 {
     public class Program
     {
