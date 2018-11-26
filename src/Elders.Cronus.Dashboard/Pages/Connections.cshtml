@@ -1,18 +1,18 @@
 ﻿@page "/connections"
 @inherits ConnectionsBase
 
-<NavLink href="connection">
-    <span class="oi oi-plus"></span> New Connection
-</NavLink>
-
+<div>
+    <NavLink href="connection">
+        <span class="oi oi-plus"></span> New Connection
+    </NavLink>
+</div>
 <h1>Available Connections</h1>
 
 @foreach (var connection in connections)
 {
     <div>
         @connection.Name
-        <NavLink href="connection">
-            <span class="oi oi-cog"></span>
-        </NavLink>
+        <NavLink href="connection"><span class="oi oi-cog" title="Edit"></span></NavLink>
+        <NavLink href="connection"><span class="oi oi-delete" title="Delete"></span></NavLink>
     </div>
 }

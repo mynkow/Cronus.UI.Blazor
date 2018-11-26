@@ -14,6 +14,16 @@ namespace Elders.Cronus.Dashboard.Pages
         [Inject]
         protected LocalStorage LocalStorage { get; set; }
 
+        [Parameter]
+        protected ConnectionModel Connection { get; set; }
+
+        protected override void OnInit()
+        {
+            name = Connection.Name;
+
+            base.OnInit();
+        }
+
         public async Task AddConnection()
         {
             ConnectionModel connection = new ConnectionModel();
