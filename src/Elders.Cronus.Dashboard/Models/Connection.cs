@@ -11,10 +11,10 @@
 
         public string CronusEndpiont { get; set; }
 
-        public Authorization oAuth { get; set; }
+        public oAuth oAuth { get; set; }
     }
 
-    public class Authorization
+    public class oAuth
     {
         public string ServerEndpoint { get; set; }
 

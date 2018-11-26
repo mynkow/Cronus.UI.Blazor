@@ -1,6 +1,8 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Net.Http;
+using System.Text;
 using System.Threading.Tasks;
 using Blazor.Extensions.Storage;
 using Elders.Cronus.Dashboard.Models;
@@ -12,10 +14,13 @@ namespace Elders.Cronus.Dashboard.Components
     public class ConnectionBase : BlazorComponent
     {
         [Inject]
+        protected ILogger<ConnectionBase> Log { get; set; }
+
+        [Inject]
         protected LocalStorage LocalStorage { get; set; }
 
         [Inject]
-        protected ILogger<ConnectionBase> Log { get; set; }
+        protected HttpClient HttpClient { get; set; }
 
         [Parameter]
         protected string Name { get; set; }
@@ -81,7 +86,7 @@ namespace Elders.Cronus.Dashboard.Components
             {
                 Name = Name,
                 CronusEndpiont = CronusEndpoint,
-                oAuth = new Authorization()
+                oAuth = new oAuth()
                 {
                     ServerEndpoint = oAuthEndpoint,
                     Client = oAuthClient,
@@ -90,11 +95,19 @@ namespace Elders.Cronus.Dashboard.Components
             };
         }
 
-        protected Task GetToken()
+        protected async Task GetToken()
         {
             Log.LogDebug("GetToken()");
 
-            return Task.CompletedTask;
+            HttpRequestMessage getTokenRequest = new HttpRequestMessage(HttpMethod.Post, connection.oAuth.ServerEndpoint);
+            getTokenRequest.Headers.Authorization = new System.Net.Http.Headers.AuthenticationHeaderValue("basic", Convert.ToBase64String(Encoding.UTF8.GetBytes($"{connection.oAuth.Client}:{connection.oAuth.Secret}")));
+            Dictionary<string, string> parameters = new Dictionary<string, string>();
+            parameters.Add("grant_type", "client_credentials");
+            parameters.Add("scope", "read");
+            getTokenRequest.Content = new FormUrlEncodedContent(parameters);
+            var disco = await HttpClient.SendAsync(getTokenRequest);
+            var result = await disco.Content.ReadAsStringAsync();
+            Log.LogDebug(result);
         }
 
         protected async Task OnDelete(Connection model)
