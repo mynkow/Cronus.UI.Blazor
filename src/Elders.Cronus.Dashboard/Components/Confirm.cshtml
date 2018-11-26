@@ -1,0 +1,17 @@
+﻿@using Elders.Cronus.Dashboard.Models.Confirmation
+@inherits DialogBase
+
+<Modal Title="GG" PrimaryButtonText="Yes" PrimaryButtonClick="@OnPrimaryButtonClick" CloseButtonText="No" Size="@ModalSize.Small" bind-IsVisible="@Context.IsVisible">
+    @Context.Message
+</Modal>
+
+@functions{
+    [Parameter]
+    protected ConfirmContext Context { get; set; }
+
+    protected bool OnPrimaryButtonClick()
+    {
+        Context.OnConfirmed();
+        return true;
+    }
+}

@@ -8,19 +8,27 @@ namespace Elders.Cronus.Dashboard.Pages
 {
     public class ConnectionsBase : BlazorComponent
     {
-        protected List<ConnectionModel> connections;
+        protected List<Connection> connections;
 
         [Inject]
         public LocalStorage LocalStorage { get; set; }
 
         public ConnectionsBase()
         {
-            this.connections = new List<ConnectionModel>();
+            this.connections = new List<Connection>();
         }
 
         protected override async Task OnInitAsync()
         {
-            connections = await LocalStorage.GetItem<List<ConnectionModel>>(LSKey.Connections);
+            connections = await LocalStorage.GetItem<List<Connection>>(LSKey.Connections);
+        }
+
+        protected async Task OnDelete(Connection model)
+        {
+            connections.Remove(model);
+            await LocalStorage.SetItem(LSKey.Connections, connections);
+
+            StateHasChanged();
         }
     }
 }

@@ -5,13 +5,13 @@
         public const string Connections = "connections";
     }
 
-    public class ConnectionModel
+    public class Connection
     {
         public string Name { get; set; }
 
         public string CronusEndpiont { get; set; }
 
-        public int MyProperty { get; set; }
+        public Authorization oAuth { get; set; }
     }
 
     public class Authorization

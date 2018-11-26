@@ -9,6 +9,7 @@
   </PropertyGroup>
 
   <ItemGroup>
+    <PackageReference Include="Blazor.Extensions.Logging" Version="0.1.9" />
     <PackageReference Include="Blazor.Extensions.Storage" Version="0.1.6" />
     <PackageReference Include="Microsoft.AspNetCore.Blazor.Browser" Version="0.7.0" />
     <PackageReference Include="Microsoft.AspNetCore.Blazor.Build" Version="0.7.0" PrivateAssets="all" />
@@ -17,19 +18,19 @@
   </ItemGroup>
 
   <ItemGroup>
-    <Compile Update="Pages\Connection.cshtml.cs">
-      <Pack>$(IncludeRazorContentInPack)</Pack>
-    </Compile>
-    <Compile Update="Pages\Connections.cshtml.cs">
-      <Pack>$(IncludeRazorContentInPack)</Pack>
-    </Compile>
     <Compile Update="Pages\Counter.cshtml.cs">
       <Pack>$(IncludeRazorContentInPack)</Pack>
     </Compile>
   </ItemGroup>
 
   <ItemGroup>
-    <Content Update="Pages\Connection.cshtml">
+    <Content Update="Components\Bootstrap\IconButton.cshtml">
+      <Pack>$(IncludeRazorContentInPack)</Pack>
+    </Content>
+    <Content Update="Pages\ConnectionEdit.cshtml">
+      <Pack>$(IncludeRazorContentInPack)</Pack>
+    </Content>
+    <Content Update="Pages\ConnectionNew.cshtml">
       <Pack>$(IncludeRazorContentInPack)</Pack>
     </Content>
   </ItemGroup>

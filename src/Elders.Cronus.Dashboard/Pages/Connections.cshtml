@@ -2,17 +2,19 @@
 @inherits ConnectionsBase
 
 <div>
-    <NavLink href="connection">
+    <NavLink href="connection/new">
         <span class="oi oi-plus"></span> New Connection
     </NavLink>
 </div>
-<h1>Available Connections</h1>
 
-@foreach (var connection in connections)
-{
-    <div>
-        @connection.Name
-        <NavLink href="connection"><span class="oi oi-cog" title="Edit"></span></NavLink>
-        <NavLink href="connection"><span class="oi oi-delete" title="Delete"></span></NavLink>
-    </div>
-}
+<div class="list-group">
+    <div class="list-group-item list-group-item-action active">Available Connections</div>
+    @foreach (var connection in connections)
+    {
+        <div class="list-group-item list-group-item-action">
+            @connection.Name
+            <a href="/connection/@connection.Name"><span class="oi oi-cog" title="Edit"></span></a>
+            <IconButton Icon="delete" ToolTip="Delete" Click="@(async () => await OnDelete(connection))" />
+        </div>
+    }
+</div>
