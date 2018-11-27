@@ -1,40 +1,36 @@
-﻿@if (Projection.IsLive)
-{
-    <div class="col-sm-4" style="margin-bottom: 1rem; min-width:30rem">
-        <div class="card">
-            <div class="card-header">
-                <div class="text-left" style="float:left">
-                    <span class="badge badge-success">Live</span>
-                    <span>@Projection.projectionName</span>
+﻿@inject CronusClient Cronus
+
+<div class="col-sm-4 projection-card" style="min-width:30rem">
+    <div class="card">
+        <div class="card-header">
+            <div class="row">
+                <div class="text-left col-lg-8">
+                    <ProjectionVersionBadge Version="@Projection.LatestVersion" LiveVersion="@Projection.LiveVersion"></ProjectionVersionBadge>
+                    <span>@Projection.ProjectionName</span>
                     <div>
-                        <span style="font-size:smaller"><cite>@Projection.projectionContractId</cite></span>
+                        <span style="font-size:small"><cite>@Projection.ProjectionContractId</cite></span>
                     </div>
                 </div>
-                <div class="text-right" style="float:right">
+                <div class="text-right col-lg-4">
                     <IconButton Icon="layers" ToolTip="Versions"></IconButton>
-                    <IconButton Icon="loop-square" ToolTip="Rebuild"></IconButton>
+                    <IconButton Icon="loop-square" ToolTip="Rebuild" Click="@(async ()=> await RebuildAsync(Projection))"></IconButton>
                 </div>
+            </div>
 
-            </div>
         </div>
     </div>
-}
-else
-{
-    <div>
-        <div class="card bg-primary text-white">
-            <div class="card-header">
-                <h5>@Projection.projectionName</h5>
-            </div>
-            <div class="card-body">
-                <cite>@Projection.projectionContractId</cite>
-            </div>
-        </div>
-    </div>
-}
+</div>
 
 @functions{
 
     [Parameter]
     protected Projection Projection { get; set; }
+
+    [Parameter]
+    protected Connection Connection { get; set; }
+
+    Task RebuildAsync(Projection projection)
+    {
+        return Cronus.RebuildAsync(Connection, Projection);
+    }
 }

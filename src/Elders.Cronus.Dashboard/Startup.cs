@@ -1,5 +1,6 @@
 using Blazor.Extensions.Logging;
 using Blazor.Extensions.Storage;
+using Elders.Cronus.Dashboard.Models;
 using Microsoft.AspNetCore.Blazor.Builder;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Logging;
@@ -16,6 +17,7 @@ namespace Elders.Cronus.Dashboard
                 .SetMinimumLevel(LogLevel.Debug)
             );
             services.AddStorage();
+            services.AddTransient<CronusClient>();
         }
 
         public void Configure(IBlazorApplicationBuilder app)

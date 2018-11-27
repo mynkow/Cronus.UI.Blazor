@@ -28,6 +28,9 @@
     <Content Update="Pages\ConnectionNew.cshtml">
       <Pack>$(IncludeRazorContentInPack)</Pack>
     </Content>
+    <Content Update="Pages\ProjectionVersionBadge.cshtml">
+      <Pack>$(IncludeRazorContentInPack)</Pack>
+    </Content>
     <Content Update="Pages\Projections.cshtml">
       <Pack>$(IncludeRazorContentInPack)</Pack>
     </Content>

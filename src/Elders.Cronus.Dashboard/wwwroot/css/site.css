@@ -121,6 +121,16 @@ app {
         display: block;
     }
 
+    /*Custom styles*/
+
+    .projection-card {
+        margin-bottom: 30px;
+    }
+
+    .legend {
+        margin: 30px;
+    }
+
     .cursor-pointer {
         cursor: pointer;
     }
