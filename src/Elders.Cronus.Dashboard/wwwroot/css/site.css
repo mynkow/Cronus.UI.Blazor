@@ -120,4 +120,20 @@ app {
         /* Never collapse the sidebar for wide screens */
         display: block;
     }
+
+    .cursor-pointer {
+        cursor: pointer;
+    }
+
+    .cursor-croshair {
+        cursor: crosshair;
+    }
+
+    .cursor-eresize {
+        cursor: e-resize;
+    }
+
+    .cursor-move {
+        cursor: move;
+    }
 }

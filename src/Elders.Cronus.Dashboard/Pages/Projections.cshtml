@@ -1,0 +1,43 @@
+﻿@inject HttpClient HttpClient
+@inject ILogger<HttpClient> Log
+
+<button type="button" class="btn btn-primary" onclick="@(async ()=> await GetProjectionsList())">Refresh</button>
+
+<div>
+    <span class="badge badge-success">Live</span>
+    <span class="badge badge-primary">Building</span>
+    <span class="badge badge-secondary">NotPresent</span>
+    <span class="badge badge-danger">Timedout</span>
+    <span class="badge badge-dark">Canceled</span>
+</div>
+
+<div class="row">
+    @foreach (var projection in projections)
+    {
+        <ProjectionCard Projection="@projection"></ProjectionCard>
+    }
+</div>
+
+@functions{
+
+    [Parameter]
+    protected Connection Connection { get; set; }
+
+    List<Projection> projections = new List<Projection>();
+
+    int index = 0;
+
+    protected async Task GetProjectionsList()
+    {
+        index = 1;
+        Log.LogDebug("GetProjectionsList()");
+
+        var asd = new CronusClient(Connection, HttpClient, Log);
+        var result = await asd.GetProjections();
+
+        Log.LogDebug($"Projections found: {result.Result.Projections.Count}");
+
+        projections = result.Result.Projections;
+    }
+
+}

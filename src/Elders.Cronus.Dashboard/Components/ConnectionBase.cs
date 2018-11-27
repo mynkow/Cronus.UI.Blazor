@@ -99,14 +99,8 @@ namespace Elders.Cronus.Dashboard.Components
         {
             Log.LogDebug("GetToken()");
 
-            HttpRequestMessage getTokenRequest = new HttpRequestMessage(HttpMethod.Post, connection.oAuth.ServerEndpoint);
-            getTokenRequest.Headers.Authorization = new System.Net.Http.Headers.AuthenticationHeaderValue("basic", Convert.ToBase64String(Encoding.UTF8.GetBytes($"{connection.oAuth.Client}:{connection.oAuth.Secret}")));
-            Dictionary<string, string> parameters = new Dictionary<string, string>();
-            parameters.Add("grant_type", "client_credentials");
-            parameters.Add("scope", "read");
-            getTokenRequest.Content = new FormUrlEncodedContent(parameters);
-            var disco = await HttpClient.SendAsync(getTokenRequest);
-            var result = await disco.Content.ReadAsStringAsync();
+            var result = await connection.oAuth.GetAccessTokenAsync(HttpClient);
+
             Log.LogDebug(result);
         }
 
