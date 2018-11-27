@@ -31,7 +31,7 @@
     <Content Update="Pages\ConnectionNew.cshtml">
       <Pack>$(IncludeRazorContentInPack)</Pack>
     </Content>
-    <Content Update="Components\Projections\Projections.cshtml">
+    <Content Update="Components\Projections\ProjectionsList.cshtml">
       <Pack>$(IncludeRazorContentInPack)</Pack>
     </Content>
     <Content Update="Components\Projections\ProjectionVersionBadge.cshtml">
