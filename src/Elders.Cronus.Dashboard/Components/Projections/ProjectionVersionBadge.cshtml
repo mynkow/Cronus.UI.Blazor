@@ -1,28 +1,28 @@
 ﻿
 @if (LiveVersion is null == false)
 {
-    <span class="badge badge-success">@ProjectionStatus.Live</span>
+    <span class="badge badge-success">@GetDisplayName(LiveVersion)</span>
 }
 
 @if (Version.Status == ProjectionStatus.Live && LiveVersion.Revision != Version.Revision)
 {
-    <span class="badge badge-success">@ProjectionStatus.Live</span>
+    <span class="badge badge-success">@GetDisplayName(Version)</span>
 }
 else if (Version.Status == ProjectionStatus.Building)
 {
-    <span class="badge badge-primary">@ProjectionStatus.Building</span>
+    <span class="badge badge-primary">@GetDisplayName(Version)</span>
 }
 else if (Version.Status == ProjectionStatus.NotPresent)
 {
-    <span class="badge badge-secondary">@ProjectionStatus.NotPresent</span>
+    <span class="badge badge-secondary">@GetDisplayName(Version)</span>
 }
 else if (Version.Status == ProjectionStatus.Timedout)
 {
-    <span class="badge badge-danger">@ProjectionStatus.Timedout</span>
+    <span class="badge badge-danger">@GetDisplayName(Version)</span>
 }
 else if (Version.Status == ProjectionStatus.Canceled)
 {
-    <span class="badge badge-dark">@ProjectionStatus.Canceled</span>
+    <span class="badge badge-dark">@GetDisplayName(Version)</span>
 }
 
 @functions{
@@ -32,4 +32,9 @@ else if (Version.Status == ProjectionStatus.Canceled)
 
     [Parameter]
     protected ProjectionVersion LiveVersion { get; set; }
+
+    string GetDisplayName(ProjectionVersion version)
+    {
+        return version.ToString();
+    }
 }

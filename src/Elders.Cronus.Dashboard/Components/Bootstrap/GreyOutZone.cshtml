@@ -1,0 +1,19 @@
+﻿<div class=@(IsGreyedOut ? "greyout" : null)>
+    <div class="cover"></div>
+
+    @ChildContent
+</div>
+
+@functions{
+    [Parameter] RenderFragment ChildContent { get; set; }
+
+    [Parameter] bool IsGreyedOut { get; set; }
+}
+
+
+@*<div id="results-area">
+        <GreyOutZone IsGreyedOut=state.SearchInProgress>
+            <SearchResults Itineraries=state.SearchResults
+                           OnAddItinerary=state.AddToShortlist />
+        </GreyOutZone>
+    </div>*@

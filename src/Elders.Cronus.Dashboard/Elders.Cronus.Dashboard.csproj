@@ -19,6 +19,9 @@
   </ItemGroup>
 
   <ItemGroup>
+    <Content Update="Components\Bootstrap\GreyOutZone.cshtml">
+      <Pack>$(IncludeRazorContentInPack)</Pack>
+    </Content>
     <Content Update="Components\Bootstrap\IconButton.cshtml">
       <Pack>$(IncludeRazorContentInPack)</Pack>
     </Content>
@@ -28,13 +31,13 @@
     <Content Update="Pages\ConnectionNew.cshtml">
       <Pack>$(IncludeRazorContentInPack)</Pack>
     </Content>
-    <Content Update="Pages\ProjectionVersionBadge.cshtml">
+    <Content Update="Components\Projections\Projections.cshtml">
       <Pack>$(IncludeRazorContentInPack)</Pack>
     </Content>
-    <Content Update="Pages\Projections.cshtml">
+    <Content Update="Components\Projections\ProjectionVersionBadge.cshtml">
       <Pack>$(IncludeRazorContentInPack)</Pack>
     </Content>
-    <Content Update="Pages\ProjectionCard.cshtml">
+    <Content Update="Components\Projections\ProjectionCard.cshtml">
       <Pack>$(IncludeRazorContentInPack)</Pack>
     </Content>
   </ItemGroup>

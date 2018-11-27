@@ -1,6 +1,4 @@
-﻿using System.Collections.Generic;
-using System.Linq;
-using System.Net.Http;
+﻿using System.Net.Http;
 using System.Text;
 using System.Threading.Tasks;
 using Microsoft.Extensions.Logging;
@@ -77,56 +75,5 @@ namespace Elders.Cronus.Dashboard.Models
         public string Errors { get; set; }
 
         public bool IsSuccess { get; set; }
-    }
-
-    public class ProjectionsResult
-    {
-        public ProjectionsResult()
-        {
-            Projections = new List<Projection>();
-        }
-
-        public List<Projection> Projections { get; set; }
-    }
-
-    public class Projection
-    {
-        public Projection()
-        {
-            Versions = new List<ProjectionVersion>();
-        }
-
-        public string ProjectionContractId { get; set; }
-
-        public string ProjectionName { get; set; }
-
-        public List<ProjectionVersion> Versions { get; set; }
-
-        public ProjectionVersion LiveVersion => Versions.Where(x => x.Status.Equals(ProjectionStatus.Live)).SingleOrDefault();
-
-        public ProjectionVersion LatestVersion => Versions.OrderByDescending(x => x.Revision).First();
-    }
-
-    public class ProjectionVersion
-    {
-        public string Hash { get; set; }
-
-        public int Revision { get; set; }
-
-        public string Status { get; set; }
-
-        public override string ToString()
-        {
-            return $"{Status}-{Hash}-{Revision}";
-        }
-    }
-
-    public class ProjectionStatus
-    {
-        public const string Live = "live";
-        public const string Building = "building";
-        public const string NotPresent = "not_present";
-        public const string Timedout = "timedout";
-        public const string Canceled = "canceled";
     }
 }

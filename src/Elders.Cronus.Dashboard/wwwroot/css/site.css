@@ -131,6 +131,17 @@ app {
         margin: 30px;
     }
 
+    .bounding-box {
+        background-image: url(https://raw.githubusercontent.com/Elders/logo/master/cronus/black.png);
+        background-repeat: no-repeat;
+        background-size: contain;
+        position: absolute;
+        background-position: center;
+        background-repeat: no-repeat;
+        height: 100%;
+        width: 100%;
+    }
+
     .cursor-pointer {
         cursor: pointer;
     }
