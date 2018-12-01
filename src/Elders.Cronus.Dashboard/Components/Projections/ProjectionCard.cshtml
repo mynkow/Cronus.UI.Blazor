@@ -1,23 +1,22 @@
-﻿@inject CronusClient Cronus
+﻿@inject AppState App
+@inject CronusClient Cronus
 
-<div class="col-sm-4 projection-card" style="min-width:30rem">
-    <div class="card">
-        <div class="card-header">
-            <div class="row">
-                <div class="text-left col-lg-8">
-                    <ProjectionVersionBadge Version="@Projection.LatestVersion" LiveVersion="@Projection.LiveVersion"></ProjectionVersionBadge>
-                    <span>@Projection.ProjectionName</span>
-                    <div>
-                        <span style="font-size:small"><cite>@Projection.ProjectionContractId</cite></span>
-                    </div>
-                </div>
-                <div class="text-right col-lg-4">
-                    <IconButton Icon="layers" ToolTip="Versions"></IconButton>
-                    <IconButton Icon="loop-square" ToolTip="Rebuild" Click="@(async ()=> await RebuildAsync(Projection))"></IconButton>
+<div class="card">
+    <div class="card-header">
+        <div class="row">
+            <div class="text-left col-lg-8">
+                <ProjectionVersionBadge Version="@Projection.LatestVersion" LiveVersion="@Projection.LiveVersion"></ProjectionVersionBadge>
+                <span>@Projection.ProjectionName</span>
+                <div>
+                    <span style="font-size:small"><cite>@Projection.ProjectionContractId</cite></span>
                 </div>
             </div>
-
+            <div class="text-right col-lg-4">
+                <IconButton Icon="layers" ToolTip="Versions"></IconButton>
+                <IconButton Icon="loop-square" ToolTip="Rebuild" Click="@(async ()=> await RebuildAsync(Projection))"></IconButton>
+            </div>
         </div>
+
     </div>
 </div>
 
@@ -26,11 +25,13 @@
     [Parameter]
     protected Projection Projection { get; set; }
 
-    [Parameter]
-    protected Connection Connection { get; set; }
+    protected override void OnInit()
+    {
+        App.OnChange += StateHasChanged;
+    }
 
     Task RebuildAsync(Projection projection)
     {
-        return Cronus.RebuildAsync(Connection, Projection);
+        return Cronus.RebuildAsync(App.Connection, Projection);
     }
 }

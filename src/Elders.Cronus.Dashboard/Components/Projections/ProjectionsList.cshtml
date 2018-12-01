@@ -1,34 +1,50 @@
-﻿@inject CronusClient Cronus
+﻿@inject AppState App
+@inject CronusClient Cronus
 
-<button type="button" class="btn btn-primary" onclick="@(async ()=> await GetProjectionsList())">Refresh</button>
+<GreyOutZone IsGreyedOut=isLoading>
+    <div hidden="@(projections?.Count == 0)" class="top-row px-4">
+        <div class="px-4">
+            <input class="input-text" value="Filter" />
+        </div>
+        <div class="px-4">
+            <span class="badge badge-success">Live</span>
+            <span class="badge badge-primary">Building</span>
+            <span class="badge badge-secondary">NotPresent</span>
+            <span class="badge badge-danger">Timedout</span>
+            <span class="badge badge-dark">Canceled</span>
+        </div>
+    </div>
 
-<div class="legend">
-    <span class="badge badge-success">Live</span>
-    <span class="badge badge-primary">Building</span>
-    <span class="badge badge-secondary">NotPresent</span>
-    <span class="badge badge-danger">Timedout</span>
-    <span class="badge badge-dark">Canceled</span>
-</div>
-
-<div class="row">
-    @foreach (var projection in projections)
-    {
-        <ProjectionCard Projection="@projection" Connection="@Connection"></ProjectionCard>
-    }
-</div>
+    <div class="row">
+        @foreach (var projection in projections)
+        {
+            <div class="col-sm-4 mt-4">
+                <ProjectionCard Projection="@projection"></ProjectionCard>
+            </div>
+        }
+    </div>
+</GreyOutZone>
 
 @functions{
-
-    [Parameter]
-    protected Connection Connection { get; set; }
-
+    bool isLoading = false;
     List<Projection> projections = new List<Projection>();
 
-    protected async Task GetProjectionsList()
+    protected override void OnInit()
     {
-        var result = await Cronus.GetProjectionsAsync(Connection);
-
-        projections = result.Result.Projections;
+        App.OnChange += StateHasChanged;
+        App.OnConnectionChanged += GetProjectionsList;
     }
 
+    protected async Task GetProjectionsList(Connection connection)
+    {
+        if (connection is null == false)
+        {
+            isLoading = true;
+            var result = await Cronus.GetProjectionsAsync(@App.Connection);
+            projections = result.Result.Projections;
+            isLoading = false;
+
+            StateHasChanged();
+        }
+    }
 }
