@@ -1,6 +1,5 @@
 ﻿@inject AppState App
 @inject LocalStorage LocalStorage
-@inject ILogger<ConnectionSelector> log
 
 <div class="btn-group connection">
     <button type="button" class="btn btn-primary w-75">@connectionName</button>
@@ -17,6 +16,8 @@
 
 @functions{
 
+    string connectionName => App.Connection?.Name ?? "Select Connection...";
+
     List<Connection> connections = new List<Connection>();
 
     protected override async Task OnInitAsync()
@@ -28,10 +29,7 @@
     {
         App.Connect(connection);
         StateHasChanged();
-        log.LogInformation("StateHasChanged");
+
         return Task.CompletedTask;
     }
-
-    string connectionName => App.Connection?.Name ?? "Select Connection...";
-
 }

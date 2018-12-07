@@ -1,4 +1,6 @@
 ﻿@page "/eventstore"
+@inject AppState App
+@inject CronusClient Cronus
 
 <div>
     <h1>
@@ -6,3 +8,17 @@
         Event Store
     </h1>
 </div>
+
+<input type="text" bind="@aggregateId" />
+<IconButton Icon="magnifying-glass" Click="@(async ()=> await GetAggregateAsync())"></IconButton>
+
+
+@functions{
+    string aggregateId = "";
+
+    async Task GetAggregateAsync()
+    {
+        var asd = await Cronus.GetAggregate(App.Connection, aggregateId);
+    }
+
+}

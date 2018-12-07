@@ -18,6 +18,7 @@ namespace Elders.Cronus.Dashboard
             );
             services.AddStorage();
             services.AddTransient<CronusClient>();
+            services.AddTransient<TokenClient>();
             services.AddSingleton<AppState>();
         }
 

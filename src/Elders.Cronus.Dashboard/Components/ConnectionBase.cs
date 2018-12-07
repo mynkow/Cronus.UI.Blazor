@@ -2,7 +2,6 @@
 using System.Collections.Generic;
 using System.Linq;
 using System.Net.Http;
-using System.Text;
 using System.Threading.Tasks;
 using Blazor.Extensions.Storage;
 using Elders.Cronus.Dashboard.Models;
@@ -18,6 +17,9 @@ namespace Elders.Cronus.Dashboard.Components
 
         [Inject]
         protected LocalStorage LocalStorage { get; set; }
+
+        [Inject]
+        protected TokenClient Token { get; set; }
 
         [Inject]
         protected HttpClient HttpClient { get; set; }
@@ -54,7 +56,7 @@ namespace Elders.Cronus.Dashboard.Components
                 connection = connections.Where(conn => conn.Name.Equals(Name, StringComparison.OrdinalIgnoreCase)).SingleOrDefault();
 
                 Name = connection.Name;
-                CronusEndpoint = connection.CronusEndpiont;
+                CronusEndpoint = connection.CronusEndpoint;
                 oAuthEndpoint = connection.oAuth.ServerEndpoint;
                 oAuthClient = connection.oAuth.Client;
                 oAuthSecret = connection.oAuth.Secret;
@@ -65,10 +67,15 @@ namespace Elders.Cronus.Dashboard.Components
 
         protected async Task EditConnection()
         {
-            connections.Remove(connection);
-            var newConnection = GetConnection();
-            connections.Add(newConnection);
-            await LocalStorage.SetItem<List<Connection>>(LSKey.Connections, connections);
+            if (connections.Remove(connection))
+            {
+                var newConnection = GetConnection();
+                connections.Add(newConnection);
+                await LocalStorage.SetItem<List<Connection>>(LSKey.Connections, connections);
+                connection = newConnection;
+            }
+
+            StateHasChanged();
         }
 
         protected async Task AddConnection()
@@ -78,6 +85,8 @@ namespace Elders.Cronus.Dashboard.Components
             var newConnection = GetConnection();
             connections.Add(newConnection);
             await LocalStorage.SetItem<List<Connection>>(LSKey.Connections, connections);
+
+            StateHasChanged();
         }
 
         Connection GetConnection()
@@ -85,7 +94,7 @@ namespace Elders.Cronus.Dashboard.Components
             return new Connection()
             {
                 Name = Name,
-                CronusEndpiont = CronusEndpoint,
+                CronusEndpoint = CronusEndpoint,
                 oAuth = new oAuth()
                 {
                     ServerEndpoint = oAuthEndpoint,
@@ -99,7 +108,7 @@ namespace Elders.Cronus.Dashboard.Components
         {
             Log.LogDebug("GetToken()");
 
-            var result = await connection.oAuth.GetAccessTokenAsync(HttpClient);
+            var result = await Token.GetAccessTokenAsync(connection);
 
             Log.LogDebug(result);
         }

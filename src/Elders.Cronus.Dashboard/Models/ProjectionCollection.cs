@@ -2,9 +2,9 @@
 
 namespace Elders.Cronus.Dashboard.Models
 {
-    public class ProjectionsResult
+    public class ProjectionCollection
     {
-        public ProjectionsResult()
+        public ProjectionCollection()
         {
             Projections = new List<Projection>();
         }
