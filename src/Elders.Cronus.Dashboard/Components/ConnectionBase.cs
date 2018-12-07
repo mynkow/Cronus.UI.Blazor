@@ -71,7 +71,7 @@ namespace Elders.Cronus.Dashboard.Components
             {
                 var newConnection = GetConnection();
                 connections.Add(newConnection);
-                await LocalStorage.SetItem<List<Connection>>(LSKey.Connections, connections);
+                await LocalStorage.SetItem(LSKey.Connections, connections);
                 connection = newConnection;
             }
 
@@ -84,7 +84,7 @@ namespace Elders.Cronus.Dashboard.Components
 
             var newConnection = GetConnection();
             connections.Add(newConnection);
-            await LocalStorage.SetItem<List<Connection>>(LSKey.Connections, connections);
+            await LocalStorage.SetItem(LSKey.Connections, connections);
 
             StateHasChanged();
         }
