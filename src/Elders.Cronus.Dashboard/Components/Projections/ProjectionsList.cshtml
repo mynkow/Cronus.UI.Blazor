@@ -29,10 +29,13 @@
     bool isLoading = false;
     List<Projection> projections = new List<Projection>();
 
-    protected override void OnInit()
+    protected override Task OnInitAsync()
     {
         App.OnChange += StateHasChanged;
         App.OnConnectionChanged += GetProjectionsList;
+
+        return GetProjectionsList(App.Connection);
+
     }
 
     protected async Task GetProjectionsList(Connection connection)
