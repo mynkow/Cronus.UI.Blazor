@@ -4,6 +4,7 @@ using Elders.Cronus.Dashboard.Models;
 using Microsoft.AspNetCore.Blazor.Builder;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Logging;
+using Toolbelt.Blazor.Extensions.DependencyInjection;
 
 namespace Elders.Cronus.Dashboard
 {
@@ -16,6 +17,7 @@ namespace Elders.Cronus.Dashboard
                 .AddBrowserConsole() // Add Blazor.Extensions.Logging.BrowserConsoleLogger
                 .SetMinimumLevel(LogLevel.Debug)
             );
+            services.AddLoadingBar();
             services.AddStorage();
             services.AddTransient<CronusClient>();
             services.AddTransient<TokenClient>();
@@ -25,6 +27,7 @@ namespace Elders.Cronus.Dashboard
         public void Configure(IBlazorApplicationBuilder app)
         {
             app.AddComponent<App>("app");
+            app.UseLoadingBar();
         }
     }
 }
