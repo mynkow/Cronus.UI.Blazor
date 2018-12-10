@@ -78,9 +78,6 @@ namespace Elders.Cronus.Dashboard.Models
             log.LogDebug(result);
             var obj = Json.Deserialize<Response<AggregateDto>>(result);
 
-            log.LogDebug(obj.IsSuccess.ToString());
-            log.LogDebug(obj.Result.BoundedContext);
-
             return obj.Result;
         }
     }
