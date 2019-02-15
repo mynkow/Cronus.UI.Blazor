@@ -12,7 +12,6 @@ namespace Elders.Cronus.Dashboard
     {
         public void ConfigureServices(IServiceCollection services)
         {
-
             services.AddLogging(builder => builder
                 .AddBrowserConsole() // Add Blazor.Extensions.Logging.BrowserConsoleLogger
                 .SetMinimumLevel(LogLevel.Debug)

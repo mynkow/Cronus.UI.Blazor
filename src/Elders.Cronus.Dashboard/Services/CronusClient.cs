@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Net.Http;
+using System.Net.Security;
 using System.Text;
 using System.Threading.Tasks;
 using Microsoft.Extensions.Logging;
@@ -77,9 +78,6 @@ namespace Elders.Cronus.Dashboard.Models
             var result = await response.Content.ReadAsStringAsync();
             log.LogDebug(result);
             var obj = Json.Deserialize<Response<AggregateDto>>(result);
-
-            log.LogDebug(obj.IsSuccess.ToString());
-            log.LogDebug(obj.Result.BoundedContext);
 
             return obj.Result;
         }
