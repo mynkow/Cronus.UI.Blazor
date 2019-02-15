@@ -205,4 +205,22 @@ app {
         position: -webkit-sticky; /* Safari */
         position: sticky;
     }
+
+    .event-list-item {
+    }
+
+    event-list {
+    }
+
+    ul.event-list li:hover {
+        background-color: #f8f9fa;
+    }
+
+    ul.event-list li:active {
+        background-color: #e9ecef;
+    }
+
+    ul.event-list li.selected {
+        background-color: #e9ecef;
+    }
 }

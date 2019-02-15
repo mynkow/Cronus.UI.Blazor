@@ -11,10 +11,10 @@
     <div class="col-lg-3">
         @foreach (var commit in commits)
         {
-            <ul class="list-group list-group-flush">
+            <ul class="list-group list-group-flush event-list">
                 @foreach (var evnt in commit.Events)
                 {
-                    <li class="list-group-item cursor-pointer" onclick="@(async ()=> await GetDetails(evnt))">
+                    <li class="list-group-item cursor-pointer event-list-item" onclick="@(async ()=> await GetDetails(evnt))">
                         <div class="row">
                             <div class="col-lg-5">
                                 <span style="font-size:smaller;">@commit.Timestamp.ToString("MMM d'th' yyyy, hh:mm:ss.fff")</span>
@@ -33,15 +33,13 @@
     </div>
     <div class="col-lg-9">
         <div class="json-box">
-            <pre>
-                @details
-            </pre>
+            <pre>@details</pre>
         </div>
     </div>
 </div>
 
 @functions{
-    string aggregateId = "dXJuOnBydXZpdDpwcm9qZWN0aW9ubWFuYWdlcjphZDc1NWQ3OC00ZWNiLTQ5MzAtODM3ZS0xNjBlZmZiZmVlMTQ=";
+    string aggregateId = "dXJuOnBydXZpdDpwcm9qZWN0aW9ubWFuYWdlcjoyNmZmMzBkYS1iZjBkLTRiM2ItODc0Zi1lMzA1ZDU4NzA3NDE=";
     List<AggregateCommitDto> commits = new List<AggregateCommitDto>();
     string details = string.Empty;
 
