@@ -1,0 +1,66 @@
+﻿@inject AppState App
+@inject CronusClient Cronus
+
+@if (Projection is null)
+{
+    <span>Please select a connection...</span>
+}
+else
+{
+    <div class="pin">
+        <ProjectionCard Projection="@Projection"></ProjectionCard>
+        <input type="text" bind="@projectionId" style="width:1000px" />
+        <IconButton Icon="magnifying-glass" Click="@(async ()=> await GetProjectionAsync())"></IconButton>
+    </div>
+
+    <div>
+        <div class="json-box">
+            <pre>@state</pre>
+        </div>
+    </div>
+}
+
+@functions{
+
+    [Parameter]
+    protected string Name { get; set; }
+
+    Projection Projection;
+
+    List<Projection> projections = new List<Projection>();
+
+    string projectionId = "dXJuOnBydXZpdDpub3RpZmljYXRpb24tc2V0dGluZ3M6NzYyNzQ=";
+    string state = "";
+    string details = string.Empty;
+
+    protected override Task OnInitAsync()
+    {
+        App.OnChange += StateHasChanged;
+        App.OnConnectionChanged += GetProjectionsList;
+
+        return GetProjectionsList(App.Connection);
+    }
+
+    protected async Task GetProjectionsList(Connection connection)
+    {
+        if (connection is null == false)
+        {
+            var result = await Cronus.GetProjectionsAsync(@App.Connection);
+            projections = result.Result.Projections;
+
+            Projection = projections.Where(x => x.ProjectionContractId == Name).SingleOrDefault();
+
+            StateHasChanged();
+        }
+    }
+
+    async Task GetProjectionAsync()
+    {
+        ProjectionStateDto projection = await Cronus.GetProjectionAsync(App.Connection, Projection.ProjectionContractId, projectionId);
+        if (projection is null == false && projection.State is null == false)
+        {
+            state = await JSRuntime.Current.InvokeAsync<string>("JSON.stringify", projection.State, null, 4);
+            StateHasChanged();
+        }
+    }
+}

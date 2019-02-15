@@ -1,23 +1,26 @@
 ﻿@inject AppState App
 @inject CronusClient Cronus
 
-<div class="card">
-    <div class="card-header">
-        <div class="row">
-            <div class="text-left col-lg-8">
-                <ProjectionVersionBadge Version="@Projection.LatestVersion" LiveVersion="@Projection.LiveVersion"></ProjectionVersionBadge>
-                <span>@Projection.ProjectionName</span>
-                <div>
-                    <span style="font-size:small"><cite>@Projection.ProjectionContractId</cite></span>
+@if (Projection is null == false)
+{
+    <div class="card">
+        <div class="card-header">
+            <div class="row">
+                <div class="text-left col-lg-8">
+                    <ProjectionVersionBadge Version="@Projection.LatestVersion" LiveVersion="@Projection.LiveVersion"></ProjectionVersionBadge>
+                    <span>@Projection.ProjectionName</span>
+                    <div>
+                        <span style="font-size:small"><cite>@Projection.ProjectionContractId</cite></span>
+                    </div>
                 </div>
-            </div>
-            <div class="text-right col-lg-4">
-                <IconButton Icon="layers" ToolTip="Versions"></IconButton>
-                <IconButton Icon="loop-square" ToolTip="Rebuild" Click="@(async ()=> await RebuildAsync(Projection))"></IconButton>
+                <div class="text-right col-lg-4">
+                    <a href="/projections/@Projection.ProjectionContractId"><Icon Identifier="magnifying-glass"></Icon></a>
+                    <IconButton Icon="loop-square" ToolTip="Rebuild" Click="@(async () => await RebuildAsync(Projection))"></IconButton>
+                </div>
             </div>
         </div>
     </div>
-</div>
+}
 
 @functions{
 

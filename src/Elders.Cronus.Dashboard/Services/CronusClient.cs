@@ -81,6 +81,25 @@ namespace Elders.Cronus.Dashboard.Models
 
             return obj.Result;
         }
+
+        public async Task<ProjectionStateDto> GetProjectionAsync(Connection connection, string projectionName, string projectionId)
+        {
+            if (string.IsNullOrEmpty(projectionName)) throw new ArgumentNullException(nameof(projectionName));
+            if (string.IsNullOrEmpty(projectionId)) throw new ArgumentNullException(nameof(projectionId));
+
+            log.LogDebug($"{projectionName}({projectionId})");
+
+            HttpRequestMessage request = new HttpRequestMessage(HttpMethod.Get, connection.CronusEndpoint + $"/Projection/Explore?projectionName={projectionName}&id={projectionId}");
+            var accessToken = await token.GetAccessTokenAsync(connection);
+            request.Headers.Authorization = new System.Net.Http.Headers.AuthenticationHeaderValue("bearer", accessToken);
+
+            var response = await client.SendAsync(request);
+            var result = await response.Content.ReadAsStringAsync();
+            log.LogDebug(result);
+            var obj = Json.Deserialize<Response<ProjectionStateDto>>(result);
+
+            return obj.Result;
+        }
     }
 
     public class AggregateDto
@@ -95,6 +114,12 @@ namespace Elders.Cronus.Dashboard.Models
         public string AggregateId { get; set; }
 
         public List<AggregateCommitDto> Commits { get; set; }
+    }
+
+    public class ProjectionStateDto
+    {
+        public string Name { get; set; }
+        public object State { get; set; }
     }
 
     public class AggregateCommitDto

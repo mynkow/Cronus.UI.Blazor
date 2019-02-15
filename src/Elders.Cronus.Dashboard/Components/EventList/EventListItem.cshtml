@@ -1,52 +1,36 @@
-﻿@*@page "/eventstore"
-    @inject AppState App
+﻿@*@inject AppState App
     @inject CronusClient Cronus
 
-    <div class="pin">
-        <input type="text" bind="@aggregateId" style="width:1000px" />
-        <IconButton Icon="magnifying-glass" Click="@(async ()=> await GetAggregateAsync())"></IconButton>
-    </div>
-
-    <div>
-        <li class="list-group-item cursor-pointer event-list-item @selected" onclick="@(async ()=> await GetDetails(evnt))">
+    <div class="card">
+        <div class="card-header">
             <div class="row">
-                <div class="col-lg-5">
-                    <span style="font-size:smaller;">@commit.Timestamp.ToString("MMM d'th' yyyy, hh:mm:ss.fff")</span>
+                <div class="text-left col-lg-8">
+                    <ProjectionVersionBadge Version="@Projection.LatestVersion" LiveVersion="@Projection.LiveVersion"></ProjectionVersionBadge>
+                    <span>@Projection.ProjectionName</span>
+                    <div>
+                        <span style="font-size:small"><cite>@Projection.ProjectionContractId</cite></span>
+                    </div>
                 </div>
-                <div class="col-lg-7">
-                    <span class="ml-4" style="color:forestgreen">
-                        <Icon Identifier="bookmark" />
-                    </span>
-                    @evnt?.EventName
+                <div class="text-right col-lg-4">
+                    <IconButton Icon="layers" ToolTip="Versions"></IconButton>
+                    <IconButton Icon="loop-square" ToolTip="Rebuild" Click="@(async ()=> await RebuildAsync(Projection))"></IconButton>
                 </div>
             </div>
-        </li>
+        </div>
     </div>
 
     @functions{
-        protected Agg
 
-        string selected = "";
-        string aggregateId = "dXJuOnBydXZpdDpwcm9qZWN0aW9ubWFuYWdlcjphZDc1NWQ3OC00ZWNiLTQ5MzAtODM3ZS0xNjBlZmZiZmVlMTQ=";
-        List<AggregateCommitDto> commits = new List<AggregateCommitDto>();
-        string details = string.Empty;
+        [Parameter]
+        protected Projection Projection { get; set; }
 
-        async Task GetAggregateAsync()
+        protected override void OnInit()
         {
-            AggregateDto ar = await Cronus.GetAggregate(App.Connection, aggregateId);
-            if (ar is null == false && ar.Commits is null == false)
-            {
-                commits = ar.Commits.OrderByDescending(commit => commit.AggregateRootRevision).ToList();
-                StateHasChanged();
-            }
+            App.OnChange += StateHasChanged;
         }
 
-        async Task GetDetails(EventDto eventDto)
+        Task RebuildAsync(Projection projection)
         {
-            details = await JSRuntime.Current.InvokeAsync<string>("JSON.stringify", eventDto.EventData, null, 4);
-            selected = "selected";
-
-            StateHasChanged();
+            return Cronus.RebuildAsync(App.Connection, Projection);
         }
-
     }*@
