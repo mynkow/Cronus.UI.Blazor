@@ -1,7 +1,7 @@
 using Blazor.Extensions.Logging;
 using Blazor.Extensions.Storage;
 using Elders.Cronus.Dashboard.Models;
-using Microsoft.AspNetCore.Blazor.Builder;
+using Microsoft.AspNetCore.Components.Builder;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Logging;
 using Toolbelt.Blazor.Extensions.DependencyInjection;
@@ -23,7 +23,7 @@ namespace Elders.Cronus.Dashboard
             services.AddSingleton<AppState>();
         }
 
-        public void Configure(IBlazorApplicationBuilder app)
+        public void Configure(IComponentsApplicationBuilder app)
         {
             app.AddComponent<App>("app");
             app.UseLoadingBar();

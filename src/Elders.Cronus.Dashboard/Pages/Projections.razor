@@ -1,0 +1,17 @@
+﻿@page "/projections/"
+@page "/projections/{Name}"
+
+@if (string.IsNullOrEmpty(@Name))
+{
+    <Elders.Cronus.Dashboard.Components.Projections.ProjectionsList />
+}
+else
+{
+    <Elders.Cronus.Dashboard.Components.Projections.ProjectionInspect Name="@Name"></Elders.Cronus.Dashboard.Components.Projections.ProjectionInspect>
+}
+
+@code {
+
+    [Parameter]
+    public string Name { get; set; }
+}

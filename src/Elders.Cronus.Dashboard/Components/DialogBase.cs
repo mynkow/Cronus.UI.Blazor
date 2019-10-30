@@ -1,14 +1,14 @@
 ﻿using System;
-using Microsoft.AspNetCore.Blazor.Components;
+using Microsoft.AspNetCore.Components;
 
 namespace Elders.Cronus.Dashboard.Components
 {
-    public class DialogBase : BlazorComponent
+    public class DialogBase : ComponentBase
     {
         private bool isVisible;
 
         [Parameter]
-        protected bool IsVisible
+        public bool IsVisible
         {
             get { return isVisible; }
             set
@@ -22,6 +22,6 @@ namespace Elders.Cronus.Dashboard.Components
         }
 
         [Parameter]
-        protected Action<bool> IsVisibleChanged { get; set; }
+        public Action<bool> IsVisibleChanged { get; set; }
     }
 }

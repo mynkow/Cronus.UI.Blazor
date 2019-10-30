@@ -25,17 +25,16 @@
     </div>
 </GreyOutZone>
 
-@functions{
+@code {
     bool isLoading = false;
     List<Projection> projections = new List<Projection>();
 
-    protected override Task OnInitAsync()
+    protected override Task OnInitializedAsync()
     {
         App.OnChange += StateHasChanged;
         App.OnConnectionChanged += GetProjectionsList;
 
         return GetProjectionsList(App.Connection);
-
     }
 
     protected async Task GetProjectionsList(Connection connection)

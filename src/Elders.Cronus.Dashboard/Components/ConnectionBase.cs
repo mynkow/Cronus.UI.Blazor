@@ -5,12 +5,12 @@ using System.Net.Http;
 using System.Threading.Tasks;
 using Blazor.Extensions.Storage;
 using Elders.Cronus.Dashboard.Models;
-using Microsoft.AspNetCore.Blazor.Components;
+using Microsoft.AspNetCore.Components;
 using Microsoft.Extensions.Logging;
 
 namespace Elders.Cronus.Dashboard.Components
 {
-    public class ConnectionBase : BlazorComponent
+    public class ConnectionBase : ComponentBase
     {
         [Inject]
         protected ILogger<ConnectionBase> Log { get; set; }
@@ -25,21 +25,21 @@ namespace Elders.Cronus.Dashboard.Components
         protected HttpClient HttpClient { get; set; }
 
         [Parameter]
-        protected string Name { get; set; }
+        public string Name { get; set; }
 
         [Parameter]
-        protected string CronusEndpoint { get; set; }
+        public string CronusEndpoint { get; set; }
 
         [Parameter]
-        protected string oAuthEndpoint { get; set; }
+        public string oAuthEndpoint { get; set; }
 
         [Parameter]
-        protected string oAuthClient { get; set; }
+        public string oAuthClient { get; set; }
 
         [Parameter]
-        protected string oAuthSecret { get; set; }
+        public string oAuthSecret { get; set; }
 
-        protected override async Task OnInitAsync()
+        protected override async Task OnInitializedAsync()
         {
             await LoadDataAsync();
         }

@@ -1,8 +1,7 @@
-﻿@page "/connection/{Name}"
+﻿@page "/connection/new"
 @inherits ConnectionBase
-@inject AppState App
 
-<h1>Edit Connection</h1>
+<h1>New Connection</h1>
 
 <fieldset>
     <div><label>Name: <br /> <input type="text" name="friendlyName" bind="@Name" /></label></div>
@@ -15,6 +14,4 @@
     <div><label>Secret <br /> <input type="password" name="oAuthSecret" bind="oAuthSecret" /></label></div>
 </fieldset>
 
-<button class="btn btn-primary" onclick="@GetToken">GetToken</button>
-
-<button class="btn btn-primary" onclick="@EditConnection">Update</button>
+<button class="btn btn-primary" @onclick="@AddConnection">Add Connection</button>

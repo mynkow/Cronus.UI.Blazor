@@ -5,9 +5,9 @@
     @Context.Message
 </Modal>
 
-@functions{
+@code {
     [Parameter]
-    protected ConfirmContext Context { get; set; }
+    public ConfirmContext Context { get; set; }
 
     protected bool OnPrimaryButtonClick()
     {

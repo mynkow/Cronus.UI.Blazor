@@ -1,5 +1,4 @@
-using Microsoft.AspNetCore.Blazor;
-using Microsoft.AspNetCore.Blazor.Components;
+using Microsoft.AspNetCore.Components;
 using Microsoft.Extensions.Logging;
 using Microsoft.JSInterop;
 using System;
@@ -7,47 +6,50 @@ using System.Collections.Generic;
 
 namespace Elders.Cronus.Dashboard.Components.Bootstrap
 {
-    public class ModalBase : BlazorComponent, System.IDisposable
+    public class ModalBase : ComponentBase, System.IDisposable
     {
         [Inject]
         internal ILogger<ModalBase> Log { get; set; }
 
+        [Inject]
+        internal IJSRuntime JSRuntime { get; set; }
+
         public string Id { get; private set; } = "BM" + Guid.NewGuid().ToString().Replace("-", String.Empty);
 
         [Parameter]
-        protected string Title { get; set; }
+        public string Title { get; set; }
 
         [Parameter]
-        protected RenderFragment ChildContent { get; set; }
+        public RenderFragment ChildContent { get; set; }
 
         [Parameter]
-        protected string PrimaryButtonText { get; set; }
+        public string PrimaryButtonText { get; set; }
 
         /// <summary>
         /// Ivoked when user clicks on primary button.
         /// When <c>true</c> is returned, modal is closed.
         /// </summary>
         [Parameter]
-        protected Func<bool> PrimaryButtonClick { get; set; }
+        public Func<bool> PrimaryButtonClick { get; set; }
 
         [Parameter]
-        protected string CloseButtonText { get; set; } = "Close";
+        public string CloseButtonText { get; set; } = "Close";
 
         /// <summary>
         /// Invoken when user clicks on close button.
         /// When <c>true</c> is returned, modal is closed.
         /// </summary>
         [Parameter]
-        protected Func<bool> CloseButtonClick { get; set; }
+        public Func<bool> CloseButtonClick { get; set; }
 
         [Parameter]
-        protected Action<bool> IsVisibleChanged { get; set; }
+        public Action<bool> IsVisibleChanged { get; set; }
 
         private bool isVisible;
         private bool isVisibleChanged;
 
         [Parameter]
-        protected bool IsVisible
+        public bool IsVisible
         {
             get { return isVisible; }
             set
@@ -66,10 +68,10 @@ namespace Elders.Cronus.Dashboard.Components.Bootstrap
         protected string DialogCssClass { get; set; }
 
         [Parameter]
-        protected ModalSize Size { get; set; } = ModalSize.Normal;
+        public ModalSize Size { get; set; } = ModalSize.Normal;
 
         [Parameter]
-        protected Action Closed { get; set; }
+        public Action Closed { get; set; }
 
         protected override void OnParametersSet()
         {
@@ -91,7 +93,7 @@ namespace Elders.Cronus.Dashboard.Components.Bootstrap
             }
         }
 
-        protected void OnPrimaryButtonClick()
+        public void OnPrimaryButtonClick()
         {
             Log.LogDebug("Primary button click raised.");
             if (IsVisible)
@@ -101,7 +103,7 @@ namespace Elders.Cronus.Dashboard.Components.Bootstrap
             }
         }
 
-        protected void OnFormSubmit(UIEventArgs e)
+        protected void OnFormSubmit(EventArgs e)
         {
             Log.LogDebug("Form onsubmit raised.");
             if (IsVisible)
@@ -119,13 +121,14 @@ namespace Elders.Cronus.Dashboard.Components.Bootstrap
                 IsVisible = false;
         }
 
-        protected override void OnAfterRender()
+        protected override void OnAfterRender(bool firstRender)
         {
-            base.OnAfterRender();
+            base.OnAfterRender(firstRender);
+
             Native.AddModal(Id, this);
 
             if (isVisibleChanged)
-                JSRuntime.Current.InvokeAsync<object>("Bootstrap.Modal.Toggle", Id, isVisible);
+                JSRuntime.InvokeAsync<object>("Bootstrap.Modal.Toggle", Id, isVisible);
         }
 
         public void Dispose()
@@ -156,7 +159,7 @@ namespace Elders.Cronus.Dashboard.Components.Bootstrap
         internal static void AddModal(string id, ModalBase component)
         {
             modals[id] = component;
-            JSRuntime.Current.InvokeAsync<object>("Bootstrap.Modal.Register", id);
+            component.JSRuntime.InvokeAsync<object>("Bootstrap.Modal.Register", id);
         }
 
         internal static void RemoveModal(string id)

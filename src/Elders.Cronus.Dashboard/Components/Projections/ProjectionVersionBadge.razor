@@ -25,13 +25,13 @@ else if (Version.Status == ProjectionStatus.Canceled)
     <span class="badge badge-dark">@GetDisplayName(Version)</span>
 }
 
-@functions{
+@code {
 
     [Parameter]
-    protected ProjectionVersion Version { get; set; }
+    public ProjectionVersion Version { get; set; }
 
     [Parameter]
-    protected ProjectionVersion LiveVersion { get; set; }
+    public ProjectionVersion LiveVersion { get; set; }
 
     string GetDisplayName(ProjectionVersion version)
     {

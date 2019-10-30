@@ -2,49 +2,49 @@
 
   <PropertyGroup>
     <TargetFramework>netstandard2.0</TargetFramework>
-    <RunCommand>dotnet</RunCommand>
-    <RunArguments>blazor serve</RunArguments>
-    <LangVersion>7.3</LangVersion>
+    <RazorLangVersion>3.0</RazorLangVersion>
     <RootNamespace>Elders.Cronus.Dashboard</RootNamespace>
   </PropertyGroup>
 
   <ItemGroup>
-    <PackageReference Include="Blazor.Extensions.Logging" Version="0.1.10" />
-    <PackageReference Include="Blazor.Extensions.Storage" Version="0.1.7" />
-    <PackageReference Include="Microsoft.AspNetCore.Blazor" Version="0.7.0" />
-    <PackageReference Include="Microsoft.AspNetCore.Blazor.Browser" Version="0.7.0" />
-    <PackageReference Include="Microsoft.AspNetCore.Blazor.Build" Version="0.7.0" PrivateAssets="all" />
-    <PackageReference Include="Toolbelt.Blazor.LoadingBar" Version="2.1.0" />
+    <PackageReference Include="Microsoft.AspNetCore.Blazor" Version="3.1.0-preview1.19508.20" />
+    <PackageReference Include="Microsoft.AspNetCore.Blazor.Build" Version="3.1.0-preview1.19508.20" PrivateAssets="all" />
+    <PackageReference Include="Microsoft.AspNetCore.Blazor.HttpClient" Version="3.1.0-preview1.19508.20" />
+    <PackageReference Include="Microsoft.AspNetCore.Blazor.DevServer" Version="3.1.0-preview1.19508.20" PrivateAssets="all" />
+    <PackageReference Include="Microsoft.AspNetCore.Components.Web" Version="3.1.0-preview1.19508.20" />
 
-    <DotNetCliToolReference Include="Microsoft.AspNetCore.Blazor.Cli" Version="0.7.0" />
+    <PackageReference Include="Blazor.Extensions.Logging" Version="1.0.0" />
+    <PackageReference Include="Blazor.Extensions.Storage" Version="1.0.0" />
+
+    <PackageReference Include="Toolbelt.Blazor.LoadingBar" Version="7.0.0" />
   </ItemGroup>
 
   <ItemGroup>
-    <Content Update="Components\Bootstrap\GreyOutZone.cshtml">
+    <Content Update="Components\Bootstrap\GreyOutZone.razor">
       <Pack>$(IncludeRazorContentInPack)</Pack>
     </Content>
-    <Content Update="Components\Bootstrap\IconButton.cshtml">
+    <Content Update="Components\Bootstrap\IconButton.razor">
       <Pack>$(IncludeRazorContentInPack)</Pack>
     </Content>
-    <Content Update="Components\ConnectionSelector.cshtml">
+    <Content Update="Components\ConnectionSelector.razor">
       <Pack>$(IncludeRazorContentInPack)</Pack>
     </Content>
-    <Content Update="Pages\ConnectionEdit.cshtml">
+    <Content Update="Pages\ConnectionEdit.razor">
       <Pack>$(IncludeRazorContentInPack)</Pack>
     </Content>
-    <Content Update="Pages\ConnectionNew.cshtml">
+    <Content Update="Pages\ConnectionNew.razor">
       <Pack>$(IncludeRazorContentInPack)</Pack>
     </Content>
-    <Content Update="Components\Projections\ProjectionsList.cshtml">
+    <Content Update="Components\Projections\ProjectionsList.razor">
       <Pack>$(IncludeRazorContentInPack)</Pack>
     </Content>
-    <Content Update="Components\Projections\ProjectionVersionBadge.cshtml">
+    <Content Update="Components\Projections\ProjectionVersionBadge.razor">
       <Pack>$(IncludeRazorContentInPack)</Pack>
     </Content>
-    <Content Update="Components\Projections\ProjectionCard.cshtml">
+    <Content Update="Components\Projections\ProjectionCard.razor">
       <Pack>$(IncludeRazorContentInPack)</Pack>
     </Content>
-    <Content Update="Pages\Projections.cshtml">
+    <Content Update="Pages\Projections.razor">
       <Pack>$(IncludeRazorContentInPack)</Pack>
     </Content>
   </ItemGroup>

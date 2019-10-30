@@ -2,11 +2,11 @@
 using System.Threading.Tasks;
 using Blazor.Extensions.Storage;
 using Elders.Cronus.Dashboard.Models;
-using Microsoft.AspNetCore.Blazor.Components;
+using Microsoft.AspNetCore.Components;
 
 namespace Elders.Cronus.Dashboard.Pages
 {
-    public class ConnectionsBase : BlazorComponent
+    public class ConnectionsBase : ComponentBase
     {
         protected List<Connection> connections;
 
@@ -18,7 +18,7 @@ namespace Elders.Cronus.Dashboard.Pages
             this.connections = new List<Connection>();
         }
 
-        protected override async Task OnInitAsync()
+        protected override async Task OnInitializedAsync()
         {
             connections = await LocalStorage.GetItem<List<Connection>>(LSKey.Connections);
         }

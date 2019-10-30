@@ -4,10 +4,12 @@
     @ChildContent
 </div>
 
-@functions{
-    [Parameter] RenderFragment ChildContent { get; set; }
+@code {
+    [Parameter]
+    public RenderFragment ChildContent { get; set; }
 
-    [Parameter] bool IsGreyedOut { get; set; }
+    [Parameter]
+    public bool IsGreyedOut { get; set; }
 }
 
 

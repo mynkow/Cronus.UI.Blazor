@@ -22,17 +22,19 @@
     </div>
 }
 
-@functions{
+@code {
 
     [Parameter]
-    protected Projection Projection { get; set; }
+    public Projection Projection { get; set; }
 
-    protected override void OnInit()
+    protected override async Task OnInitializedAsync()
     {
+        await base.OnInitializedAsync();
+
         App.OnChange += StateHasChanged;
     }
 
-    Task RebuildAsync(Projection projection)
+    public Task RebuildAsync(Projection projection)
     {
         return Cronus.RebuildAsync(App.Connection, Projection);
     }

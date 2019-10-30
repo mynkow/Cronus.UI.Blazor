@@ -2,13 +2,13 @@
     <Icon Identifier="@Icon" />
 </button>
 
-@functions{
+@code {
     [Parameter]
-    protected string Icon { get; set; }
+    public string Icon { get; set; }
 
     [Parameter]
-    protected string ToolTip { get; set; }
+    public string ToolTip { get; set; }
 
     [Parameter]
-    protected Action Click { get; set; }
+    public Action Click { get; set; }
 }

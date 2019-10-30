@@ -9,23 +9,23 @@
     <div class="dropdown-menu" aria-labelledby="dropdownMenuButton">
         @foreach (var connection in connections)
         {
-            <span class="dropdown-item cursor-pointer" onclick="@(async ()=> await OnClick(connection))">@connection.Name</span>
+            <span class="dropdown-item cursor-pointer" onclick="@OnClick(connection)">@connection.Name</span>
         }
     </div>
 </div>
 
-@functions{
+@code {
 
     string connectionName => App.Connection?.Name ?? "Select Connection...";
 
     List<Connection> connections = new List<Connection>();
 
-    protected override async Task OnInitAsync()
+    protected override async Task OnInitializedAsync()
     {
         connections = await LocalStorage.GetItem<List<Connection>>(LSKey.Connections);
     }
 
-    Task OnClick(Connection connection)
+    protected Task OnClick(Connection connection)
     {
         App.Connect(connection);
         StateHasChanged();

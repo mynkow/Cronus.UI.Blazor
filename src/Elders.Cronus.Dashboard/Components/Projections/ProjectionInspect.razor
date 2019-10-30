@@ -1,5 +1,6 @@
 ﻿@inject AppState App
 @inject CronusClient Cronus
+@inject IJSRuntime JSRuntime
 
 @if (Projection is null)
 {
@@ -20,10 +21,10 @@ else
     </div>
 }
 
-@functions{
+@code {
 
     [Parameter]
-    protected string Name { get; set; }
+    public string Name { get; set; }
 
     Projection Projection;
 
@@ -33,7 +34,7 @@ else
     string state = "";
     string details = string.Empty;
 
-    protected override Task OnInitAsync()
+    protected override Task OnInitializedAsync()
     {
         App.OnChange += StateHasChanged;
         App.OnConnectionChanged += GetProjectionsList;
@@ -59,7 +60,7 @@ else
         ProjectionStateDto projection = await Cronus.GetProjectionAsync(App.Connection, Projection.ProjectionContractId, projectionId);
         if (projection is null == false && projection.State is null == false)
         {
-            state = await JSRuntime.Current.InvokeAsync<string>("JSON.stringify", projection.State, null, 4);
+            state = await JSRuntime.InvokeAsync<string>("JSON.stringify", projection.State, null, 4);
             StateHasChanged();
         }
     }

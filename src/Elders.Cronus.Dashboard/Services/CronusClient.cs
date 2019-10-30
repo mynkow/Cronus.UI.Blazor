@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Net.Http;
 using System.Net.Security;
 using System.Text;
+using System.Text.Json;
 using System.Threading.Tasks;
 using Microsoft.Extensions.Logging;
 using Microsoft.JSInterop;
@@ -31,7 +32,7 @@ namespace Elders.Cronus.Dashboard.Models
             var response = await client.SendAsync(request);
             var result = await response.Content.ReadAsStringAsync();
             log.LogDebug(result);
-            var obj = Json.Deserialize<Response<ProjectionCollection>>(result);
+            var obj = JsonSerializer.Deserialize<Response<ProjectionCollection>>(result);
 
             foreach (var projection in obj.Result.Projections)
             {
@@ -56,7 +57,7 @@ namespace Elders.Cronus.Dashboard.Models
                 Hash = projection.LatestVersion.Hash
             };
 
-            request.Content = new StringContent(Json.Serialize(rebuildRequest), Encoding.UTF8, "application/json");
+            request.Content = new StringContent(JsonSerializer.Serialize(rebuildRequest), Encoding.UTF8, "application/json");
 
             var response = await client.SendAsync(request);
             var result = await response.Content.ReadAsStringAsync();
@@ -77,7 +78,7 @@ namespace Elders.Cronus.Dashboard.Models
             var response = await client.SendAsync(request);
             var result = await response.Content.ReadAsStringAsync();
             log.LogDebug(result);
-            var obj = Json.Deserialize<Response<AggregateDto>>(result);
+            var obj = JsonSerializer.Deserialize<Response<AggregateDto>>(result);
 
             return obj.Result;
         }
@@ -96,7 +97,7 @@ namespace Elders.Cronus.Dashboard.Models
             var response = await client.SendAsync(request);
             var result = await response.Content.ReadAsStringAsync();
             log.LogDebug(result);
-            var obj = Json.Deserialize<Response<ProjectionStateDto>>(result);
+            var obj = JsonSerializer.Deserialize<Response<ProjectionStateDto>>(result);
 
             return obj.Result;
         }

@@ -1,5 +1,6 @@
 ﻿using System.Collections.Generic;
 using System.Net.Http;
+using System.Text.Json;
 using System.Threading.Tasks;
 
 namespace Elders.Cronus.Dashboard.Models
@@ -23,7 +24,7 @@ namespace Elders.Cronus.Dashboard.Models
             getTokenRequest.Content = new FormUrlEncodedContent(parameters);
             var response = await httpClient.SendAsync(getTokenRequest);
             var result = await response.Content.ReadAsStringAsync();
-            var obj = Microsoft.JSInterop.Json.Deserialize<TokenResult>(result);
+            var obj = JsonSerializer.Deserialize<TokenResult>(result);
             return obj.Access_Token;
         }
 
