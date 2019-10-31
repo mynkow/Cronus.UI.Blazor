@@ -1,4 +1,5 @@
-﻿using System.Collections.Generic;
+﻿using Microsoft.Extensions.Logging;
+using System.Collections.Generic;
 using System.Net.Http;
 using System.Text.Json;
 using System.Threading.Tasks;
@@ -8,10 +9,12 @@ namespace Elders.Cronus.Dashboard.Models
     public class TokenClient
     {
         private readonly HttpClient httpClient;
+        private readonly ILogger<TokenClient> log;
 
-        public TokenClient(HttpClient httpClient)
+        public TokenClient(HttpClient httpClient, ILogger<TokenClient> log)
         {
             this.httpClient = httpClient;
+            this.log = log;
         }
 
         public async Task<string> GetAccessTokenAsync(Connection connection)
@@ -22,21 +25,20 @@ namespace Elders.Cronus.Dashboard.Models
             parameters.Add("grant_type", "client_credentials");
             parameters.Add("scope", "read");
             getTokenRequest.Content = new FormUrlEncodedContent(parameters);
-            var response = await httpClient.SendAsync(getTokenRequest);
-            var result = await response.Content.ReadAsStringAsync();
+            var response = await httpClient.SendAsync(getTokenRequest).ConfigureAwait(false);
+            var result = await response.Content.ReadAsStringAsync().ConfigureAwait(false);
             var obj = JsonSerializer.Deserialize<TokenResult>(result);
-            return obj.Access_Token;
+            log.LogDebug(obj.access_token);
+            return obj.access_token;
         }
 
         public class TokenResult
         {
-            public string Access_Token { get; set; }
+            public string access_token { get; set; }
 
-            public long Expires_in { get; set; }
+            public long expires_in { get; set; }
 
-            public string Token_type { get; set; }
+            public string token_type { get; set; }
         }
     }
-
-
 }

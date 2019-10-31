@@ -21,6 +21,8 @@ namespace Elders.Cronus.Dashboard.Pages
         protected override async Task OnInitializedAsync()
         {
             connections = await LocalStorage.GetItem<List<Connection>>(LSKey.Connections);
+            if (connections is null)
+                connections = new List<Connection>();
         }
 
         protected async Task OnDelete(Connection model)

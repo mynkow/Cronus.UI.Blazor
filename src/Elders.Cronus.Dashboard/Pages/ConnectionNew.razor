@@ -4,14 +4,14 @@
 <h1>New Connection</h1>
 
 <fieldset>
-    <div><label>Name: <br /> <input type="text" name="friendlyName" bind="@Name" /></label></div>
-    <div><label>Cronus Endpoint: <br /> <input type="url" name="cronusUrl" bind="@CronusEndpoint" /></label></div>
+    <div><label>Name: <br /> <input type="text" name="friendlyName" @bind="@Name" /></label></div>
+    <div><label>Cronus Endpoint: <br /> <input type="url" name="cronusUrl" @bind="@CronusEndpoint" /></label></div>
 </fieldset>
 <fieldset>
     <legend> Authorization </legend>
-    <div><label>Server <br /> <input type="url" name="oAuthUrl" bind="oAuthEndpoint" /></label></div>
-    <div><label>Client <br /> <input type="text" name="oAuthClient" bind="oAuthClient" /></label></div>
-    <div><label>Secret <br /> <input type="password" name="oAuthSecret" bind="oAuthSecret" /></label></div>
+    <div><label>Server <br /> <input type="url" name="oAuthUrl" @bind="oAuthEndpoint" /></label></div>
+    <div><label>Client <br /> <input type="text" name="oAuthClient" @bind="oAuthClient" /></label></div>
+    <div><label>Secret <br /> <input type="password" name="oAuthSecret" @bind="oAuthSecret" /></label></div>
 </fieldset>
 
 <button class="btn btn-primary" @onclick="@AddConnection">Add Connection</button>
