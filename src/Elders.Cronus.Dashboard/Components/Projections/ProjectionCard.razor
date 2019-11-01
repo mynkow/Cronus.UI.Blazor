@@ -27,11 +27,11 @@
     [Parameter]
     public Projection Projection { get; set; }
 
-    protected override async Task OnInitializedAsync()
+    protected override Task OnInitializedAsync()
     {
-        await base.OnInitializedAsync();
-
         App.OnChange += StateHasChanged;
+
+        return Task.CompletedTask;
     }
 
     public Task RebuildAsync(Projection projection)
