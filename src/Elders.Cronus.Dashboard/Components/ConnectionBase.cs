@@ -3,7 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Net.Http;
 using System.Threading.Tasks;
-using Blazor.Extensions.Storage;
+using Blazor.Extensions.Storage.Interfaces;
 using Elders.Cronus.Dashboard.Models;
 using Microsoft.AspNetCore.Components;
 using Microsoft.Extensions.Logging;
@@ -16,7 +16,7 @@ namespace Elders.Cronus.Dashboard.Components
         protected ILogger<ConnectionBase> Log { get; set; }
 
         [Inject]
-        protected LocalStorage LocalStorage { get; set; }
+        protected ILocalStorage LocalStorage { get; set; }
 
         [Inject]
         protected TokenClient Token { get; set; }
@@ -29,6 +29,9 @@ namespace Elders.Cronus.Dashboard.Components
 
         [Parameter]
         public string CronusEndpoint { get; set; }
+
+        [Parameter]
+        public bool UseAuthentication { get; set; }
 
         [Parameter]
         public string oAuthEndpoint { get; set; }
@@ -57,6 +60,7 @@ namespace Elders.Cronus.Dashboard.Components
 
                 Name = connection.Name;
                 CronusEndpoint = connection.CronusEndpoint;
+                UseAuthentication = connection.UseAuthentication;
                 oAuthEndpoint = connection.oAuth.ServerEndpoint;
                 oAuthClient = connection.oAuth.Client;
                 oAuthSecret = connection.oAuth.Secret;
@@ -95,6 +99,7 @@ namespace Elders.Cronus.Dashboard.Components
             {
                 Name = Name,
                 CronusEndpoint = CronusEndpoint,
+                UseAuthentication = UseAuthentication,
                 oAuth = new oAuth()
                 {
                     ServerEndpoint = oAuthEndpoint,

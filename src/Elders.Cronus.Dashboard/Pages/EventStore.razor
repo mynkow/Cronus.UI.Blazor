@@ -3,6 +3,10 @@
 @inject CronusClient Cronus
 @inject IJSRuntime JSRuntime
 
+<div>
+    <Elders.Cronus.Dashboard.Components.EventStore.EventStoreIndices></Elders.Cronus.Dashboard.Components.EventStore.EventStoreIndices>
+</div>
+
 <div class="pin">
     <input type="text" bind="@aggregateId" style="width:1000px" />
     <IconButton Icon="magnifying-glass" Click="@(async ()=> await GetAggregateAsync())"></IconButton>

@@ -11,4 +11,14 @@ namespace Elders.Cronus.Dashboard.Models
 
         public List<Projection> Projections { get; set; }
     }
+
+    public class EventStoreIndexCollection
+    {
+        public EventStoreIndexCollection()
+        {
+            Indices = new List<EventStoreIndex>();
+        }
+
+        public List<EventStoreIndex> Indices { get; set; }
+    }
 }

@@ -1,6 +1,6 @@
 ﻿using System.Collections.Generic;
 using System.Threading.Tasks;
-using Blazor.Extensions.Storage;
+using Blazor.Extensions.Storage.Interfaces;
 using Elders.Cronus.Dashboard.Models;
 using Microsoft.AspNetCore.Components;
 
@@ -11,7 +11,7 @@ namespace Elders.Cronus.Dashboard.Pages
         protected List<Connection> connections;
 
         [Inject]
-        public LocalStorage LocalStorage { get; set; }
+        public ILocalStorage LocalStorage { get; set; }
 
         public ConnectionsBase()
         {

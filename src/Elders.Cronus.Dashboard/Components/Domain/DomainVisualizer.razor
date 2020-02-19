@@ -1,0 +1,32 @@
+﻿@inject AppState App
+@inject CronusClient Cronus
+@inject IJSRuntime JSRuntime
+
+Stabilize when clustering:
+<input type="checkbox" id="stabilizeCheckbox">
+<button id="domainAggregate" class="btn-warning">ARs</button>
+<div id="domainGraph"></div>
+
+
+@code {
+
+    protected override async Task OnAfterRenderAsync(bool firstRender)
+    {
+        List<object> nodesList = new List<object>()
+    {
+            new { id = 1, label = "CreateStory", group = "command", cid = "story" },
+            new { id = 2, label = "PublishStory", group = "command", cid = "story" },
+            new { id = 3, label = "Story", group = "aggregate", cid = "story" },
+            new { id = 4, label = "StoryCreated", group = "event", cid = "story" },
+            new { id = 5, label = "StoryPublished", group = "event", cid = "story" },
+            new { id = 6, label = "StoryRescheduled", group = "event", cid = "story" },
+
+            new { id = 10, label = "Command1", group = "command", cid = "ar" },
+            new { id = 11, label = "Command2", group = "command", cid = "ar" },
+            new { id = 12, label = "AR", group = "aggregate", cid = "ar" },
+            new { id = 13, label = "Event1", group = "event", cid = "ar" }
+        };
+
+        await JSRuntime.InvokeVoidAsync("visualizeDomain", nodesList);
+    }
+}

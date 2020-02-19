@@ -28,8 +28,11 @@ namespace Elders.Cronus.Dashboard.Models
         public async Task<Response<ProjectionCollection>> GetProjectionsAsync(Connection connection)
         {
             HttpRequestMessage request = new HttpRequestMessage(HttpMethod.Get, connection.CronusEndpoint + "/projections");
-            var accessToken = await token.GetAccessTokenAsync(connection);
-            request.Headers.Authorization = new System.Net.Http.Headers.AuthenticationHeaderValue("bearer", accessToken);
+            if (connection.UseAuthentication)
+            {
+                var accessToken = await token.GetAccessTokenAsync(connection);
+                request.Headers.Authorization = new System.Net.Http.Headers.AuthenticationHeaderValue("bearer", accessToken);
+            }
 
             var response = await client.SendAsync(request);
             var result = await response.Content.ReadAsStringAsync();
@@ -45,18 +48,63 @@ namespace Elders.Cronus.Dashboard.Models
             return obj;
         }
 
+        public async Task<Response<List<EventStoreIndex>>> GetEventStoreIndicesAsync(Connection connection)
+        {
+            HttpRequestMessage request = new HttpRequestMessage(HttpMethod.Get, connection.CronusEndpoint + "/eventstore/index/meta");
+            if (connection.UseAuthentication)
+            {
+                var accessToken = await token.GetAccessTokenAsync(connection);
+                request.Headers.Authorization = new System.Net.Http.Headers.AuthenticationHeaderValue("bearer", accessToken);
+            }
+
+            var response = await client.SendAsync(request);
+            var result = await response.Content.ReadAsStringAsync();
+            log.LogDebug(result);
+            var obj = JsonSerializer.Deserialize<Response<List<EventStoreIndex>>>(result, options);
+
+            return obj;
+        }
+
         public async Task<bool> RebuildAsync(Connection connection, Projection projection)
         {
             log.LogInformation("Rebuilding...");
 
             HttpRequestMessage request = new HttpRequestMessage(HttpMethod.Post, connection.CronusEndpoint + "/projection/rebuild");
-            var accessToken = await token.GetAccessTokenAsync(connection);
-            request.Headers.Authorization = new System.Net.Http.Headers.AuthenticationHeaderValue("bearer", accessToken);
+            if (connection.UseAuthentication)
+            {
+                var accessToken = await token.GetAccessTokenAsync(connection);
+                request.Headers.Authorization = new System.Net.Http.Headers.AuthenticationHeaderValue("bearer", accessToken);
+            }
 
             var rebuildRequest = new RebuildRequest()
             {
                 ProjectionContractId = projection.ProjectionContractId,
                 Hash = projection.LatestVersion.Hash
+            };
+
+            request.Content = new StringContent(JsonSerializer.Serialize(rebuildRequest), Encoding.UTF8, "application/json");
+
+            var response = await client.SendAsync(request);
+            var result = await response.Content.ReadAsStringAsync();
+            log.LogDebug(result);
+
+            return true;
+        }
+
+        public async Task<bool> RebuildIndexAsync(Connection connection, EventStoreIndex index)
+        {
+            log.LogInformation("Rebuilding...");
+
+            HttpRequestMessage request = new HttpRequestMessage(HttpMethod.Post, connection.CronusEndpoint + "/EventStore/Index/Rebuild");
+            if (connection.UseAuthentication)
+            {
+                var accessToken = await token.GetAccessTokenAsync(connection);
+                request.Headers.Authorization = new System.Net.Http.Headers.AuthenticationHeaderValue("bearer", accessToken);
+            }
+
+            var rebuildRequest = new RebuildIndexRequest()
+            {
+                Id = index.Id,
             };
 
             request.Content = new StringContent(JsonSerializer.Serialize(rebuildRequest), Encoding.UTF8, "application/json");
@@ -74,8 +122,11 @@ namespace Elders.Cronus.Dashboard.Models
             log.LogDebug($"GetAggregate({aggregateId})");
 
             HttpRequestMessage request = new HttpRequestMessage(HttpMethod.Get, connection.CronusEndpoint + $"/EventStore/Explore?id={aggregateId}");
-            var accessToken = await token.GetAccessTokenAsync(connection);
-            request.Headers.Authorization = new System.Net.Http.Headers.AuthenticationHeaderValue("bearer", accessToken);
+            if (connection.UseAuthentication)
+            {
+                var accessToken = await token.GetAccessTokenAsync(connection);
+                request.Headers.Authorization = new System.Net.Http.Headers.AuthenticationHeaderValue("bearer", accessToken);
+            }
 
             var response = await client.SendAsync(request);
             var result = await response.Content.ReadAsStringAsync();
@@ -93,8 +144,11 @@ namespace Elders.Cronus.Dashboard.Models
             log.LogDebug($"{projectionName}({projectionId})");
 
             HttpRequestMessage request = new HttpRequestMessage(HttpMethod.Get, connection.CronusEndpoint + $"/Projection/Explore?projectionName={projectionName}&id={projectionId}");
-            var accessToken = await token.GetAccessTokenAsync(connection);
-            request.Headers.Authorization = new System.Net.Http.Headers.AuthenticationHeaderValue("bearer", accessToken);
+            if (connection.UseAuthentication)
+            {
+                var accessToken = await token.GetAccessTokenAsync(connection);
+                request.Headers.Authorization = new System.Net.Http.Headers.AuthenticationHeaderValue("bearer", accessToken);
+            }
 
             var response = await client.SendAsync(request);
             var result = await response.Content.ReadAsStringAsync();
@@ -160,5 +214,10 @@ namespace Elders.Cronus.Dashboard.Models
         public string Errors { get; set; }
 
         public bool IsSuccess { get; set; }
+    }
+
+    public class RebuildIndexRequest
+    {
+        public string Id { get; set; }
     }
 }

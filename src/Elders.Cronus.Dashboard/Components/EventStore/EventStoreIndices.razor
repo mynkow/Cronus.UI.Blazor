@@ -1,0 +1,74 @@
+﻿@using MatBlazor
+@inject AppState App
+@inject CronusClient Cronus
+
+    <GreyOutZone IsGreyedOut=isLoading>
+        <div hidden="@(indices?.Count == 0)" class="top-row px-4">
+            <div class="px-4">
+                <input class="input-text" value="Filter" />
+            </div>
+            <div class="px-4">
+                <span class="badge badge-success">Live</span>
+                <span class="badge badge-primary">Building</span>
+                <span class="badge badge-secondary">NotPresent</span>
+                <span class="badge badge-danger">Timedout</span>
+                <span class="badge badge-dark">Canceled</span>
+            </div>
+        </div>
+
+        <div class="row">
+            @foreach (var index in indices)
+            {
+                <div class="col-sm-4 mt-4">
+                    GRRRRRRRRRRRRR
+                    @index.Name
+                </div>
+            }
+        </div>
+
+        <MatTable Items="@indices" AllowSelection="true" class="mat-elevation-z5">
+            <MatTableHeader>
+                <th>Name</th>
+                <th>Status</th>
+                <th>Progress</th>
+                <th>Actions</th>
+            </MatTableHeader>
+            <MatTableRow>
+                <td>@context.Name<br /><span style="font-size:xx-small;font-style:italic">@context.Id</span></td>
+                <td align="center">@context.Status</td>
+                <td align="center">56%</td>
+                <td><MatButton @onclick="@(async () => await RebuildAsync(@context))">Rebuild</MatButton><br /><MatButton>Cancel</MatButton></td>
+            </MatTableRow>
+        </MatTable>
+    </GreyOutZone>
+
+@code {
+    bool isLoading = false;
+    List<EventStoreIndex> indices = new List<EventStoreIndex>();
+
+    protected override Task OnInitializedAsync()
+    {
+        App.OnChange += StateHasChanged;
+        App.OnConnectionChanged += GetEventStoreIndexList;
+
+        return GetEventStoreIndexList(App.Connection);
+    }
+
+    protected async Task GetEventStoreIndexList(Connection connection)
+    {
+        if (connection is null == false)
+        {
+            isLoading = true;
+            var result = await Cronus.GetEventStoreIndicesAsync(@App.Connection);
+            indices = result.Result;
+            isLoading = false;
+
+            StateHasChanged();
+        }
+    }
+
+    public Task RebuildAsync(EventStoreIndex index)
+    {
+        return Cronus.RebuildIndexAsync(App.Connection, index);
+    }
+}

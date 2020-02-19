@@ -20,4 +20,13 @@ namespace Elders.Cronus.Dashboard.Models
 
         public ProjectionVersion LatestVersion => Versions.OrderByDescending(x => x.Revision).First();
     }
+
+    public class EventStoreIndex
+    {
+        public string Id { get; set; }
+
+        public string Name { get; set; }
+
+        public string Status { get; set; }
+    }
 }

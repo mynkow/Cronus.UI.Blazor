@@ -14,6 +14,8 @@ namespace Elders.Cronus.Dashboard.Models
 
         public string CronusEndpoint { get; set; }
 
+        public bool UseAuthentication { get; set; }
+
         public oAuth oAuth { get; set; }
     }
 
