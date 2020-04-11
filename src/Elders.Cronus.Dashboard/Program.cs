@@ -1,4 +1,4 @@
-﻿using Blazor.Extensions.Logging;
+﻿//using Blazor.Extensions.Logging;
 using Blazor.Extensions.Storage;
 using Elders.Cronus.Dashboard.Models;
 using Microsoft.AspNetCore.Blazor.Hosting;
@@ -22,10 +22,10 @@ namespace Elders.Cronus.Dashboard
 
         static void ConfigureServices(IServiceCollection services)
         {
-            services.AddLogging(builder => builder
-                .AddBrowserConsole() // Add Blazor.Extensions.Logging.BrowserConsoleLogger
-                .SetMinimumLevel(LogLevel.Debug)
-            );
+            //services.AddLogging(builder => builder
+            //    .AddBrowserConsole() // Add Blazor.Extensions.Logging.BrowserConsoleLogger
+            //    .SetMinimumLevel(LogLevel.Debug)
+            //);
             services.AddLoadingBar();
             services.AddStorage();
             services.AddTransient<CronusClient>();

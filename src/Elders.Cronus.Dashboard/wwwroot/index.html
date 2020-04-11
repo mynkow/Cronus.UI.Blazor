@@ -7,6 +7,7 @@
     <base href="/" />
     <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.1.3/css/bootstrap.min.css" integrity="sha384-MCw98/SFnGE8fJT3GXwEOngsV7Zt27NXFoaoApmYm81iuXoPkFOJwJ8ERdknLPMO" crossorigin="anonymous">
     <link href="css/site.css" rel="stylesheet" />
+    <script src="_content/Blazor.Extensions.Storage/Storage.js"></script>
 
     <script type="text/javascript" src="https://unpkg.com/vis-network/standalone/umd/vis-network.min.js"></script>
     <style type="text/css">
@@ -37,15 +38,15 @@
 
             cluster() {
                 var clusterOptionsByData = {
-                    joinCondition:function(childOptions) {
+                    joinCondition: function (childOptions) {
                         return childOptions.cid == 'story';
                     },
-                    clusterNodeProperties: {id:'cidCluster', borderWidth:3, shape:'database'}
+                    clusterNodeProperties: { id: 'cidCluster', borderWidth: 3, shape: 'database' }
                 };
                 this.network.cluster(clusterOptionsByData);
             }
         }
-        
+
         function visualizeDomain(nodeList) {
 
             var clusters = [];
@@ -81,7 +82,7 @@
                     }
                 },
                 groups: {
-                    command: { color: { background: '#03c2fc' }, shape: 'dot',  },
+                    command: { color: { background: '#03c2fc' }, shape: 'dot', },
                     event: { color: { background: '#208f14' }, shape: 'triangle' },
                     aggregate: {
                         font: {
@@ -98,11 +99,11 @@
                         }
                     }
                 },
-                interaction:{
+                interaction: {
                     navigationButtons: true,
                     keyboard: true,
                     hoverConnectedEdges: true,
-                    tooltipDelay: 100        
+                    tooltipDelay: 100
                 }
             };
 
@@ -133,7 +134,7 @@
                 var group = groups[n];
 
                 network.cluster({
-                    joinCondition: function(item) {
+                    joinCondition: function (item) {
                         return item.group == group;
                     },
                     clusterNodeProperties: {
@@ -144,7 +145,7 @@
 
             //=============================================================
             // set the first initial zoom level
-            network.once('initRedraw', function() {
+            network.once('initRedraw', function () {
                 if (lastClusterZoomLevel === 0) {
                     lastClusterZoomLevel = network.getScale();
                 }
@@ -154,11 +155,11 @@
             network.on('zoom', function (params) {
                 console.log(params);
                 if (params.direction == '-') {
-                    if (params.scale < lastClusterZoomLevel*clusterFactor) {
-				        var totalCID = 7;
-				        for (var i = 1; i <= totalCID; i++) {
-					        makeClusters(params.scale, "story");
-				        }
+                    if (params.scale < lastClusterZoomLevel * clusterFactor) {
+                        var totalCID = 7;
+                        for (var i = 1; i <= totalCID; i++) {
+                            makeClusters(params.scale, "story");
+                        }
                         lastClusterZoomLevel = params.scale;
                     }
                 }
@@ -181,22 +182,22 @@
                 var clusterOptionsByData = {
                     processProperties: function (clusterOptions, childNodes) {
                         var childrenCount = 0;
-                        for (var i = 0; i < childNodes.length; i++) {
+                        for (var i = 0; i < childNodes.length; {
                             childrenCount += childNodes[i].childrenCount || 1;
                         }
-                        
-                        clusterOptions.childrenCount = childrenCount;
+
+                                        clusterOptions.childrenCount = childrenCount;
                         clusterOptions.label = "cid: " + clusterIndex + " (" + childrenCount + ")";
                         clusterOptions.id = 'cluster:' + clusterIndex;
-                        clusters.push({id:'cluster:' + clusterIndex, scale:scale});
+                        clusters.push({ id: 'cluster:' + clusterIndex, scale: scale });
                         return clusterOptions;
                     },
-			        joinCondition:function(childOptions) {
-				        return childOptions.cid == clusterIndex;
-			        },
-                    clusterNodeProperties: {borderWidth: 3, shape: 'database', font: {size: 30}}
+                    joinCondition: function (childOptions) {
+                        return childOptions.cid == clusterIndex;
+                    },
+                    clusterNodeProperties: { borderWidth: 3, shape: 'database', font: { size: 30 } }
                 }
-                
+
                 network.cluster(clusterOptionsByData);
                 if (document.getElementById('stabilizeCheckbox').checked === true) {
                     network.stabilize();
@@ -207,41 +208,41 @@
             function openClusters(scale) {
                 var newClusters = [];
                 var declustered = false;
-                for (var i = 0; i < clusters.length; i++) {
-                    if (clusters[i].scale < scale) {
-                        network.openCluster(clusters[i].id);
-                        lastClusterZoomLevel = scale;
-                        declustered = true;
-                    }
-                    else {
-                        newClusters.push(clusters[i])
-                    }
+                for (var i = 0; i < clusters.length; {
+                    if(clusters[i].scale < scale) {
+                    network.openCluster(clusters[i].id);
+                    lastClusterZoomLevel = scale;
+                    declustered = true;
                 }
-                clusters = newClusters;
-                if (declustered === true && document.getElementById('stabilizeCheckbox').checked === true) {
-                    network.stabilize();
+                                    else {
+                    newClusters.push(clusters[i])
                 }
             }
-
-            var domain = new Domain(network);
-            console.log(domain);
-
-            // ...and hook it up
-            var button = document.getElementById("domainAggregate");
-            if (button.addEventListener) {
-                button.addEventListener('click', function () {
-                    domain.cluster();
-                }, false);
-            }
-            else if (button.attachEvent) {
-                button.attachEvent('onclick', function() {
-                    domain.cluster();
-                });
-            }
-            else {
-                container.log("May be this is very old browser");
+            clusters = newClusters;
+            if (declustered === true && document.getElementById('stabilizeCheckbox').checked === true) {
+                network.stabilize();
             }
         }
+
+        var domain = new Domain(network);
+        console.log(domain);
+
+        // ...and hook it up
+        var button = document.getElementById("domainAggregate");
+        if (button.addEventListener) {
+            button.addEventListener('click', function () {
+                domain.cluster();
+            }, false);
+        }
+        else if (button.attachEvent) {
+            button.attachEvent('onclick', function () {
+                domain.cluster();
+            });
+        }
+        else {
+            container.log("May be this is very old browser");
+        }
+                        }
 
     </script>
 </body>
