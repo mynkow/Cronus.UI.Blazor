@@ -1,12 +1,10 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Net.Http;
-using System.Net.Security;
 using System.Text;
 using System.Text.Json;
 using System.Threading.Tasks;
 using Microsoft.Extensions.Logging;
-using Microsoft.JSInterop;
 
 namespace Elders.Cronus.Dashboard.Models
 {
@@ -28,8 +26,11 @@ namespace Elders.Cronus.Dashboard.Models
         public async Task<Response<ProjectionCollection>> GetProjectionsAsync(Connection connection)
         {
             HttpRequestMessage request = new HttpRequestMessage(HttpMethod.Get, connection.CronusEndpoint + "/projections");
-            var accessToken = await token.GetAccessTokenAsync(connection);
-            request.Headers.Authorization = new System.Net.Http.Headers.AuthenticationHeaderValue("bearer", accessToken);
+            if (string.IsNullOrEmpty(connection.oAuth.ServerEndpoint) == false)
+            {
+                var accessToken = await token.GetAccessTokenAsync(connection);
+                request.Headers.Authorization = new System.Net.Http.Headers.AuthenticationHeaderValue("bearer", accessToken);
+            }
 
             var response = await client.SendAsync(request);
             var result = await response.Content.ReadAsStringAsync();
@@ -50,8 +51,11 @@ namespace Elders.Cronus.Dashboard.Models
             log.LogInformation("Rebuilding...");
 
             HttpRequestMessage request = new HttpRequestMessage(HttpMethod.Post, connection.CronusEndpoint + "/projection/rebuild");
-            var accessToken = await token.GetAccessTokenAsync(connection);
-            request.Headers.Authorization = new System.Net.Http.Headers.AuthenticationHeaderValue("bearer", accessToken);
+            if (string.IsNullOrEmpty(connection.oAuth.ServerEndpoint) == false)
+            {
+                var accessToken = await token.GetAccessTokenAsync(connection);
+                request.Headers.Authorization = new System.Net.Http.Headers.AuthenticationHeaderValue("bearer", accessToken);
+            }
 
             var rebuildRequest = new RebuildRequest()
             {
@@ -74,14 +78,18 @@ namespace Elders.Cronus.Dashboard.Models
             log.LogDebug($"GetAggregate({aggregateId})");
 
             HttpRequestMessage request = new HttpRequestMessage(HttpMethod.Get, connection.CronusEndpoint + $"/EventStore/Explore?id={aggregateId}");
-            var accessToken = await token.GetAccessTokenAsync(connection);
-            request.Headers.Authorization = new System.Net.Http.Headers.AuthenticationHeaderValue("bearer", accessToken);
+            if (string.IsNullOrEmpty(connection.oAuth.ServerEndpoint) == false)
+            {
+                var accessToken = await token.GetAccessTokenAsync(connection);
+                request.Headers.Authorization = new System.Net.Http.Headers.AuthenticationHeaderValue("bearer", accessToken);
+            }
 
             var response = await client.SendAsync(request);
             var result = await response.Content.ReadAsStringAsync();
+
             log.LogDebug(result);
             var obj = JsonSerializer.Deserialize<Response<AggregateDto>>(result, options);
-            
+
             return obj.Result;
         }
 
@@ -93,8 +101,11 @@ namespace Elders.Cronus.Dashboard.Models
             log.LogDebug($"{projectionName}({projectionId})");
 
             HttpRequestMessage request = new HttpRequestMessage(HttpMethod.Get, connection.CronusEndpoint + $"/Projection/Explore?projectionName={projectionName}&id={projectionId}");
-            var accessToken = await token.GetAccessTokenAsync(connection);
-            request.Headers.Authorization = new System.Net.Http.Headers.AuthenticationHeaderValue("bearer", accessToken);
+            if (string.IsNullOrEmpty(connection.oAuth.ServerEndpoint) == false)
+            {
+                var accessToken = await token.GetAccessTokenAsync(connection);
+                request.Headers.Authorization = new System.Net.Http.Headers.AuthenticationHeaderValue("bearer", accessToken);
+            }
 
             var response = await client.SendAsync(request);
             var result = await response.Content.ReadAsStringAsync();

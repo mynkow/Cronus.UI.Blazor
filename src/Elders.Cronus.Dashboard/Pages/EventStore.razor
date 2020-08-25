@@ -4,7 +4,7 @@
 @inject IJSRuntime JSRuntime
 
 <div class="pin">
-    <input type="text" bind="@aggregateId" style="width:1000px" />
+    <input type="text" @bind="@AggregateId" style="width:1000px" />
     <IconButton Icon="magnifying-glass" Click="@(async ()=> await GetAggregateAsync())"></IconButton>
 </div>
 
@@ -40,13 +40,13 @@
 </div>
 
 @code {
-    string aggregateId = "dXJuOnBydXZpdDpwcm9qZWN0aW9ubWFuYWdlcjoyNmZmMzBkYS1iZjBkLTRiM2ItODc0Zi1lMzA1ZDU4NzA3NDE=";
+    string AggregateId { get; set; }
     List<AggregateCommitDto> commits = new List<AggregateCommitDto>();
     string details = string.Empty;
 
     async Task GetAggregateAsync()
     {
-        AggregateDto ar = await Cronus.GetAggregate(App.Connection, aggregateId);
+        AggregateDto ar = await Cronus.GetAggregate(App.Connection, AggregateId);
         if (ar is null == false && ar.Commits is null == false)
         {
             commits = ar.Commits.OrderByDescending(commit => commit.AggregateRootRevision).ToList();

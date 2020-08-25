@@ -10,7 +10,7 @@ else
 {
     <div class="pin">
         <ProjectionCard Projection="@Projection"></ProjectionCard>
-        <input type="text" bind="@projectionId" style="width:1000px" />
+        <input type="text" @bind="@projectionId" style="width:1000px" />
         <IconButton Icon="magnifying-glass" Click="@(async ()=> await GetProjectionAsync())"></IconButton>
     </div>
 
