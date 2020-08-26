@@ -1,6 +1,6 @@
 ﻿using System.Collections.Generic;
 using System.Threading.Tasks;
-using Blazor.Extensions.Storage;
+using Blazored.LocalStorage;
 using Elders.Cronus.Dashboard.Models;
 using Microsoft.AspNetCore.Components;
 
@@ -11,7 +11,7 @@ namespace Elders.Cronus.Dashboard.Pages
         protected List<Connection> connections;
 
         [Inject]
-        public LocalStorage LocalStorage { get; set; }
+        public ILocalStorageService LocalStorage { get; set; }
 
         public ConnectionsBase()
         {
@@ -20,7 +20,7 @@ namespace Elders.Cronus.Dashboard.Pages
 
         protected override async Task OnInitializedAsync()
         {
-            connections = await LocalStorage.GetItem<List<Connection>>(LSKey.Connections);
+            connections = await LocalStorage.GetItemAsync<List<Connection>>(LSKey.Connections);
             if (connections is null)
                 connections = new List<Connection>();
         }
@@ -28,7 +28,7 @@ namespace Elders.Cronus.Dashboard.Pages
         protected async Task OnDelete(Connection model)
         {
             connections.Remove(model);
-            await LocalStorage.SetItem(LSKey.Connections, connections);
+            await LocalStorage.SetItemAsync(LSKey.Connections, connections);
 
             StateHasChanged();
         }

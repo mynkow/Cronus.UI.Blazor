@@ -3,7 +3,8 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Net.Http;
 using System.Threading.Tasks;
-using Blazor.Extensions.Storage;
+using Blazored.LocalStorage;
+//using Blazor.Extensions.Storage;
 using Elders.Cronus.Dashboard.Models;
 using Microsoft.AspNetCore.Components;
 using Microsoft.Extensions.Logging;
@@ -16,7 +17,7 @@ namespace Elders.Cronus.Dashboard.Components
         protected ILogger<ConnectionBase> Log { get; set; }
 
         [Inject]
-        protected LocalStorage LocalStorage { get; set; }
+        protected ILocalStorageService LocalStorage { get; set; }
 
         [Inject]
         protected TokenClient Token { get; set; }
@@ -49,7 +50,7 @@ namespace Elders.Cronus.Dashboard.Components
 
         protected async Task<bool> LoadDataAsync()
         {
-            connections = await LocalStorage.GetItem<List<Connection>>(LSKey.Connections);
+            connections = await LocalStorage.GetItemAsync<List<Connection>>(LSKey.Connections);
 
             if (string.IsNullOrEmpty(Name) == false)
             {
@@ -71,7 +72,7 @@ namespace Elders.Cronus.Dashboard.Components
             {
                 var newConnection = GetConnection();
                 connections.Add(newConnection);
-                await LocalStorage.SetItem(LSKey.Connections, connections);
+                await LocalStorage.SetItemAsync(LSKey.Connections, connections);
                 connection = newConnection;
             }
 
@@ -80,11 +81,11 @@ namespace Elders.Cronus.Dashboard.Components
 
         protected async Task AddConnection()
         {
-            var connections = await LocalStorage.GetItem<List<Connection>>(LSKey.Connections) ?? new List<Connection>();
+             var connections = await LocalStorage.GetItemAsync<List<Connection>>(LSKey.Connections) ?? new List<Connection>();
 
             var newConnection = GetConnection();
             connections.Add(newConnection);
-            await LocalStorage.SetItem(LSKey.Connections, connections);
+            await LocalStorage.SetItemAsync(LSKey.Connections, connections);
 
             StateHasChanged();
         }
@@ -118,7 +119,7 @@ namespace Elders.Cronus.Dashboard.Components
             Log.LogDebug("OnDelete");
 
             connections.Remove(model);
-            await LocalStorage.SetItem(LSKey.Connections, connections);
+            await LocalStorage.SetItemAsync(LSKey.Connections, connections);
 
             StateHasChanged();
         }

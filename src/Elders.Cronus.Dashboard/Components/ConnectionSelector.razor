@@ -1,41 +1,38 @@
 ﻿@inject AppState App
-@inject LocalStorage LocalStorage
 @inject ILogger<ConnectionSelector> Log
+@inject Blazored.LocalStorage.ILocalStorageService LocalStorage
 
-    <div class="btn-group connection">
-        <button type="button" class="btn btn-primary w-75">@connectionName</button>
-        <button type="button" class="btn btn-primary dropdown-toggle dropdown-toggle-split" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
-            <span class="sr-only">Toggle Dropdown</span>
-        </button>
-        <div class="dropdown-menu" aria-labelledby="dropdownMenuButton">
-            @foreach (var connection in connections)
-            {
-                <span class="dropdown-item cursor-pointer" @onclick="@(async ()=> await OnClick(connection))">@connection.Name</span>
-            }
-        </div>
+<div class="btn-group connection">
+    <button type="button" class="btn btn-primary w-75">@connectionName</button>
+    <button type="button" class="btn btn-primary dropdown-toggle dropdown-toggle-split" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+        <span class="sr-only">Toggle Dropdown</span>
+    </button>
+    <div class="dropdown-menu" aria-labelledby="dropdownMenuButton">
+        @foreach (var connection in connections)
+        {
+            <span class="dropdown-item cursor-pointer" @onclick="@(async ()=> await OnClick(connection))">@connection.Name</span>
+        }
     </div>
+</div>
 
-    @code {
+@code {
 
-        string connectionName => App.Connection?.Name ?? "Select Connection...";
+    string connectionName => App.Connection?.Name ?? "Select Connection...";
 
-        List<Connection> connections = new List<Connection>();
+    List<Connection> connections = new List<Connection>();
 
-        protected override async Task OnInitializedAsync()
-        {
-            Log.LogDebug("Start.OnInitializedAsync");
-            connections = await LocalStorage.GetItem<List<Connection>>(LSKey.Connections);
-            if (connections is null)
-                connections = new List<Connection>();
-
-            Log.LogDebug("Finish.OnInitializedAsync");
-        }
-
-        protected Task OnClick(Connection connection)
-        {
-            App.Connect(connection);
-            StateHasChanged();
-
-            return Task.CompletedTask;
-        }
+    protected override async Task OnInitializedAsync()
+    {
+        connections = await LocalStorage.GetItemAsync<List<Connection>>(LSKey.Connections);
+        if (connections is null)
+            connections = new List<Connection>();
     }
+
+    protected Task OnClick(Connection connection)
+    {
+        App.Connect(connection);
+        StateHasChanged();
+
+        return Task.CompletedTask;
+    }
+}
