@@ -5,6 +5,7 @@
 
 <div class="pin">
     <input type="text" @bind="@AggregateId" style="width:1000px" />
+    <MatIconButton Icon="search" OnClick="@(async ()=> await GetAggregateAsync())"></MatIconButton>
     <IconButton Icon="magnifying-glass" Click="@(async ()=> await GetAggregateAsync())"></IconButton>
 </div>
 
