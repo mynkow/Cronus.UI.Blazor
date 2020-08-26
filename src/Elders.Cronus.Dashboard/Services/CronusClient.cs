@@ -1,26 +1,21 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Net.Http;
-using System.Text;
-using System.Text.Json;
+using System.Runtime.InteropServices;
 using System.Threading.Tasks;
 using Microsoft.Extensions.Logging;
 
 namespace Elders.Cronus.Dashboard.Models
 {
-    public class CronusClient
+    public class CronusClient : HttpClientBase
     {
-        private readonly HttpClient client;
         private readonly TokenClient token;
         private readonly ILogger<CronusClient> log;
-        private readonly JsonSerializerOptions options;
 
-        public CronusClient(HttpClient client, TokenClient token, ILogger<CronusClient> log)
+        public CronusClient(HttpClient client, TokenClient token, ILogger<CronusClient> log) : base(client)
         {
-            this.client = client;
             this.token = token;
             this.log = log;
-            this.options = new JsonSerializerOptions() { PropertyNameCaseInsensitive = true };
         }
 
         public async Task<Response<ProjectionCollection>> GetProjectionsAsync(Connection connection)
@@ -32,30 +27,30 @@ namespace Elders.Cronus.Dashboard.Models
                 request.Headers.Authorization = new System.Net.Http.Headers.AuthenticationHeaderValue("bearer", accessToken);
             }
 
-            var response = await client.SendAsync(request);
-            var result = await response.Content.ReadAsStringAsync();
-            log.LogDebug(result);
-            var obj = JsonSerializer.Deserialize<Response<ProjectionCollection>>(result, options);
+            var response = await ExecuteRequestAsync<Response<ProjectionCollection>>(request);
 
-            foreach (var projection in obj.Result.Projections)
+            return response.Data;
+        }
+
+        public async Task<DomainDto> GetDomainAsync(Connection connection)
+        {
+            HttpRequestMessage request = new HttpRequestMessage(HttpMethod.Get, connection.CronusEndpoint + "/domain/explore");
+            if (string.IsNullOrEmpty(connection.oAuth.ServerEndpoint) == false)
             {
-                string versions = string.Join(" | ", projection.Versions);
-                log.LogDebug($"{projection.ProjectionName}: {versions}");
+                var accessToken = await token.GetAccessTokenAsync(connection);
+                request.Headers.Authorization = new System.Net.Http.Headers.AuthenticationHeaderValue("bearer", accessToken);
             }
 
-            return obj;
+            var response = await ExecuteRequestAsync<DomainDto>(request);
+
+            return response.Data;
         }
 
         public async Task<bool> RebuildAsync(Connection connection, Projection projection)
         {
             log.LogInformation("Rebuilding...");
 
-            HttpRequestMessage request = new HttpRequestMessage(HttpMethod.Post, connection.CronusEndpoint + "/projection/rebuild");
-            if (string.IsNullOrEmpty(connection.oAuth.ServerEndpoint) == false)
-            {
-                var accessToken = await token.GetAccessTokenAsync(connection);
-                request.Headers.Authorization = new System.Net.Http.Headers.AuthenticationHeaderValue("bearer", accessToken);
-            }
+            string resource = connection.CronusEndpoint + "/projection/rebuild";
 
             var rebuildRequest = new RebuildRequest()
             {
@@ -63,11 +58,15 @@ namespace Elders.Cronus.Dashboard.Models
                 Hash = projection.LatestVersion.Hash
             };
 
-            request.Content = new StringContent(JsonSerializer.Serialize(rebuildRequest), Encoding.UTF8, "application/json");
+            HttpRequestMessage request = CreateJsonPostRequest(rebuildRequest, resource);
 
-            var response = await client.SendAsync(request);
-            var result = await response.Content.ReadAsStringAsync();
-            log.LogDebug(result);
+            if (string.IsNullOrEmpty(connection.oAuth.ServerEndpoint) == false)
+            {
+                var accessToken = await token.GetAccessTokenAsync(connection);
+                request.Headers.Authorization = new System.Net.Http.Headers.AuthenticationHeaderValue("bearer", accessToken);
+            }
+
+            await ExecuteRequestAsync<object>(request);
 
             return true;
         }
@@ -84,13 +83,9 @@ namespace Elders.Cronus.Dashboard.Models
                 request.Headers.Authorization = new System.Net.Http.Headers.AuthenticationHeaderValue("bearer", accessToken);
             }
 
-            var response = await client.SendAsync(request);
-            var result = await response.Content.ReadAsStringAsync();
+            var result = await ExecuteRequestAsync<Response<AggregateDto>>(request);
 
-            log.LogDebug(result);
-            var obj = JsonSerializer.Deserialize<Response<AggregateDto>>(result, options);
-
-            return obj.Result;
+            return result.Data.Result;
         }
 
         public async Task<ProjectionStateDto> GetProjectionAsync(Connection connection, string projectionName, string projectionId)
@@ -107,13 +102,39 @@ namespace Elders.Cronus.Dashboard.Models
                 request.Headers.Authorization = new System.Net.Http.Headers.AuthenticationHeaderValue("bearer", accessToken);
             }
 
-            var response = await client.SendAsync(request);
-            var result = await response.Content.ReadAsStringAsync();
-            log.LogDebug(result);
-            var obj = JsonSerializer.Deserialize<Response<ProjectionStateDto>>(result, options);
+            var result = await ExecuteRequestAsync<Response<ProjectionStateDto>>(request);
 
-            return obj.Result;
+            return result.Data.Result;
         }
+    }
+
+    public class DomainDto
+    {
+        public List<DomainAggregateDto> Aggregates { get; set; }
+    }
+
+    public class DomainAggregateDto
+    {
+        public DomainAggregateDto()
+        {
+            Commands = new List<DomainCommandDto>();
+            Events = new List<DomainEventDto>();
+        }
+
+        public string Name { get; set; }
+
+        public List<DomainCommandDto> Commands { get; set; }
+        public List<DomainEventDto> Events { get; set; }
+    }
+
+    public class DomainEventDto
+    {
+        public string Name { get; set; }
+    }
+
+    public class DomainCommandDto
+    {
+        public string Name { get; set; }
     }
 
     public class AggregateDto
