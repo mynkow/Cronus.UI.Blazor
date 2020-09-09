@@ -3,35 +3,38 @@
 @inject CronusClient Cronus
 @inject IJSRuntime JSRuntime
 
-<div class="mat-layout-grid">
-    <h1>Sagas</h1>
+    <h2 class="mat-h2">Sagas</h2>
 
-    <MatTable Items="@Domain?.Sagas" PageLabel="dfjgh" LoadInitialData="true" FilterByColumnName="Name" PageSize="9999" ShowPaging="false" Striped="false" AllowSelection="true" SelectionChanged="SagaSelectionChangedEvent" class="mat-elevation-z5">
-        <MatTableHeader>
-            <th>Name</th>
-            <th>ID</th>
-        </MatTableHeader>
-        <MatTableRow>
-            <td>@context.Name</td>
-            <td>@context.Id</td>
-        </MatTableRow>
-    </MatTable>
-    <div class="mat-layout-grid-inner">
-        <div class="mat-layout-grid-cell mat-layout-grid-cell-span-6">
-            <h2>@Saga?.Name Events</h2>
-            <MatTable Items="@Saga?.Events" LoadInitialData="true" FilterByColumnName="Name" PageSize="9999" ShowPaging="false" Striped="false" AllowSelection="true" class="mat-elevation-z5">
-                <MatTableHeader>
-                    <th>Name</th>
-                    <th>ID</th>
-                </MatTableHeader>
-                <MatTableRow>
-                    <td>@context.Name</td>
-                    <td><i>@context.Id</i></td>
-                </MatTableRow>
-            </MatTable>
+    <div class="mat-layout-grid">
+
+        <MatTable Items="@Domain?.Sagas" PageLabel="dfjgh" LoadInitialData="true" FilterByColumnName="Name" PageSize="9999" ShowPaging="false" Striped="false" AllowSelection="true" SelectionChanged="SagaSelectionChangedEvent" class="mat-elevation-z5">
+            <MatTableHeader>
+                <th>Name</th>
+                <th>ID</th>
+            </MatTableHeader>
+            <MatTableRow>
+                <td>@context.Name</td>
+                <td>@context.Id</td>
+            </MatTableRow>
+        </MatTable>
+
+        <div class="mat-layout-grid-inner">
+            <div class="mat-layout-grid-cell mat-layout-grid-cell-span-6">
+                <h3 class="mat-h3">@Saga?.Name Events</h3>
+                <MatTable Items="@Saga?.Events" LoadInitialData="true" FilterByColumnName="Name" PageSize="9999" ShowPaging="false" Striped="false" AllowSelection="true" class="mat-elevation-z5">
+                    <MatTableHeader>
+                        <th>Name</th>
+                        <th>ID</th>
+                    </MatTableHeader>
+                    <MatTableRow>
+                        <td>@context.Name</td>
+                        <td><i>@context.Id</i></td>
+                    </MatTableRow>
+                </MatTable>
+            </div>
         </div>
+
     </div>
-</div>
 
 @code {
     DomainDto Domain { get; set; }
