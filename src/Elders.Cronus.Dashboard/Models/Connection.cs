@@ -6,6 +6,7 @@ namespace Elders.Cronus.Dashboard.Models
     public class LSKey
     {
         public const string Connections = "connections";
+        public const string SelectedConnection = "selected-connection";
     }
 
     public class Connection

@@ -1,16 +1,51 @@
 @inherits LayoutComponentBase
 
-<div class="sidebar">
-    <NavMenu />
-</div>
+<MatAppBarContainer Style="width:100%">
+    <MatAppBar>
+        <MatAppBarRow>
+            <MatAppBarSection>
+                <MatIconButton Icon="menu"></MatIconButton>
+                <MatAppBarTitle>Cronus Dashboard &nbsp;</MatAppBarTitle>
+                <ConnectionSelector />
+            </MatAppBarSection>
+            <MatAppBarSection Align="@MatAppBarSectionAlign.End">
+                <MatIconButton Icon="favorite"></MatIconButton>
+            </MatAppBarSection>
+        </MatAppBarRow>
+    </MatAppBar>
 
-<div class="main">
-    <div class="top-row px-4" style="z-index:100">
-        <ConnectionSelector />
-        <a href="https://github.com/Elders/Cronus" target="_blank" class="ml-md-auto">About Cronus</a>
-    </div>
+    <MatAppBarContent>
+        <div class="mat-layout-grid">
+            <div class="mat-layout-grid-inner">
+                <div class="mat-layout-grid-cell mat-layout-grid-cell-span-2">
+                    <MatNavMenu>
+                        <MatNavItem href="connections"><MatIcon Icon="bolt"></MatIcon>&nbsp; Connections </MatNavItem>
+                        <MatDivider></MatDivider>
+                        <MatNavSubMenu Expanded="true">
+                            <MatNavSubMenuHeader>
+                                <MatNavItem AllowSelection="false"><MatIcon Icon="wb_sunny"></MatIcon>&nbsp; Domain</MatNavItem>
+                            </MatNavSubMenuHeader>
+                            <MatNavSubMenuList>
+                                <MatNavItem Href="domain-aggregates">&nbsp; Aggregates</MatNavItem>
+                                <MatNavItem Href="domain-gateways">&nbsp; Gateways</MatNavItem>
+                                <MatNavItem Href="domain-ports">&nbsp; Ports</MatNavItem>
+                                <MatNavItem Href="domain-projections">&nbsp; Projections</MatNavItem>
+                                <MatNavItem Href="domain-sagas">&nbsp; Sagas</MatNavItem>
+                                <MatNavItem>&nbsp; Triggers</MatNavItem>
+                            </MatNavSubMenuList>
+                        </MatNavSubMenu>
+                        <MatDivider></MatDivider>
+                        <MatNavItem href="eventstore"><MatIcon Icon="book"></MatIcon>&nbsp; Event Store </MatNavItem>
+                        <MatDivider></MatDivider>
+                        <MatNavItem href="projections"><MatIcon Icon="dashboard"></MatIcon>&nbsp; Projections </MatNavItem>
+                        <MatDivider></MatDivider>
+                    </MatNavMenu>
+                </div>
+                <div class="mat-layout-grid-cell mat-layout-grid-cell-span-10">
+                    @Body
+                </div>
+            </div>
+            </div>
+    </MatAppBarContent>
+</MatAppBarContainer>
 
-    <div class="content px-4">
-        @Body
-    </div>
-</div>

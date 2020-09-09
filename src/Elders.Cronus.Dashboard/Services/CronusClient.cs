@@ -111,6 +111,14 @@ namespace Elders.Cronus.Dashboard.Models
     public class DomainDto
     {
         public List<DomainAggregateDto> Aggregates { get; set; }
+
+        public List<DomainGatewayDto> Gateways { get; set; }
+
+        public List<DomainProjectionDto> Projections { get; set; }
+
+        public List<DomainProjectionDto> Ports { get; set; }
+
+        public List<DomainSagaDto> Sagas { get; set; }
     }
 
     public class DomainAggregateDto
@@ -129,12 +137,42 @@ namespace Elders.Cronus.Dashboard.Models
 
     public class DomainEventDto
     {
+        public string Id { get; set; }
         public string Name { get; set; }
+    }
+
+    public class DomainPortDto
+    {
+        public string Id { get; set; }
+        public string Name { get; set; }
+    }
+
+    public class DomainGatewayDto
+    {
+        public string Id { get; set; }
+        public string Name { get; set; }
+    }
+
+    public class DomainSagaDto
+    {
+        public string Id { get; set; }
+        public string Name { get; set; }
+
+        public List<DomainEventDto> Events { get; set; }
     }
 
     public class DomainCommandDto
     {
+        public string Id { get; set; }
         public string Name { get; set; }
+    }
+
+    public class DomainProjectionDto
+    {
+        public string Id { get; set; }
+        public string Name { get; set; }
+
+        public List<DomainEventDto> Events { get; set; }
     }
 
     public class AggregateDto

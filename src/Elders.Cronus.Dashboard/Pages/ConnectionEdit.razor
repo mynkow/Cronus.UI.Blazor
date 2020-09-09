@@ -5,16 +5,17 @@
 <h1>Edit Connection</h1>
 
 <fieldset>
-    <div><label>Name: <br /> <input type="text" name="friendlyName" @bind="@Name" /></label></div>
-    <div><label>Cronus Endpoint: <br /> <input type="url" name="cronusUrl" @bind="@CronusEndpoint" /></label></div>
+    <MatTextField @bind-Value="@Name" Label="Name" FullWidth="true" Required="true"></MatTextField>
+    <MatTextField @bind-Value="@CronusEndpoint" Label="Cronus Endpoint" FullWidth="true" Required="true"></MatTextField>
 </fieldset>
+
 <fieldset>
     <legend> Authorization </legend>
-    <div><label>Server <br /> <input type="url" name="oAuthUrl" @bind="oAuthEndpoint" /></label></div>
-    <div><label>Client <br /> <input type="text" name="oAuthClient" @bind="oAuthClient" /></label></div>
-    <div><label>Secret <br /> <input type="password" name="oAuthSecret" @bind="oAuthSecret" /></label></div>
+
+    <MatTextField @bind-Value="@oAuthEndpoint" Label="Server" FullWidth="true"></MatTextField>
+    <MatTextField @bind-Value="@oAuthClient" Label="Client" FullWidth="true"></MatTextField>
+    <MatTextField @bind-Value="@oAuthSecret" Label="Secret" FullWidth="true" Type="password" Icon="lock_outline" IconTrailing="true"></MatTextField>
 </fieldset>
 
-<button class="btn btn-primary" @onclick="@GetToken">GetToken</button>
-
-<button class="btn btn-primary" @onclick="@(async () => await EditConnection())">Update</button>
+<MatButton Outlined="true" OnClick="@GetToken">Get Token</MatButton>
+<MatButton Outlined="true" TrailingIcon="save" OnClick="@(async () => await EditConnection())">Update</MatButton>

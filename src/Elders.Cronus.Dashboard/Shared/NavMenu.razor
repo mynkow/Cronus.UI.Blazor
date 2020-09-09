@@ -1,4 +1,40 @@
-﻿<div class="top-row pl-4 navbar navbar-dark">
+﻿<MatAppBarContainer>
+    <MatAppBar Fixed="true">
+        <MatAppBarRow>
+            <MatAppBarSection Align="@MatAppBarSectionAlign.Start">
+                <MatIconButton Icon="menu"></MatIconButton>
+                <MatAppBarTitle>Cronus Dashboard</MatAppBarTitle>
+            </MatAppBarSection>
+            <MatAppBarSection Align="@MatAppBarSectionAlign.Start">
+                <ConnectionSelector />
+            </MatAppBarSection>
+            <MatAppBarSection Align="@MatAppBarSectionAlign.End">
+                <MatIconButton Icon="favorite"></MatIconButton>
+            </MatAppBarSection>
+        </MatAppBarRow>
+    </MatAppBar>
+
+    <MatAppBarContent>
+        <div class="mat-layout-grid">
+            <div class="mat-layout-grid-inner">
+                <div class="mat-layout-grid-cell mat-layout-grid-cell-span-11">
+                    <MatNavMenu>
+                        <MatNavItem href="connections"><MatIcon Icon="bolt"></MatIcon>&nbsp; Connections </MatNavItem>
+                        <MatDivider></MatDivider>
+                        <MatNavItem href="domain"><MatIcon Icon="wb_sunny"></MatIcon>&nbsp; Domain </MatNavItem>
+                        <MatDivider></MatDivider>
+                        <MatNavItem href="eventstore"><MatIcon Icon="book"></MatIcon>&nbsp; Event Store </MatNavItem>
+                        <MatDivider></MatDivider>
+                        <MatNavItem href="projections"><MatIcon Icon="dashboard"></MatIcon>&nbsp; Projections </MatNavItem>
+                        <MatDivider></MatDivider>
+                    </MatNavMenu>
+                </div>
+            </div>
+        </div>
+    </MatAppBarContent>
+</MatAppBarContainer>
+
+@*<div class="top-row pl-4 navbar navbar-dark">
     <a class="navbar-brand" href="">Cronus Dashboard</a>
     <button class="navbar-toggler" @onclick="ToggleNavMenu">
         <span class="navbar-toggler-icon"></span>
@@ -16,6 +52,9 @@
             <NavLink class="nav-link" href="domain">
                 <span class="oi oi-sun" aria-hidden="true"></span> Domain
             </NavLink>
+            <NavLink class="nav-link" href="domain-po">
+                <span class="oi oi-sun" aria-hidden="true"></span> Domain - Ports
+            </NavLink>
         </li>
         <li class="nav-item px-3">
             <NavLink class="nav-link" href="eventstore">
@@ -28,7 +67,7 @@
             </NavLink>
         </li>
     </ul>
-</div>
+</div>*@
 
 @code {
     bool collapseNavMenu = true;

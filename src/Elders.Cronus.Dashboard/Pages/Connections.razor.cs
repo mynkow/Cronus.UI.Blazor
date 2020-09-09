@@ -3,6 +3,7 @@ using System.Threading.Tasks;
 using Blazored.LocalStorage;
 using Elders.Cronus.Dashboard.Models;
 using Microsoft.AspNetCore.Components;
+using Microsoft.Extensions.Logging;
 
 namespace Elders.Cronus.Dashboard.Pages
 {
@@ -12,6 +13,10 @@ namespace Elders.Cronus.Dashboard.Pages
 
         [Inject]
         public ILocalStorageService LocalStorage { get; set; }
+
+        [Inject]
+        public ILogger<ConnectionsBase> Logger { get; set; }
+
 
         public ConnectionsBase()
         {
@@ -25,10 +30,12 @@ namespace Elders.Cronus.Dashboard.Pages
                 connections = new List<Connection>();
         }
 
-        protected async Task OnDelete(Connection model)
+        protected async Task OnDeleteAsync(Connection model)
         {
             connections.Remove(model);
             await LocalStorage.SetItemAsync(LSKey.Connections, connections);
+
+            Logger.LogInformation($"{model.Name} has been deleted.");
 
             StateHasChanged();
         }

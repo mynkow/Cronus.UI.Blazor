@@ -1,20 +1,26 @@
 ﻿@page "/connections"
 @inherits ConnectionsBase
 
+<h1>Connections</h1>
 <div>
     <NavLink href="connection/new">
         <span class="oi oi-plus"></span> New Connection
     </NavLink>
 </div>
-
-<div class="list-group">
-    <div class="list-group-item list-group-item-action active">Available Connections</div>
-    @foreach (var connection in connections)
-    {
-        <div class="list-group-item list-group-item-action">
-            @connection.Name
-            <a href="/connection/@connection.Name"><span class="oi oi-cog" title="Edit"></span></a>
-            <IconButton Icon="delete" ToolTip="Delete" Click="@(async () => await OnDelete(connection))" />
-        </div>
-    }
-</div>
+<MatTable Items="@connections" LoadInitialData="true" FilterByColumnName="Name" PageSize="9999" ShowPaging="false" Striped="false" AllowSelection="true" class="mat-elevation-z5">
+    <MatTableHeader>
+        <th style="width:600px">Name</th>
+        <th>Endpoint</th>
+        <th>Authority</th>
+        <th>Actions</th>
+    </MatTableHeader>
+    <MatTableRow>
+        <td>@context.Name</td>
+        <td>@context.CronusEndpoint</td>
+        <td>@context.oAuth.ServerEndpoint</td>
+        <td>
+            <MatButton Outlined="true" TrailingIcon="edit" Link="@($"/connection/{@context.Name}")">Edit</MatButton>
+            <MatButton Outlined="true" TrailingIcon="delete" OnClick="@(async () => await OnDeleteAsync(context))">Delete</MatButton>
+        </td>
+    </MatTableRow>
+</MatTable>

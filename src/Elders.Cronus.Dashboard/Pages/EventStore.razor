@@ -1,83 +1,65 @@
-﻿@page "/domain"
+﻿@page "/eventstore"
 @inject AppState App
 @inject CronusClient Cronus
 @inject IJSRuntime JSRuntime
 
+<div class="pin">
+    <input type="text" @bind="@AggregateId" style="width:1000px" />
+    <MatIconButton Icon="search" OnClick="@(async ()=> await GetAggregateAsync())"></MatIconButton>
+    <IconButton Icon="magnifying-glass" Click="@(async ()=> await GetAggregateAsync())"></IconButton>
+</div>
 
-
-    
-
-<div class="mat-layout-grid">
-    <h1>Aggregates</h1>
-
-    <MatTable Items="@Aggregates" LoadInitialData="true" Striped="false" AllowSelection="true" SelectionChanged="AggregateSelectionChangedEvent" class="mat-elevation-z5">
-        <MatTableHeader>
-            <th>Name</th>
-            <th>Description</th>
-        </MatTableHeader>
-        <MatTableRow>
-            <td>@context.Name</td>
-            <td>@String.Format("${0:f2}", @context.Name)</td>
-        </MatTableRow>
-    </MatTable>
-    <div class="mat-layout-grid-inner">
-        <div class="mat-layout-grid-cell mat-layout-grid-cell-span-6">
-            <h2>Commands</h2>
-
-            <MatTable Items="@AggregateCommands" LoadInitialData="true" Striped="false" AllowSelection="true" class="mat-elevation-z5">
-                <MatTableHeader>
-                    <th>Name</th>
-                    <th>Description</th>
-                </MatTableHeader>
-                <MatTableRow>
-                    <td>@context.Name</td>
-                    <td>@String.Format("${0:f2}", @context.Name)</td>
-                </MatTableRow>
-            </MatTable>
-        </div>
-        <div class="mat-layout-grid-cell mat-layout-grid-cell-span-6">
-            <h2>Events</h2>
-
-            <MatTable Items="@AggregateEvents" LoadInitialData="true" Striped="false" AllowSelection="true" class="mat-elevation-z5">
-                <MatTableHeader>
-                    <th>Name</th>
-                    <th>Description</th>
-                </MatTableHeader>
-                <MatTableRow>
-                    <td>@context.Name</td>
-                    <td>@String.Format("${0:f2}", @context.Name)</td>
-                </MatTableRow>
-            </MatTable>
+<div class="row">
+    <div class="col-lg-3">
+        @foreach (var commit in commits)
+        {
+            <ul class="list-group list-group-flush event-list">
+                @foreach (var evnt in commit.Events)
+                {
+                    <li class="list-group-item cursor-pointer event-list-item" @onclick="@(async ()=> await GetDetails(evnt))">
+                        <div class="row">
+                            <div class="col-lg-5">
+                                <span style="font-size:smaller;">@commit.Timestamp.ToString("MMM d'th' yyyy, hh:mm:ss.fff")</span>
+                            </div>
+                            <div class="col-lg-7">
+                                <span class="ml-4" style="color:forestgreen">
+                                    <Icon Identifier="bookmark" />
+                                </span>
+                                @evnt?.EventName
+                            </div>
+                        </div>
+                    </li>
+                }
+            </ul>
+        }
+    </div>
+    <div class="col-lg-9">
+        <div class="json-box">
+            <pre>@details</pre>
         </div>
     </div>
 </div>
 
-    @code {
-        DomainAggregateDto[] Aggregates { get; set; }
+@code {
+    string AggregateId { get; set; }
+    List<AggregateCommitDto> commits = new List<AggregateCommitDto>();
+    string details = string.Empty;
 
-        DomainEventDto[] AggregateEvents { get; set; }
-
-        DomainCommandDto[] AggregateCommands { get; set; }
-
-        protected override async Task OnInitializedAsync()
+    async Task GetAggregateAsync()
+    {
+        AggregateDto ar = await Cronus.GetAggregate(App.Connection, AggregateId);
+        if (ar is null == false && ar.Commits is null == false)
         {
-            var result = await Cronus.GetDomainAsync(@App.Connection);
-            Aggregates = result.Aggregates.ToArray();
-        }
-
-        public void AggregateSelectionChangedEvent(object row)
-        {
-            if (row == null)
-            {
-                AggregateCommands = new List<DomainCommandDto>().ToArray();
-                AggregateEvents = new List<DomainEventDto>().ToArray();
-            }
-            else
-            {
-                AggregateCommands = ((DomainAggregateDto)row).Commands.ToArray();
-                AggregateEvents = ((DomainAggregateDto)row).Events.ToArray();
-            }
-
-            this.StateHasChanged();
+            commits = ar.Commits.OrderByDescending(commit => commit.AggregateRootRevision).ToList();
+            StateHasChanged();
         }
     }
+
+    public async Task GetDetails(EventDto eventDto)
+    {
+        details = await JSRuntime.InvokeAsync<string>("JSON.stringify", eventDto.EventData, null, 4);
+
+        StateHasChanged();
+    }
+
+}

@@ -1,0 +1,56 @@
+﻿@page "/domain-ports"
+@inject AppState App
+@inject CronusClient Cronus
+@inject IJSRuntime JSRuntime
+
+<div class="mat-layout-grid">
+    <h1>Ports</h1>
+
+    <MatTable Items="@Domain?.Ports" PageLabel="dfjgh" LoadInitialData="true" FilterByColumnName="Name" PageSize="9999" ShowPaging="false" Striped="false" AllowSelection="true" class="mat-elevation-z5">
+        <MatTableHeader>
+            <th>Name</th>
+            <th>ID</th>
+        </MatTableHeader>
+        <MatTableRow>
+            <td>@context.Name</td>
+            <td>@context.Id</td>
+        </MatTableRow>
+    </MatTable>
+    @*<div class="mat-layout-grid-inner">
+        <div class="mat-layout-grid-cell mat-layout-grid-cell-span-6">
+            <h2>@selectedAggregate Commands</h2>
+            <MatTable Items="@AggregateCommands" LoadInitialData="true" FilterByColumnName="Name" PageSize="9999" ShowPaging="false" Striped="false" AllowSelection="true" class="mat-elevation-z5">
+                <MatTableHeader>
+                    <th>Name</th>
+                    <th>ID</th>
+                </MatTableHeader>
+                <MatTableRow>
+                    <td>@context.Name</td>
+                    <td><i>@context.Id</i></td>
+                </MatTableRow>
+            </MatTable>
+        </div>
+        <div class="mat-layout-grid-cell mat-layout-grid-cell-span-6">
+            <h2>@selectedAggregate Events</h2>
+            <MatTable Items="@AggregateEvents" LoadInitialData="true" FilterByColumnName="Name" PageSize="9999" ShowPaging="false" Striped="false" AllowSelection="true" class="mat-elevation-z5">
+                <MatTableHeader>
+                    <th>Name</th>
+                    <th>ID</th>
+                </MatTableHeader>
+                <MatTableRow>
+                    <td>@context.Name</td>
+                    <td><i>@context.Id</i></td>
+                </MatTableRow>
+            </MatTable>
+        </div>
+    </div>*@
+</div>
+
+@code {
+    DomainDto Domain { get; set; }
+
+    protected override async Task OnInitializedAsync()
+    {
+        Domain = await Cronus.GetDomainAsync(@App.Connection);
+    }
+}
