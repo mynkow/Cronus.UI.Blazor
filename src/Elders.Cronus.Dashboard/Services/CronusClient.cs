@@ -32,6 +32,20 @@ namespace Elders.Cronus.Dashboard.Models
             return response.Data;
         }
 
+        public async Task<Response<IndexCollection>> GetIndicesAsync(Connection connection)
+        {
+            HttpRequestMessage request = new HttpRequestMessage(HttpMethod.Get, connection.CronusEndpoint + "/indices");
+            if (string.IsNullOrEmpty(connection.oAuth.ServerEndpoint) == false)
+            {
+                var accessToken = await token.GetAccessTokenAsync(connection);
+                request.Headers.Authorization = new System.Net.Http.Headers.AuthenticationHeaderValue("bearer", accessToken);
+            }
+
+            var response = await ExecuteRequestAsync<Response<IndexCollection>>(request);
+
+            return response.Data;
+        }
+
         public async Task<DomainDto> GetDomainAsync(Connection connection)
         {
             HttpRequestMessage request = new HttpRequestMessage(HttpMethod.Get, connection.CronusEndpoint + "/domain/explore");
@@ -46,7 +60,7 @@ namespace Elders.Cronus.Dashboard.Models
             return response.Data;
         }
 
-        public async Task<bool> RebuildAsync(Connection connection, Projection projection)
+        public async Task<bool> RebuilProjectiondAsync(Connection connection, Projection projection)
         {
             log.LogInformation("Rebuilding...");
 
@@ -56,6 +70,30 @@ namespace Elders.Cronus.Dashboard.Models
             {
                 ProjectionContractId = projection.ProjectionContractId,
                 Hash = projection.LatestVersion.Hash
+            };
+
+            HttpRequestMessage request = CreateJsonPostRequest(rebuildRequest, resource);
+
+            if (string.IsNullOrEmpty(connection.oAuth.ServerEndpoint) == false)
+            {
+                var accessToken = await token.GetAccessTokenAsync(connection);
+                request.Headers.Authorization = new System.Net.Http.Headers.AuthenticationHeaderValue("bearer", accessToken);
+            }
+
+            await ExecuteRequestAsync<object>(request);
+
+            return true;
+        }
+
+        public async Task<bool> FinalizeIndexRebuildAsync(Connection connection, string indexContractId)
+        {
+            log.LogInformation("Finalizing index request...");
+
+            string resource = connection.CronusEndpoint + "/index/finalize";
+
+            var rebuildRequest = new IndexFinalizeRebuildRequestManually()
+            {
+                IndexContractId = indexContractId
             };
 
             HttpRequestMessage request = CreateJsonPostRequest(rebuildRequest, resource);
@@ -221,6 +259,11 @@ namespace Elders.Cronus.Dashboard.Models
         public string ProjectionContractId { get; set; }
 
         public string Hash { get; set; }
+    }
+
+    public class IndexFinalizeRebuildRequestManually
+    {
+        public string IndexContractId { get; set; }
     }
 
     public class Response<T>

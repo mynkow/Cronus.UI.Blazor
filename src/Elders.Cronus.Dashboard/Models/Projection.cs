@@ -16,7 +16,7 @@ namespace Elders.Cronus.Dashboard.Models
 
         public List<ProjectionVersion> Versions { get; set; }
 
-        public ProjectionVersion LiveVersion => Versions.Where(x => x.Status.Equals(ProjectionStatus.Live)).SingleOrDefault();
+        public ProjectionVersion LiveVersion => Versions.Where(x => x.Status.Equals(ProjectionStatus.Live)).LastOrDefault();
 
         public ProjectionVersion LatestVersion => Versions.OrderByDescending(x => x.Revision).First();
     }
