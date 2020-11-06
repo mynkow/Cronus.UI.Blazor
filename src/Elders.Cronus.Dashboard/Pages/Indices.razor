@@ -18,6 +18,7 @@
             <td>@context.IndexName</td>
             <td>@context.Status</td>
             <td>
+                <MatButton Label="Rebuild" OnClick="@(async () => await RebuildIndex(context.IndexContractId))"></MatButton>
                 <MatButton Label="Finalize" OnClick="@(async () => await FinalizeIndex(context.IndexContractId))"></MatButton>
             </td>
         </MatTableRow>
@@ -91,5 +92,10 @@
     protected async Task FinalizeIndex(string indexId)
     {
         await Cronus.FinalizeIndexRebuildAsync(@App.Connection, indexId);
+    }
+
+    protected async Task RebuildIndex(string indexId)
+    {
+        await Cronus.RebuildIndexAsync(@App.Connection, indexId);
     }
 }

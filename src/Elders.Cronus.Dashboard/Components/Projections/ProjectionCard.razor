@@ -15,7 +15,14 @@
                 </div>
                 <div class="text-right col-lg-4">
                     <a href="/projections/@Projection.ProjectionContractId"><Icon Identifier="magnifying-glass"></Icon></a>
-                    <IconButton Icon="loop-square" ToolTip="Rebuild" Click="@(async () => await RebuildAsync(Projection))"></IconButton>
+                    @if (Projection.LatestVersion.Status != ProjectionStatus.Building)
+                    {
+                        <IconButton Icon="loop-square" ToolTip="Rebuild" Click="@(async () => await RebuildAsync(Projection))"></IconButton>
+                    }
+                    else
+                    {
+                        <IconButton Icon="media-stop" ToolTip="Cancel" Click="@(async () => await CancelAsync(Projection))"></IconButton>
+                    }
                 </div>
             </div>
         </div>
@@ -36,6 +43,11 @@
 
     public Task RebuildAsync(Projection projection)
     {
-        return Cronus.RebuilProjectiondAsync(App.Connection, Projection);
+        return Cronus.RebuildProjectionAsync(App.Connection, Projection);
+    }
+
+    public Task CancelAsync(Projection projection)
+    {
+        return Cronus.CancelProjectionRebuildAsync(App.Connection, Projection);
     }
 }
