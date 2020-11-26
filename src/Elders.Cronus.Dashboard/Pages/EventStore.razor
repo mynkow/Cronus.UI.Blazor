@@ -93,13 +93,6 @@
         }
     }
 
-    public async Task GetDetails(EventDto eventDto)
-    {
-        details = await JSRuntime.InvokeAsync<string>("JSON.stringify", eventDto.EventData, null, 4);
-
-        StateHasChanged();
-    }
-
     public async Task<string> FormatJsonAsync(object data)
     {
         return await JSRuntime.InvokeAsync<string>("JSON.stringify", data, null, 4);
