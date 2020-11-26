@@ -4,40 +4,68 @@
 @inject IJSRuntime JSRuntime
 
 <div class="pin">
-    <input type="text" @bind="@AggregateId" style="width:1000px" />
+    <MatTextField @bind-Value="@AggregateId" Label="Aggregate ID" style="width:1000px"></MatTextField>
     <MatIconButton Icon="search" OnClick="@(async ()=> await GetAggregateAsync())"></MatIconButton>
-    <IconButton Icon="magnifying-glass" Click="@(async ()=> await GetAggregateAsync())"></IconButton>
 </div>
 
-<div class="row">
-    <div class="col-lg-3">
+<div class="mat-layout-grid">
+
+    <MatAccordion Multi="true">
         @foreach (var commit in commits)
         {
-            <ul class="list-group list-group-flush event-list">
-                @foreach (var evnt in commit.Events)
-                {
-                    <li class="list-group-item cursor-pointer event-list-item" @onclick="@(async ()=> await GetDetails(evnt))">
-                        <div class="row">
-                            <div class="col-lg-5">
-                                <span style="font-size:smaller;">@commit.Timestamp.ToString("MMM d'th' yyyy, hh:mm:ss.fff")</span>
-                            </div>
-                            <div class="col-lg-7">
-                                <span class="ml-4" style="color:forestgreen">
-                                    <Icon Identifier="bookmark" />
-                                </span>
-                                @evnt?.EventName
-                            </div>
-                        </div>
-                    </li>
-                }
-            </ul>
+            <MatAccordion Multi="true">
+                <MatExpansionPanel>
+                    <MatExpansionPanelSummary>
+                        <MatExpansionPanelHeader>
+                            <h3 class="mat-subtitle1">Commit revision @commit.AggregateRootRevision - @commit.Timestamp.ToString("MMM d'th' yyyy, hh:mm:ss.fff")</h3>
+                        </MatExpansionPanelHeader>
+                    </MatExpansionPanelSummary>
+                    <MatExpansionPanelDetails>
+                        @foreach (var theEvent in commit.Events)
+                        {
+                            <MatExpansionPanel>
+                                <MatExpansionPanelSummary>
+                                    <MatExpansionPanelHeader>
+                                        <span style="font-size:smaller;"> </span>
+                                        @if (@theEvent.IsEntityEvent)
+                                        {
+                                            <span style="color:maroon">
+                                                @theEvent.EventPosition
+                                                <Icon Identifier="bookmark" />
+                                                @theEvent?.EventName
+                                            </span>
+                                        }
+                                        else if (@theEvent.IsPublicEvent)
+                                        {
+                                            <span style="color:royalblue">
+                                                @theEvent.EventPosition
+                                                <Icon Identifier="bookmark" />
+                                                @theEvent?.EventName
+                                            </span>
+                                        }
+                                        else
+                                        {
+                                            <span style="color:forestgreen">
+                                                @theEvent.EventPosition
+                                                <Icon Identifier="bookmark" />
+                                                @theEvent?.EventName
+                                            </span>
+                                        }
+
+                                    </MatExpansionPanelHeader>
+                                </MatExpansionPanelSummary>
+                                <MatExpansionPanelDetails>
+                                    <div class="json-box">
+                                        <pre>@theEvent.EventData</pre>
+                                    </div>
+                                </MatExpansionPanelDetails>
+                            </MatExpansionPanel>
+                        }
+                    </MatExpansionPanelDetails>
+                </MatExpansionPanel>
+            </MatAccordion>
         }
-    </div>
-    <div class="col-lg-9">
-        <div class="json-box">
-            <pre>@details</pre>
-        </div>
-    </div>
+    </MatAccordion>
 </div>
 
 @code {
@@ -50,7 +78,17 @@
         AggregateDto ar = await Cronus.GetAggregate(App.Connection, AggregateId);
         if (ar is null == false && ar.Commits is null == false)
         {
+            foreach (var commit in ar.Commits)
+            {
+                foreach (var evnt in commit.Events)
+                {
+                    evnt.EventData = await FormatJsonAsync(evnt.EventData);
+                }
+                commit.Events = commit.Events.OrderByDescending(e => e.EventPosition).ToList();
+            }
+
             commits = ar.Commits.OrderByDescending(commit => commit.AggregateRootRevision).ToList();
+
             StateHasChanged();
         }
     }
@@ -60,6 +98,11 @@
         details = await JSRuntime.InvokeAsync<string>("JSON.stringify", eventDto.EventData, null, 4);
 
         StateHasChanged();
+    }
+
+    public async Task<string> FormatJsonAsync(object data)
+    {
+        return await JSRuntime.InvokeAsync<string>("JSON.stringify", data, null, 4);
     }
 
 }

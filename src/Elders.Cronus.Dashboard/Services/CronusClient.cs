@@ -95,7 +95,7 @@ namespace Elders.Cronus.Dashboard.Models
             {
                 ProjectionContractId = projection.ProjectionContractId,
                 Version = projection.LatestVersion,
-                
+
             };
 
             HttpRequestMessage request = CreateJsonPostRequest(rebuildRequest, resource);
@@ -302,6 +302,12 @@ namespace Elders.Cronus.Dashboard.Models
         public string EventName { get; set; }
 
         public object EventData { get; set; }
+
+        public bool IsEntityEvent { get; set; }
+
+        public bool IsPublicEvent { get; set; }
+
+        public int EventPosition { get; set; }
     }
 
     public class RebuildRequest
