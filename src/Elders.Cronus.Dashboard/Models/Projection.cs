@@ -14,7 +14,7 @@ namespace Elders.Cronus.Dashboard.Models
 
         public string ProjectionName { get; set; }
 
-        public bool IsReplayable { get; set; }
+        public bool IsReplayable { get; set; } = true;
 
         public List<ProjectionVersion> Versions { get; set; }
 

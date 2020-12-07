@@ -41,11 +41,18 @@
 
     protected async Task GetProjectionsListAsync(Connection connection)
     {
-        if (App.Connection is null == false || connection is null == false)
+        try
         {
-            var result = await Cronus.GetProjectionsAsync(connection ?? App.Connection);
-            projections = result.Result.Projections;
+            projections = new List<Projection>();
 
+            if (App.Connection is null == false || connection is null == false)
+            {
+                var result = await Cronus.GetProjectionsAsync(connection ?? App.Connection);
+                projections = result.Result.Projections;
+            }
+        }
+        finally
+        {
             StateHasChanged();
         }
     }
