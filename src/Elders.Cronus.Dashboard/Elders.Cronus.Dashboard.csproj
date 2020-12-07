@@ -4,7 +4,8 @@
     <TargetFramework>netstandard2.1</TargetFramework>
     <RazorLangVersion>3.0</RazorLangVersion>
     <RootNamespace>Elders.Cronus.Dashboard</RootNamespace>
-    <BlazorCacheBootResources>false</BlazorCacheBootResources>   <!--https://github.com/dotnet/aspnetcore/issues/24505#issuecomment-684857753-->
+    <BlazorCacheBootResources>false</BlazorCacheBootResources>
+    <!--https://github.com/dotnet/aspnetcore/issues/24505#issuecomment-684857753-->
   </PropertyGroup>
 
   <ItemGroup>

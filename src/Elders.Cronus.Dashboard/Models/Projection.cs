@@ -14,6 +14,8 @@ namespace Elders.Cronus.Dashboard.Models
 
         public string ProjectionName { get; set; }
 
+        public bool IsReplayable { get; set; }
+
         public List<ProjectionVersion> Versions { get; set; }
 
         public ProjectionVersion LiveVersion => Versions.Where(x => x.Status.Equals(ProjectionStatus.Live)).LastOrDefault();

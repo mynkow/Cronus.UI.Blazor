@@ -1,52 +1,58 @@
-﻿@inject AppState App
+﻿@implements IDisposable
+@inject AppState App
 @inject CronusClient Cronus
 
-<GreyOutZone IsGreyedOut=isLoading>
-    <div hidden="@(projections?.Count == 0)" class="top-row px-4">
-        <div class="px-4">
-            <input class="input-text" value="Filter" />
-        </div>
-        <div class="px-4">
-            <span class="badge badge-success">Live</span>
-            <span class="badge badge-primary">Building</span>
-            <span class="badge badge-secondary">NotPresent</span>
-            <span class="badge badge-danger">Timedout</span>
-            <span class="badge badge-dark">Canceled</span>
-        </div>
+<div hidden="@(projections?.Count == 0)" class="top-row px-4">
+    <div class="px-4">
+        <input class="input-text" value="Filter" />
     </div>
+    <div class="px-4">
+        <span class="badge badge-success">Live</span>
+        <span class="badge badge-primary">Building</span>
+        <span class="badge badge-secondary">NotPresent</span>
+        <span class="badge badge-danger">Timedout</span>
+        <span class="badge badge-dark">Canceled</span>
+    </div>
+</div>
 
-    <div class="row">
-        @foreach (var projection in projections)
-        {
-            <div class="col-sm-4 mt-4">
-                <ProjectionCard Projection="@projection"></ProjectionCard>
-            </div>
-        }
-    </div>
-</GreyOutZone>
+<div class="row">
+    @foreach (var projection in projections)
+    {
+        <div class="col-sm-4 mt-4">
+            <ProjectionCard Projection="@projection"></ProjectionCard>
+        </div>
+    }
+</div>
 
 @code {
-    bool isLoading = false;
+    private System.Threading.Timer timer;
+
     List<Projection> projections = new List<Projection>();
 
-    protected override Task OnInitializedAsync()
+    protected override async Task OnInitializedAsync()
     {
         App.OnChange += StateHasChanged;
-        App.OnConnectionChanged += GetProjectionsList;
+        App.OnConnectionChanged += GetProjectionsListAsync;
 
-        return GetProjectionsList(App.Connection);
+        await GetProjectionsListAsync(App.Connection);
+
+        timer = new System.Threading.Timer(_ => InvokeAsync(() => GetProjectionsListAsync(App.Connection)), null, 0, 5000);
     }
 
-    protected async Task GetProjectionsList(Connection connection)
+    protected async Task GetProjectionsListAsync(Connection connection)
     {
-        if (connection is null == false)
+        if (App.Connection is null == false || connection is null == false)
         {
-            isLoading = true;
-            var result = await Cronus.GetProjectionsAsync(@App.Connection);
+            var result = await Cronus.GetProjectionsAsync(connection ?? App.Connection);
             projections = result.Result.Projections;
-            isLoading = false;
 
             StateHasChanged();
         }
+    }
+
+    void IDisposable.Dispose()
+    {
+        timer?.Dispose();
+        timer = null;
     }
 }

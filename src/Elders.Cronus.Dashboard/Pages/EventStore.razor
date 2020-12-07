@@ -2,6 +2,7 @@
 @inject AppState App
 @inject CronusClient Cronus
 @inject IJSRuntime JSRuntime
+@inject ILogger<EventStore> Log
 
 <div class="pin">
     <MatTextField @bind-Value="@AggregateId" Label="Aggregate ID" style="width:1000px"></MatTextField>
@@ -26,7 +27,6 @@
                             <MatExpansionPanel>
                                 <MatExpansionPanelSummary>
                                     <MatExpansionPanelHeader>
-                                        <span style="font-size:smaller;"> </span>
                                         @if (@theEvent.IsEntityEvent)
                                         {
                                             <span style="color:maroon">
@@ -51,10 +51,10 @@
                                                 @theEvent?.EventName
                                             </span>
                                         }
-
                                     </MatExpansionPanelHeader>
                                 </MatExpansionPanelSummary>
                                 <MatExpansionPanelDetails>
+                                    <MatButton OnClick="@(() => OpenDialog(theEvent.Id, commit.AggregateRootRevision, theEvent.EventPosition))" Raised="true">REPUBLISH</MatButton>
                                     <div class="json-box">
                                         <pre>@theEvent.EventData</pre>
                                     </div>
@@ -68,10 +68,50 @@
     </MatAccordion>
 </div>
 
+<MatDialog @bind-IsOpen="@dialogIsOpen">
+    <MatDialogTitle>Select Handlers</MatDialogTitle>
+    <MatDialogContent>
+        @foreach (var element in _selectElements)
+        {
+            <MatCheckbox Value="@element.Selected"
+                         ValueChanged="@((bool value) => OnValueChanged(element, value))"
+                         ValueExpression="@(() => element.Selected)"
+                         Label="@element.Name">
+            </MatCheckbox>
+
+        }
+    </MatDialogContent>
+    <MatDialogActions>
+        <MatButton OnClick="@(e => { dialogIsOpen = false; })">Cancel</MatButton>
+        <MatButton OnClick="@(async () => { await RepublishEventAsync(); dialogIsOpen = false; })">REPUBLISH</MatButton>
+    </MatDialogActions>
+</MatDialog>
+
 @code {
+    bool dialogIsOpen = false;
+    List<IMessageHandlerDto> handlerCandidates = new List<IMessageHandlerDto>();
+    bool checked1 = true;
+
+    private readonly List<SelectableElement> _selectElements = new List<SelectableElement>();
+    bool? AllSelected { get; set; }
+
+
+
+
+
     string AggregateId { get; set; }
+    int CommitRevision { get; set; } = -1;
+    int EventPosition { get; set; } = -1;
+
     List<AggregateCommitDto> commits = new List<AggregateCommitDto>();
     string details = string.Empty;
+
+    DomainDto Domain { get; set; }
+
+    protected override async Task OnInitializedAsync()
+    {
+        Domain = await Cronus.GetDomainAsync(@App.Connection);
+    }
 
     async Task GetAggregateAsync()
     {
@@ -93,9 +133,95 @@
         }
     }
 
+    async Task RepublishEventAsync()
+    {
+        var first = _selectElements.First();
+        Log.LogInformation($"firstRepublishEventAsync - {first.Id} - {first.Selected}");
+
+        var elementsss = string.Join(',', _selectElements.Where(x => x.Selected).Select(x => x.Id));
+
+        Log.LogInformation($"republishing {AggregateId} - {CommitRevision} - {EventPosition} - {elementsss}");
+        if (CommitRevision > 0 && EventPosition >= 0)
+            await Cronus.RepublishEventAsync(App.Connection, AggregateId, CommitRevision, EventPosition, _selectElements.Where(x => x.Selected).Select(x => x.Id).ToArray());
+    }
+
     public async Task<string> FormatJsonAsync(object data)
     {
         return await JSRuntime.InvokeAsync<string>("JSON.stringify", data, null, 4);
+    }
+
+
+
+
+
+    Task OnValueChanged(SelectableElement element, bool s)
+    {
+        element.Selected = s;
+
+        var first = _selectElements.First();
+        Log.LogInformation($"firstOnValueChanged - {first.Id} - {first.Selected}");
+
+        var all = _selectElements.All(r => r.Selected);
+        var any = all || _selectElements.Any(r => r.Selected);
+
+        if (any && !all)
+        {
+            AllSelected = null;
+        }
+        else
+        {
+            AllSelected = all;
+        }
+
+        return Task.CompletedTask;
+    }
+
+    void OnChangeAllSelected(bool? s)
+    {
+        AllSelected = s;
+        if (AllSelected == null) return;
+
+        foreach (var element in _selectElements)
+        {
+            element.Selected = AllSelected == true;
+        }
+    }
+
+    void OpenDialog(string eventId, int commitRevision, int eventPosition)
+    {
+        _selectElements.Clear();
+
+
+        CommitRevision = commitRevision;
+        EventPosition = eventPosition;
+        handlerCandidates = Domain.FindHandlers(new DomainEventDto() { Id = eventId }).ToList();
+        foreach (var element in handlerCandidates)
+        {
+            Log.LogInformation($"theID - {element.Id}");
+            _selectElements.Add(new SelectableElement(false, element.Id, element.Name));
+        }
+
+        var first = _selectElements.First();
+        Log.LogInformation($"firstOpenDialog - {first.Id} - {first.Selected}");
+
+        dialogIsOpen = true;
+    }
+
+
+    class SelectableElement
+    {
+        public bool Selected { get; set; }
+
+        public string Id { get; }
+
+        public string Name { get; set; }
+
+        public SelectableElement(bool selected, string id, string name)
+        {
+            Selected = selected;
+            Id = id;
+            Name = name;
+        }
     }
 
 }

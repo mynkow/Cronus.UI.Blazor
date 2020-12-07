@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Linq;
 using System.Net.Http;
 using System.Runtime.InteropServices;
 using System.Threading.Tasks;
@@ -176,6 +177,31 @@ namespace Elders.Cronus.Dashboard.Models
             return result.Data.Result;
         }
 
+        public async Task RepublishEventAsync(Connection connection, string aggregateId, int commitRevision, int eventPosition, string[] recipientHandlers)
+        {
+            log.LogInformation("Republishing event request...");
+
+            string resource = connection.CronusEndpoint + "/EventStore/Republish";
+
+            var requestModel = new RepublishEventRequest()
+            {
+                Id = aggregateId,
+                CommitRevision = commitRevision,
+                EventPosition = eventPosition,
+                RecipientHandlers = recipientHandlers
+            };
+
+            HttpRequestMessage request = CreateJsonPostRequest(requestModel, resource);
+
+            if (string.IsNullOrEmpty(connection.oAuth.ServerEndpoint) == false)
+            {
+                var accessToken = await token.GetAccessTokenAsync(connection);
+                request.Headers.Authorization = new System.Net.Http.Headers.AuthenticationHeaderValue("bearer", accessToken);
+            }
+
+            await ExecuteRequestAsync<object>(request);
+        }
+
         public async Task<ProjectionStateDto> GetProjectionAsync(Connection connection, string projectionName, string projectionId)
         {
             if (string.IsNullOrEmpty(projectionName)) throw new ArgumentNullException(nameof(projectionName));
@@ -207,6 +233,23 @@ namespace Elders.Cronus.Dashboard.Models
         public List<DomainProjectionDto> Ports { get; set; }
 
         public List<DomainSagaDto> Sagas { get; set; }
+
+        public IEnumerable<IMessageHandlerDto> FindHandlers(IMessageDto message)
+        {
+            return Sagas.Where(x => x.Events.Any(@event => @event.Id == message.Id));
+        }
+    }
+
+    public interface IMessageDto
+    {
+        string Id { get; set; }
+        string Name { get; set; }
+    }
+
+    public interface IMessageHandlerDto
+    {
+        string Id { get; set; }
+        string Name { get; set; }
     }
 
     public class DomainAggregateDto
@@ -223,25 +266,25 @@ namespace Elders.Cronus.Dashboard.Models
         public List<DomainEventDto> Events { get; set; }
     }
 
-    public class DomainEventDto
+    public class DomainEventDto : IMessageDto
     {
         public string Id { get; set; }
         public string Name { get; set; }
     }
 
-    public class DomainPortDto
+    public class DomainPortDto : IMessageHandlerDto
     {
         public string Id { get; set; }
         public string Name { get; set; }
     }
 
-    public class DomainGatewayDto
+    public class DomainGatewayDto : IMessageHandlerDto
     {
         public string Id { get; set; }
         public string Name { get; set; }
     }
 
-    public class DomainSagaDto
+    public class DomainSagaDto : IMessageHandlerDto
     {
         public string Id { get; set; }
         public string Name { get; set; }
@@ -249,13 +292,13 @@ namespace Elders.Cronus.Dashboard.Models
         public List<DomainEventDto> Events { get; set; }
     }
 
-    public class DomainCommandDto
+    public class DomainCommandDto : IMessageDto
     {
         public string Id { get; set; }
         public string Name { get; set; }
     }
 
-    public class DomainProjectionDto
+    public class DomainProjectionDto : IMessageHandlerDto
     {
         public string Id { get; set; }
         public string Name { get; set; }
@@ -299,6 +342,8 @@ namespace Elders.Cronus.Dashboard.Models
 
     public class EventDto
     {
+        public string Id { get; set; }
+
         public string EventName { get; set; }
 
         public object EventData { get; set; }
@@ -334,6 +379,17 @@ namespace Elders.Cronus.Dashboard.Models
     public class RebuildIndex
     {
         public string Id { get; set; }
+    }
+
+    public class RepublishEventRequest
+    {
+        public string Id { get; set; }
+
+        public int CommitRevision { get; set; }
+
+        public int EventPosition { get; set; }
+
+        public string[] RecipientHandlers { get; set; }
     }
 
     public class Response<T>

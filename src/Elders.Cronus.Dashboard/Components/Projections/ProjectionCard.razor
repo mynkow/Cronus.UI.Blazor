@@ -15,13 +15,17 @@
                 </div>
                 <div class="text-right col-lg-4">
                     <a href="/projections/@Projection.ProjectionContractId"><Icon Identifier="magnifying-glass"></Icon></a>
-                    @if (Projection.LatestVersion.Status != ProjectionStatus.Building)
+
+                    @if (Projection.IsReplayable)
                     {
-                        <IconButton Icon="loop-square" ToolTip="Rebuild" Click="@(async () => await RebuildAsync(Projection))"></IconButton>
-                    }
-                    else
-                    {
-                        <IconButton Icon="media-stop" ToolTip="Cancel" Click="@(async () => await CancelAsync(Projection))"></IconButton>
+                        @if (Projection.LatestVersion.Status != ProjectionStatus.Building)
+                        {
+                            <IconButton Icon="loop-square" ToolTip="Rebuild" Click="@(async () => await RebuildAsync(Projection))"></IconButton>
+                        }
+                        else
+                        {
+                            <IconButton Icon="media-stop" ToolTip="Cancel" Click="@(async () => await CancelAsync(Projection))"></IconButton>
+                        }
                     }
                 </div>
             </div>
