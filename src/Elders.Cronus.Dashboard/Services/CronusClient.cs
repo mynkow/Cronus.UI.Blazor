@@ -177,7 +177,7 @@ namespace Elders.Cronus.Dashboard.Models
             return result.Data.Result;
         }
 
-        public async Task RepublishEventAsync(Connection connection, string aggregateId, int commitRevision, int eventPosition, string[] recipientHandlers)
+        public async Task RepublishEventAsync(Connection connection, string aggregateId, int commitRevision, int eventPosition, string[] recipientHandlers, bool isPublicEvent)
         {
             log.LogInformation("Republishing event request...");
 
@@ -188,7 +188,8 @@ namespace Elders.Cronus.Dashboard.Models
                 Id = aggregateId,
                 CommitRevision = commitRevision,
                 EventPosition = eventPosition,
-                RecipientHandlers = recipientHandlers
+                RecipientHandlers = recipientHandlers,
+                IsPublicEvent = isPublicEvent
             };
 
             HttpRequestMessage request = CreateJsonPostRequest(requestModel, resource);
@@ -236,7 +237,11 @@ namespace Elders.Cronus.Dashboard.Models
 
         public IEnumerable<IMessageHandlerDto> FindHandlers(IMessageDto message)
         {
-            return Sagas.Where(x => x.Events.Any(@event => @event.Id == message.Id));
+            return
+                Sagas.Where(x => x.Events.Any(@event => @event.Id == message.Id)).Cast<IMessageHandlerDto>().Concat(
+                Projections.Where(x => x.Events.Any(@event => @event.Id == message.Id))).Cast<IMessageHandlerDto>().Concat(
+                Ports.Where(x => x.Events.Any(@event => @event.Id == message.Id))).Cast<IMessageHandlerDto>().Concat(
+                Gateways.Where(x => x.Events.Any(@event => @event.Id == message.Id))).Cast<IMessageHandlerDto>();
         }
     }
 
@@ -250,6 +255,7 @@ namespace Elders.Cronus.Dashboard.Models
     {
         string Id { get; set; }
         string Name { get; set; }
+        string Type { get; set; }
     }
 
     public class DomainAggregateDto
@@ -276,18 +282,25 @@ namespace Elders.Cronus.Dashboard.Models
     {
         public string Id { get; set; }
         public string Name { get; set; }
+        public string Type { get; set; } = "Port";
+
+        public List<DomainEventDto> Events { get; set; }
     }
 
     public class DomainGatewayDto : IMessageHandlerDto
     {
         public string Id { get; set; }
         public string Name { get; set; }
+        public string Type { get; set; } = "Gateway";
+
+        public List<DomainEventDto> Events { get; set; }
     }
 
     public class DomainSagaDto : IMessageHandlerDto
     {
         public string Id { get; set; }
         public string Name { get; set; }
+        public string Type { get; set; } = "Saga";
 
         public List<DomainEventDto> Events { get; set; }
     }
@@ -302,6 +315,7 @@ namespace Elders.Cronus.Dashboard.Models
     {
         public string Id { get; set; }
         public string Name { get; set; }
+        public string Type { get; set; } = "Projection";
 
         public List<DomainEventDto> Events { get; set; }
     }
@@ -390,6 +404,8 @@ namespace Elders.Cronus.Dashboard.Models
         public int EventPosition { get; set; }
 
         public string[] RecipientHandlers { get; set; }
+
+        public bool IsPublicEvent { get; set; }
     }
 
     public class Response<T>

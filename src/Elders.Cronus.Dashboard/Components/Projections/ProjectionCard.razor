@@ -14,8 +14,6 @@
                     </div>
                 </div>
                 <div class="text-right col-lg-4">
-                    <a href="/projections/@Projection.ProjectionContractId"><Icon Identifier="magnifying-glass"></Icon></a>
-
                     @if (Projection.IsReplayable)
                     {
                         @if (Projection.LatestVersion.Status != ProjectionStatus.Building)
@@ -27,6 +25,7 @@
                             <IconButton Icon="media-stop" ToolTip="Cancel" Click="@(async () => await CancelAsync(Projection))"></IconButton>
                         }
                     }
+                    <a href="/projections/@Projection.ProjectionContractId"><Icon Identifier="magnifying-glass"></Icon></a>
                 </div>
             </div>
         </div>
