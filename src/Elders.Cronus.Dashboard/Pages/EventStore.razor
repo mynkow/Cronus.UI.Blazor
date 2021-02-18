@@ -54,7 +54,7 @@
                                     </MatExpansionPanelHeader>
                                 </MatExpansionPanelSummary>
                                 <MatExpansionPanelDetails>
-                                    <RepublishEvent Event="@theEvent" AggregateCommit="commit"></RepublishEvent>
+                                    <RepublishEvent AggregateId="@AggregateId" Event="@theEvent" AggregateCommit="commit"></RepublishEvent>
                                     <div class="json-box">
                                         <pre>@theEvent.EventData</pre>
                                     </div>

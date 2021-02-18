@@ -48,6 +48,9 @@
     private readonly List<SelectableElement> selectElements = new List<SelectableElement>();
 
     [Parameter]
+    public string AggregateId { get; set; }
+
+    [Parameter]
     public EventDto Event { get; set; }
 
     [Parameter]
@@ -57,9 +60,9 @@
     {
         var handlers = string.Join(',', selectElements.Where(x => x.Selected).Select(x => x.Id));
 
-        Log.LogInformation($"Republishing:{Environment.NewLine}\tID-Revision-Position: {Event.Id} - {AggregateCommit.AggregateRootRevision} - {Event.EventPosition}{Environment.NewLine}\tHandlers: {handlers}");
+        Log.LogInformation($"Republishing:{Environment.NewLine}\tID-Revision-Position: {AggregateId} - {AggregateCommit.AggregateRootRevision} - {Event.EventPosition}{Environment.NewLine}\tHandlers: {handlers}");
         if (AggregateCommit.AggregateRootRevision > 0 && Event.EventPosition >= 0)
-            await Cronus.RepublishEventAsync(App.Connection, Event.Id, AggregateCommit.AggregateRootRevision, Event.EventPosition, selectElements.Where(x => x.Selected).Select(x => x.Id).ToArray(), Event.IsPublicEvent);
+            await Cronus.RepublishEventAsync(App.Connection, AggregateId, AggregateCommit.AggregateRootRevision, Event.EventPosition, selectElements.Where(x => x.Selected).Select(x => x.Id).ToArray(), Event.IsPublicEvent);
     }
 
     public async Task<string> FormatJsonAsync(object data)
