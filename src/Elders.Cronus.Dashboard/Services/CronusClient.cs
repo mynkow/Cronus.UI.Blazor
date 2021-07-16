@@ -86,6 +86,31 @@ namespace Elders.Cronus.Dashboard.Models
             return true;
         }
 
+        public async Task<bool> ReplayProjectionAsync(Connection connection, Projection projection)
+        {
+            log.LogInformation("Replaying...");
+
+            string resource = connection.CronusEndpoint + "/projection/replay";
+
+            var rebuildRequest = new RebuildRequest()
+            {
+                ProjectionContractId = projection.ProjectionContractId,
+                Hash = projection.LatestVersion.Hash
+            };
+
+            HttpRequestMessage request = CreateJsonPostRequest(rebuildRequest, resource);
+
+            if (string.IsNullOrEmpty(connection.oAuth.ServerEndpoint) == false)
+            {
+                var accessToken = await token.GetAccessTokenAsync(connection);
+                request.Headers.Authorization = new System.Net.Http.Headers.AuthenticationHeaderValue("bearer", accessToken);
+            }
+
+            await ExecuteRequestAsync<object>(request);
+
+            return true;
+        }
+
         public async Task<bool> CancelProjectionRebuildAsync(Connection connection, Projection projection)
         {
             log.LogInformation("Canceling...");

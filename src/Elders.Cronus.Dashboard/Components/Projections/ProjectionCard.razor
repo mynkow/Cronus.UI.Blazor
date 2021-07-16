@@ -35,9 +35,14 @@
                     </div>
                 </div>
                 <div class="text-right col-lg-4">
+                    @if (Projection.LatestVersion.Status != ProjectionStatus.Building)
+                    {
+                        <IconButton Icon="media-play" ToolTip="Replays the projection and creates a new version. You should use this when your projection contains events you do not want." Click="@(async () => await ReplayAsync(Projection))"></IconButton>
+                    }
+
                     @if (Projection.IsReplayable && Projection.LatestVersion.Status != ProjectionStatus.Building)
                     {
-                        <IconButton Icon="loop-square" ToolTip="Rebuild" Click="@(async () => await RebuildAsync(Projection))"></IconButton>
+                        <IconButton Icon="loop-square" ToolTip="Rebuilds the projection version. You should use this when there are missing events." Click="@(async () => await RebuildAsync(Projection))"></IconButton>
                     }
 
                     <a href="/projections/@Projection.ProjectionContractId"><Icon Identifier="magnifying-glass"></Icon></a>
@@ -118,6 +123,11 @@
     public Task RebuildAsync(Projection projection)
     {
         return Cronus.RebuildProjectionAsync(App.Connection, Projection);
+    }
+
+    public Task ReplayAsync(Projection projection)
+    {
+        return Cronus.ReplayProjectionAsync(App.Connection, Projection);
     }
 
     public Task CancelAsync(Projection projection)
