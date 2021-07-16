@@ -33,6 +33,7 @@ namespace Elders.Cronus.Dashboard.Models
                 {
                     using (var contentStream = await response.Content.ReadAsStreamAsync().ConfigureAwait(false))
                     {
+                        contentStream.Position = 0;
                         T responseObject = await JsonSerializer.DeserializeAsync<T>(contentStream, serializerOptions).ConfigureAwait(false);
                         return (response, responseObject);
                     }

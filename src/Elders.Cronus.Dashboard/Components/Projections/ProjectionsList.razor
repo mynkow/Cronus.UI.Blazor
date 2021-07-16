@@ -36,7 +36,7 @@
 
         await GetProjectionsListAsync(App.Connection);
 
-        timer = new System.Threading.Timer(_ => InvokeAsync(() => GetProjectionsListAsync(App.Connection)), null, 0, 5000);
+        timer = new System.Threading.Timer(_ => InvokeAsync(() => GetProjectionsListAsync(App.Connection)), null, 0, 50000);
     }
 
     protected async Task GetProjectionsListAsync(Connection connection)

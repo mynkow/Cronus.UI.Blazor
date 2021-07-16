@@ -13,11 +13,79 @@ else
         <input type="text" @bind="@projectionId" style="width:1000px" />
         <IconButton Icon="magnifying-glass" Click="@(async ()=> await GetProjectionAsync())"></IconButton>
     </div>
+    <div>
+        <MatTabGroup>
+            <MatTab Label="State">
+                <ChildContent>
+                    <div class="json-box">
+                        <pre>@state</pre>
+                    </div>
+                </ChildContent>
+            </MatTab>
+            <MatTab Label="@eventsLabel" @onactivate="@(async ()=> await GetProjectionEventsAsync())">
+                <MatIconButton Icon="search" OnClick="@(async ()=> await GetProjectionEventsAsync())"></MatIconButton>
+                <div class="mat-layout-grid">
+                    <MatAccordion Multi="true">
+                        @foreach (var commit in commits)
+                        {
+                            <MatAccordion Multi="true">
+                                <MatExpansionPanel>
+                                    <MatExpansionPanelSummary>
+                                        <MatExpansionPanelHeader>
+                                            <h3 class="mat-subtitle1">@commit.Timestamp.ToString("MMM d'th' yyyy, hh:mm:ss.fff")</h3>
+                                        </MatExpansionPanelHeader>
+                                    </MatExpansionPanelSummary>
+                                    <MatExpansionPanelDetails>
+                                        @foreach (var theEvent in commit.Events)
+                                        {
+                                            <MatExpansionPanel>
+                                                <MatExpansionPanelSummary>
+                                                    <MatExpansionPanelHeader>
+                                                        @if (@theEvent.IsEntityEvent)
+                                                        {
+                                                            <span style="color:maroon">
+                                                                @theEvent.EventPosition
+                                                                <Icon Identifier="bookmark" />
+                                                                @theEvent?.EventName
+                                                            </span>
+                                                        }
+                                                        else if (@theEvent.IsPublicEvent)
+                                                        {
+                                                            <span style="color:royalblue">
+                                                                @theEvent.EventPosition
+                                                                <Icon Identifier="bookmark" />
+                                                                @theEvent?.EventName
+                                                            </span>
+                                                        }
+                                                        else
+                                                        {
+                                                            <span style="color:forestgreen">
+                                                                @theEvent.EventPosition
+                                                                <Icon Identifier="bookmark" />
+                                                                @theEvent?.EventName
+                                                            </span>
+                                                        }
+                                                    </MatExpansionPanelHeader>
+                                                </MatExpansionPanelSummary>
+                                                <MatExpansionPanelDetails>
+                                                    <div class="json-box">
+                                                        <pre>@theEvent.EventData</pre>
+                                                    </div>
+                                                </MatExpansionPanelDetails>
+                                            </MatExpansionPanel>
+                                        }
+                                    </MatExpansionPanelDetails>
+                                </MatExpansionPanel>
+                            </MatAccordion>
+                        }
+                    </MatAccordion>
+                </div>
+            </MatTab>
+        </MatTabGroup>
+    </div>
 
     <div>
-        <div class="json-box">
-            <pre>@state</pre>
-        </div>
+
     </div>
 }
 
@@ -30,9 +98,12 @@ else
 
     List<Projection> projections = new List<Projection>();
 
-    string projectionId = "dXJuOnBydXZpdDpub3RpZmljYXRpb24tc2V0dGluZ3M6NzYyNzQ=";
+    List<ProjectionCommitDto> commits = new List<ProjectionCommitDto>();
+
+    string projectionId = "urn:";
     string state = "";
     string details = string.Empty;
+    string eventsLabel = "Events";
 
     protected override Task OnInitializedAsync()
     {
@@ -63,5 +134,32 @@ else
             state = await JSRuntime.InvokeAsync<string>("JSON.stringify", projection.State, null, 4);
             StateHasChanged();
         }
+    }
+
+    async Task GetProjectionEventsAsync()
+    {
+        ProjectionCommitsDto projection = await Cronus.GetProjectionEventsAsync(App.Connection, Projection.ProjectionContractId, projectionId);
+        if (projection is null == false && projection.Commits is null == false)
+        {
+            foreach (var commit in projection.Commits)
+            {
+                foreach (var evnt in commit.Events)
+                {
+                    evnt.EventData = await FormatJsonAsync(evnt.EventData);
+                }
+                commit.Events = commit.Events.OrderByDescending(e => e.EventPosition).ToList();
+            }
+
+            commits = projection.Commits.OrderByDescending(commit => commit.Timestamp).ToList();
+
+            eventsLabel = $"Events ({commits.SelectMany(c => c.Events).Count()})";
+
+            StateHasChanged();
+        }
+    }
+
+    public async Task<string> FormatJsonAsync(object data)
+    {
+        return await JSRuntime.InvokeAsync<string>("JSON.stringify", data, null, 4);
     }
 }

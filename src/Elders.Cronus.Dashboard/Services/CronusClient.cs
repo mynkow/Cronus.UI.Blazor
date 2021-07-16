@@ -221,6 +221,25 @@ namespace Elders.Cronus.Dashboard.Models
 
             return result.Data.Result;
         }
+
+        public async Task<ProjectionCommitsDto> GetProjectionEventsAsync(Connection connection, string projectionName, string projectionId)
+        {
+            if (string.IsNullOrEmpty(projectionName)) throw new ArgumentNullException(nameof(projectionName));
+            if (string.IsNullOrEmpty(projectionId)) throw new ArgumentNullException(nameof(projectionId));
+
+            log.LogDebug($"{projectionName}({projectionId})");
+
+            HttpRequestMessage request = new HttpRequestMessage(HttpMethod.Get, connection.CronusEndpoint + $"/Projection/ExploreEvents?projectionName={projectionName}&id={projectionId}");
+            if (string.IsNullOrEmpty(connection.oAuth.ServerEndpoint) == false)
+            {
+                var accessToken = await token.GetAccessTokenAsync(connection);
+                request.Headers.Authorization = new System.Net.Http.Headers.AuthenticationHeaderValue("bearer", accessToken);
+            }
+
+            var result = await ExecuteRequestAsync<Response<ProjectionCommitsDto>>(request);
+
+            return result.Data.Result;
+        }
     }
 
     public class DomainDto
@@ -231,7 +250,7 @@ namespace Elders.Cronus.Dashboard.Models
 
         public List<DomainProjectionDto> Projections { get; set; }
 
-        public List<DomainProjectionDto> Ports { get; set; }
+        public List<DomainPortDto> Ports { get; set; }
 
         public List<DomainSagaDto> Sagas { get; set; }
 
@@ -340,6 +359,19 @@ namespace Elders.Cronus.Dashboard.Models
         public object State { get; set; }
     }
 
+    public class ProjectionCommitsDto
+    {
+        public string Name { get; set; }
+        public List<ProjectionCommitDto> Commits { get; set; }
+    }
+
+    public class ProjectionCommitDto
+    {
+        public List<EventDto> Events { get; set; }
+
+        public DateTimeOffset Timestamp { get; set; }
+    }
+
     public class AggregateCommitDto
     {
         public AggregateCommitDto()
@@ -367,6 +399,8 @@ namespace Elders.Cronus.Dashboard.Models
         public bool IsPublicEvent { get; set; }
 
         public int EventPosition { get; set; }
+
+        public DateTimeOffset Timestamp { get; set; }
     }
 
     public class RebuildRequest
