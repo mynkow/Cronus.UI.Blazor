@@ -35,7 +35,7 @@
     <Content Update="Components\Bootstrap\IconButton.razor">
       <Pack>$(IncludeRazorContentInPack)</Pack>
     </Content>
-    <Content Update="Components\ConnectionSelector.razor">
+    <Content Update="Pages\ConnectionSelector.razor">
       <Pack>$(IncludeRazorContentInPack)</Pack>
     </Content>
     <Content Update="Pages\ConnectionEdit.razor">

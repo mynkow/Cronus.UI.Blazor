@@ -5,7 +5,7 @@ using Elders.Cronus.Dashboard.Models;
 using Microsoft.AspNetCore.Components;
 using Microsoft.Extensions.Logging;
 
-namespace Elders.Cronus.Dashboard.Pages
+namespace Elders.Cronus.Dashboard.Components
 {
     public class ConnectionsBase : ComponentBase
     {
