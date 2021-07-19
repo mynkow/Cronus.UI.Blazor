@@ -19,6 +19,20 @@ namespace Elders.Cronus.Dashboard.Models
             this.log = log;
         }
 
+        public async Task<List<string>> GetTenantsAsync(Connection connection)
+        {
+            HttpRequestMessage request = new HttpRequestMessage(HttpMethod.Get, connection.CronusEndpoint + "/domain/tenants");
+            if (string.IsNullOrEmpty(connection.oAuth.ServerEndpoint) == false)
+            {
+                var accessToken = await token.GetAccessTokenAsync(connection);
+                request.Headers.Authorization = new System.Net.Http.Headers.AuthenticationHeaderValue("bearer", accessToken);
+            }
+
+            var response = await ExecuteRequestAsync<List<string>>(request);
+
+            return response.Data;
+        }
+
         public async Task<Response<ProjectionCollection>> GetProjectionsAsync(Connection connection)
         {
             HttpRequestMessage request = new HttpRequestMessage(HttpMethod.Get, connection.CronusEndpoint + "/projections");

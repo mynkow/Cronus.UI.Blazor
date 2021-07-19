@@ -13,6 +13,11 @@ namespace Elders.Cronus.Dashboard.Components
 {
     public class ConnectionBase : ComponentBase
     {
+        public ConnectionBase()
+        {
+            TenantAuths = new List<oAuth>();
+        }
+
         [Inject]
         protected ILogger<ConnectionBase> Log { get; set; }
 
@@ -24,6 +29,9 @@ namespace Elders.Cronus.Dashboard.Components
 
         [Inject]
         protected HttpClient HttpClient { get; set; }
+
+        [Inject]
+        protected CronusClient Cronus { get; set; }
 
         [Parameter]
         public string Name { get; set; }
@@ -39,6 +47,9 @@ namespace Elders.Cronus.Dashboard.Components
 
         [Parameter]
         public string oAuthSecret { get; set; }
+
+        [Parameter]
+        public List<oAuth> TenantAuths { get; set; }
 
         protected override async Task OnInitializedAsync()
         {
@@ -61,6 +72,7 @@ namespace Elders.Cronus.Dashboard.Components
                 oAuthEndpoint = connection.oAuth.ServerEndpoint;
                 oAuthClient = connection.oAuth.Client;
                 oAuthSecret = connection.oAuth.Secret;
+                TenantAuths = connection.oAuths;
             }
 
             return true;
@@ -81,7 +93,7 @@ namespace Elders.Cronus.Dashboard.Components
 
         protected async Task AddConnection()
         {
-             var connections = await LocalStorage.GetItemAsync<List<Connection>>(LSKey.Connections) ?? new List<Connection>();
+            var connections = await LocalStorage.GetItemAsync<List<Connection>>(LSKey.Connections) ?? new List<Connection>();
 
             var newConnection = GetConnection();
             connections.Add(newConnection);
@@ -92,7 +104,7 @@ namespace Elders.Cronus.Dashboard.Components
 
         Connection GetConnection()
         {
-            return new Connection()
+            return new Connection(Name, CronusEndpoint)
             {
                 Name = Name,
                 CronusEndpoint = CronusEndpoint,
@@ -101,7 +113,8 @@ namespace Elders.Cronus.Dashboard.Components
                     ServerEndpoint = oAuthEndpoint,
                     Client = oAuthClient,
                     Secret = oAuthSecret
-                }
+                },
+                oAuths = TenantAuths
             };
         }
 
@@ -112,6 +125,28 @@ namespace Elders.Cronus.Dashboard.Components
             var result = await Token.GetAccessTokenAsync(connection);
 
             Log.LogDebug(result);
+        }
+
+        protected async Task GetTenants()
+        {
+            Log.LogDebug("GetTenants()");
+
+            var tenantsForCurrentConnection = await Cronus.GetTenantsAsync(new Connection(Name, CronusEndpoint));
+
+            foreach (var tenant in tenantsForCurrentConnection)
+            {
+                bool tenantHasAlreadyBeenSetUp = TenantAuths.Any(x => x.Tenant.Equals(tenant));
+                if (tenantHasAlreadyBeenSetUp)
+                    continue;
+
+                TenantAuths.Add(new oAuth()
+                {
+                    Tenant = tenant,
+                    ServerEndpoint = oAuthEndpoint
+                });
+            }
+
+            StateHasChanged();
         }
 
         protected async Task OnDelete(Connection model)
