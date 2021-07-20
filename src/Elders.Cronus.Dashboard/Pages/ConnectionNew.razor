@@ -6,6 +6,7 @@
 <fieldset>
     <MatTextField @bind-Value="@Name" Label="Name" FullWidth="true" Required="true"></MatTextField>
     <MatTextField @bind-Value="@CronusEndpoint" Label="Cronus Endpoint" FullWidth="true" Required="true"></MatTextField>
+    <MatButton Outlined="true" OnClick="@GetTenants">Check</MatButton>
 </fieldset>
 
 <fieldset>

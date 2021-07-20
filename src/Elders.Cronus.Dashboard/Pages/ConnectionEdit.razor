@@ -1,12 +1,14 @@
 ﻿@page "/connection/{Name}"
 @inherits ConnectionBase
 @inject AppState App
+@inject CronusClient Cronus
 
 <h1>Edit Connection</h1>
 
 <fieldset>
     <MatTextField @bind-Value="@Name" Label="Name" FullWidth="true" Required="true"></MatTextField>
     <MatTextField @bind-Value="@CronusEndpoint" Label="Cronus Endpoint" FullWidth="true" Required="true"></MatTextField>
+    <MatButton Outlined="true" OnClick="@GetTenants">Check</MatButton>
 </fieldset>
 
 <fieldset>
@@ -19,3 +21,28 @@
 
 <MatButton Outlined="true" OnClick="@GetToken">Get Token</MatButton>
 <MatButton Outlined="true" TrailingIcon="save" OnClick="@(async () => await EditConnection())">Update</MatButton>
+
+
+<MatTable Items="@TenantAuths" class="mat-elevation-z5" ShowPaging="false" UseSortHeaderRow="true">
+    <MatTableHeader>
+        <MatSortHeaderRow>
+            <MatSortHeader>Tenant</MatSortHeader>
+            <MatSortHeader>Server (100g)</MatSortHeader>
+            <MatSortHeader>Client</MatSortHeader>
+            <MatSortHeader>Secret</MatSortHeader>
+            <MatSortHeader>Scope</MatSortHeader>
+            <MatSortHeader>Actions</MatSortHeader>
+        </MatSortHeaderRow>
+    </MatTableHeader>
+    <MatTableRow>
+        <td>@context.Tenant</td>
+        <td>@context.ServerEndpoint</td>
+        <td>@context.Client</td>
+        <td>@context.Secret</td>
+        <td>@context.Scope</td>
+        <td>
+            <MatButton Outlined="true" OnClick="@GetToken">Get Token</MatButton>
+            <MatButton Outlined="true" TrailingIcon="edit" Link="@($"/connection/{@Name}/{context.Tenant}")">Edit</MatButton>
+        </td>
+    </MatTableRow>
+</MatTable>

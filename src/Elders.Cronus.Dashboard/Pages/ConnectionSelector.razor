@@ -1,0 +1,27 @@
+﻿@inherits ConnectionSelectorBase
+
+<div class="btn-group connection">
+    <button type="button" class="btn btn-primary w-75">@ConnectionName</button>
+    <button type="button" class="btn btn-primary dropdown-toggle dropdown-toggle-split" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+        <span class="sr-only">Toggle Dropdown</span>
+    </button>
+    <div class="dropdown-menu" aria-labelledby="dropdownMenuButton">
+        @foreach (var connection in connections)
+        {
+            <span class="dropdown-item cursor-pointer" @onclick="@(async () => await OnConnectionClick(connection))">@connection.Name</span>
+        }
+    </div>
+</div>
+
+<div class="btn-group connection">
+    <button type="button" class="btn btn-primary w-75">@TenantName</button>
+    <button type="button" class="btn btn-primary dropdown-toggle dropdown-toggle-split" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+        <span class="sr-only">Toggle Dropdown</span>
+    </button>
+    <div class="dropdown-menu" aria-labelledby="dropdownMenuButton">
+        @foreach (var oAuth in oAuths)
+        {
+            <span class="dropdown-item cursor-pointer" @onclick="@(async () => await OnAuthSelected(oAuth))">@oAuth.Tenant</span>
+        }
+    </div>
+</div>
