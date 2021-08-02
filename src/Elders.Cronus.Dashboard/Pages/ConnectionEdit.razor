@@ -11,23 +11,11 @@
     <MatButton Outlined="true" OnClick="@GetTenants">Check</MatButton>
 </fieldset>
 
-<fieldset>
-    <legend> Authorization </legend>
-
-    <MatTextField @bind-Value="@oAuthEndpoint" Label="Server" FullWidth="true"></MatTextField>
-    <MatTextField @bind-Value="@oAuthClient" Label="Client" FullWidth="true"></MatTextField>
-    <MatTextField @bind-Value="@oAuthSecret" Label="Secret" FullWidth="true" Type="password" Icon="lock_outline" IconTrailing="true"></MatTextField>
-</fieldset>
-
-<MatButton Outlined="true" OnClick="@GetToken">Get Token</MatButton>
-<MatButton Outlined="true" TrailingIcon="save" OnClick="@(async () => await EditConnection())">Update</MatButton>
-
-
 <MatTable Items="@TenantAuths" class="mat-elevation-z5" ShowPaging="false" UseSortHeaderRow="true">
     <MatTableHeader>
         <MatSortHeaderRow>
             <MatSortHeader>Tenant</MatSortHeader>
-            <MatSortHeader>Server (100g)</MatSortHeader>
+            <MatSortHeader>Authority Address</MatSortHeader>
             <MatSortHeader>Client</MatSortHeader>
             <MatSortHeader>Secret</MatSortHeader>
             <MatSortHeader>Scope</MatSortHeader>
@@ -41,8 +29,10 @@
         <td>@context.Secret</td>
         <td>@context.Scope</td>
         <td>
-            <MatButton Outlined="true" OnClick="@GetToken">Get Token</MatButton>
+            <MatButton Outlined="true" OnClick="@(async () => await @GetToken(context))">Get Token</MatButton>
             <MatButton Outlined="true" TrailingIcon="edit" Link="@($"/connection/{@Name}/{context.Tenant}")">Edit</MatButton>
         </td>
     </MatTableRow>
 </MatTable>
+
+<MatButton Outlined="true" TrailingIcon="save" OnClick="@(async () => await EditConnection())">Update</MatButton>

@@ -27,6 +27,7 @@ namespace Elders.Cronus.Dashboard
         public void SelectTenant(oAuth selectedoAuth)
         {
             oAuth = selectedoAuth;
+            Connection.oAuth = selectedoAuth;
             NotifyStateChanged();
             NotifyTenantChanged(oAuth);
         }

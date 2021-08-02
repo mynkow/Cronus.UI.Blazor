@@ -118,11 +118,12 @@ namespace Elders.Cronus.Dashboard.Components
             };
         }
 
-        protected async Task GetToken()
+        protected async Task GetToken(oAuth oAuth)
         {
             Log.LogDebug("GetToken()");
 
-            var result = await Token.GetAccessTokenAsync(connection);
+            Connection testConnection = new Connection(Name, CronusEndpoint, oAuth);
+            var result = await Token.GetAccessTokenAsync(testConnection);
 
             Log.LogDebug(result);
         }
