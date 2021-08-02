@@ -23,8 +23,9 @@ namespace Elders.Cronus.Dashboard.Models
             getTokenRequest.Headers.Authorization = new System.Net.Http.Headers.AuthenticationHeaderValue("basic", connection.oAuth.BasicAuthorization);
             Dictionary<string, string> parameters = new Dictionary<string, string>();
             parameters.Add("grant_type", "client_credentials");
-            //parameters.Add("scope", "read");
-            parameters.Add("scope", "dmo");
+
+            parameters.Add("scope", connection.oAuth.Scope);
+
             getTokenRequest.Content = new FormUrlEncodedContent(parameters);
             var response = await httpClient.SendAsync(getTokenRequest).ConfigureAwait(false);
             var result = await response.Content.ReadAsStringAsync().ConfigureAwait(false);
