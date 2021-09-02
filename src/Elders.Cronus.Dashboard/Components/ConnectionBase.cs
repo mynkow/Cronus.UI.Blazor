@@ -75,6 +75,8 @@ namespace Elders.Cronus.Dashboard.Components
                 TenantAuths = connection.oAuths;
             }
 
+            await GetTenants();
+
             return true;
         }
 
