@@ -35,12 +35,15 @@ namespace Elders.Cronus.Dashboard.Components
 
         protected override async Task OnInitializedAsync()
         {
+            App.OnConnectionsUpdated += UpdateConnections;
+
             ConnectionName = App.Connection?.Name ?? "Select Connection...";
             TenantName = App.oAuth?.Tenant ?? "Select Tenant...";
             connections = new List<Connection>();
             oAuths = new List<oAuth>();
 
             connections = await LocalStorage.GetItemAsync<List<Connection>>(LSKey.Connections);
+            App.LoadConnections(connections);
         }
 
         protected async Task OnConnectionClick(Connection connection)
@@ -60,6 +63,12 @@ namespace Elders.Cronus.Dashboard.Components
             App.SelectTenant(oAuth);
             TenantName = oAuth.Tenant;
 
+            StateHasChanged();
+        }
+
+        protected async Task UpdateConnections(List<Connection> updatedConnections)
+        {
+            connections = updatedConnections;
             StateHasChanged();
         }
     }

@@ -19,6 +19,9 @@ namespace Elders.Cronus.Dashboard.Components
         }
 
         [Inject]
+        public AppState App { get; set; }
+
+        [Inject]
         protected ILogger<ConnectionBase> Log { get; set; }
 
         [Inject]
@@ -88,6 +91,8 @@ namespace Elders.Cronus.Dashboard.Components
                 connections.Add(newConnection);
                 await LocalStorage.SetItemAsync(LSKey.Connections, connections);
                 connection = newConnection;
+
+                App.UpdateConnections(connections);
             }
 
             StateHasChanged();
@@ -100,6 +105,8 @@ namespace Elders.Cronus.Dashboard.Components
             var newConnection = GetConnection();
             connections.Add(newConnection);
             await LocalStorage.SetItemAsync(LSKey.Connections, connections);
+
+            App.UpdateConnections(connections);
 
             StateHasChanged();
         }
@@ -118,6 +125,12 @@ namespace Elders.Cronus.Dashboard.Components
                 },
                 oAuths = TenantAuths
             };
+        }
+
+        protected async Task UpdateConnections(List<Connection> updatedConnections)
+        {
+            connections = updatedConnections;
+            StateHasChanged();
         }
 
         protected async Task GetToken(oAuth oAuth)
