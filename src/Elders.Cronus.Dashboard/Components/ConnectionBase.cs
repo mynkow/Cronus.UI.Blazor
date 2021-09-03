@@ -135,12 +135,6 @@ namespace Elders.Cronus.Dashboard.Components
             };
         }
 
-        protected async Task UpdateConnections(List<Connection> updatedConnections)
-        {
-            connections = updatedConnections;
-            StateHasChanged();
-        }
-
         protected async Task CheckConnection()
         {
             List<string> response = await Cronus.GetTenantsAsync(new Connection(Name, CronusEndpoint));
