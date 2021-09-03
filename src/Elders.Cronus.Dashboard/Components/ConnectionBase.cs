@@ -19,7 +19,10 @@ namespace Elders.Cronus.Dashboard.Components
         }
 
         [Inject]
-        public AppState App { get; set; }
+        protected AppState App { get; set; }
+
+        [Inject]
+        protected NavigationManager NavigationManager { get; set; }
 
         [Inject]
         protected ILogger<ConnectionBase> Log { get; set; }
@@ -54,11 +57,15 @@ namespace Elders.Cronus.Dashboard.Components
         [Parameter]
         public List<oAuth> TenantAuths { get; set; }
 
+        [Parameter]
+        public bool IsEndpointValid { get; set; }
+
         protected override async Task OnInitializedAsync()
         {
             await LoadDataAsync();
         }
 
+        private const string PathToConnections = "/connections";
         protected List<Connection> connections;
         protected Connection connection;
 
@@ -109,6 +116,7 @@ namespace Elders.Cronus.Dashboard.Components
             App.UpdateConnections(connections);
 
             StateHasChanged();
+            NavigationManager.NavigateTo(PathToConnections);
         }
 
         Connection GetConnection()
@@ -133,6 +141,14 @@ namespace Elders.Cronus.Dashboard.Components
             StateHasChanged();
         }
 
+        protected async Task CheckConnection()
+        {
+            List<string> response = await Cronus.GetTenantsAsync(new Connection(Name, CronusEndpoint));
+
+            IsEndpointValid = response.Any() ? true : false;
+            StateHasChanged();
+        }
+
         protected async Task GetToken(oAuth oAuth)
         {
             Log.LogDebug("GetToken()");
@@ -148,6 +164,7 @@ namespace Elders.Cronus.Dashboard.Components
             Log.LogDebug("GetTenants()");
 
             var tenantsForCurrentConnection = await Cronus.GetTenantsAsync(new Connection(Name, CronusEndpoint));
+            IsEndpointValid = tenantsForCurrentConnection.Any() ? true : false;
 
             foreach (var tenant in tenantsForCurrentConnection)
             {

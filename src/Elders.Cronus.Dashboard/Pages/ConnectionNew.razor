@@ -6,7 +6,15 @@
 <fieldset>
     <MatTextField @bind-Value="@Name" Label="Name" FullWidth="true" Required="true"></MatTextField>
     <MatTextField @bind-Value="@CronusEndpoint" Label="Cronus Endpoint" FullWidth="true" Required="true"></MatTextField>
-    <MatButton Outlined="true" OnClick="@GetTenants">Check</MatButton>
+    <MatButton Outlined="true" OnClick="@CheckConnection">Check</MatButton>
+    @if (IsEndpointValid)
+    {
+        <span class="badge rounded-pill bg-success">Correct Endpoint</span>
+    }
+    else
+    {
+        <span class="badge rounded-pill bg-danger">Correct Endpoint</span>
+    }
 </fieldset>
 
 @*<MatButton Outlined="true" OnClick="@GetToken">Get Token</MatButton>*@

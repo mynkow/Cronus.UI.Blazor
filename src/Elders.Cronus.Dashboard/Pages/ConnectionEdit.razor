@@ -9,6 +9,14 @@
     <MatTextField @bind-Value="@Name" Label="Name" FullWidth="true" Required="true"></MatTextField>
     <MatTextField @bind-Value="@CronusEndpoint" Label="Cronus Endpoint" FullWidth="true" Required="true"></MatTextField>
     <MatButton Outlined="true" OnClick="@GetTenants">Check</MatButton>
+    @if (IsEndpointValid)
+    {
+        <span class="badge rounded-pill bg-success">Correct Endpoint</span>
+    }
+    else
+    {
+        <span class="badge rounded-pill bg-danger">Correct Endpoint</span>
+    }
 </fieldset>
 
 <MatTable Items="@TenantAuths" class="mat-elevation-z5" ShowPaging="false" UseSortHeaderRow="true">

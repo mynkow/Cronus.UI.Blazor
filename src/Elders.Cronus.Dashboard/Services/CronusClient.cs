@@ -21,16 +21,24 @@ namespace Elders.Cronus.Dashboard.Models
 
         public async Task<List<string>> GetTenantsAsync(Connection connection)
         {
-            HttpRequestMessage request = new HttpRequestMessage(HttpMethod.Get, connection.CronusEndpoint + "/domain/tenants");
-            if (string.IsNullOrEmpty(connection.oAuth.ServerEndpoint) == false)
+            try
             {
-                var accessToken = await token.GetAccessTokenAsync(connection);
-                request.Headers.Authorization = new System.Net.Http.Headers.AuthenticationHeaderValue("bearer", accessToken);
+                HttpRequestMessage request = new HttpRequestMessage(HttpMethod.Get, connection.CronusEndpoint + "/domain/tenants");
+                if (string.IsNullOrEmpty(connection.oAuth.ServerEndpoint) == false)
+                {
+                    var accessToken = await token.GetAccessTokenAsync(connection);
+                    request.Headers.Authorization = new System.Net.Http.Headers.AuthenticationHeaderValue("bearer", accessToken);
+                }
+
+                var response = await ExecuteRequestAsync<List<string>>(request);
+
+                return response.Data;
             }
-
-            var response = await ExecuteRequestAsync<List<string>>(request);
-
-            return response.Data;
+            catch (Exception ex)
+            {
+                log.LogInformation($"Probably the domain for Cronus Client is not the right one. s{ex.Message}");
+                return new List<string>();
+            }
         }
 
         public async Task<Response<ProjectionCollection>> GetProjectionsAsync(Connection connection)
