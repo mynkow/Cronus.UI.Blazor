@@ -12,6 +12,9 @@ namespace Elders.Cronus.Dashboard.Components
         protected List<Connection> connections;
 
         [Inject]
+        public AppState App { get; set; }
+
+        [Inject]
         public ILocalStorageService LocalStorage { get; set; }
 
         [Inject]
@@ -34,6 +37,7 @@ namespace Elders.Cronus.Dashboard.Components
         {
             connections.Remove(model);
             await LocalStorage.SetItemAsync(LSKey.Connections, connections);
+            App.UpdateConnections(connections);
 
             Logger.LogInformation($"{model.Name} has been deleted.");
 
