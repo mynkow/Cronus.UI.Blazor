@@ -3,7 +3,7 @@
 
 @if (HasValidToken is null)
 {
-    <Chase align="center" />
+    <Chase />
 }
 else if (HasValidToken == true)
 {
@@ -46,38 +46,3 @@ else
 {
     <p>Please check your connection!</p>
 }
-
-@*@if (HasValidToken)
-    {
-        <EditForm Model="validationModel" OnValidSubmit="Success">
-            <DataAnnotationsValidator />
-            <p>
-                <MatTextField Label="Tenant" @bind-Value="validationModel.Tenant" class="col-lg-6" />
-                <ValidationMessage For="@(() => validationModel.Tenant)" />
-            </p>
-
-            <p>
-                <MatTextField Label="RecipientBoundedContext" @bind-Value="validationModel.RecipientBoundedContext" class="col-lg-6" />
-                <ValidationMessage For="@(() => validationModel.RecipientBoundedContext)" />
-            </p>
-
-            <p>
-                <MatTextField Label="RecipientHandlers" @bind-Value="validationModel.RecipientHandlers" class="col-lg-6" />
-                <ValidationMessage For="@(() => validationModel.RecipientHandlers)" />
-            </p>
-
-            <p>
-                <MatTextField Label="SourceEventTypeId" @bind-Value="validationModel.SourceEventTypeId" class="col-lg-6" />
-                <ValidationMessage For="@(() => validationModel.SourceEventTypeId)" />
-            </p>
-            <MatButton Raised="true" OnClick="Reset">Reset</MatButton>
-            <MatButton Type="submit" Raised="true">Replay</MatButton>
-        </EditForm>
-    }
-    else
-    {
-        <p>Please check your connection!</p>
-
-    }*@
-
-

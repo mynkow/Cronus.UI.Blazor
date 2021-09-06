@@ -53,9 +53,7 @@ namespace Elders.Cronus.Dashboard.Components
                 ReplayAfter = replayAfter
             };
 
-            Logger.LogInformation(replayAfter.Value.ToString());
-            Logger.LogInformation(model.ReplayAfter.ToString());
-            //await Cronus.ReplayPublicEventAsync(App.Connection, model);
+            await Cronus.ReplayPublicEventAsync(App.Connection, model);
         }
 
         protected void Reset()
