@@ -28,6 +28,16 @@ else if (HasValidToken == true)
             <MatTextField Label="SourceEventTypeId" @bind-Value="validationModel.SourceEventTypeId" class="col-lg-6" />
             <ValidationMessage For="@(() => validationModel.SourceEventTypeId)" />
         </p>
+        <p>
+            <MatDatePicker Outlined="true" Label="Replay After" @bind-Value="@validationModel.ReplayAfter" EnableTime="true"></MatDatePicker>
+
+            <MatButton OnClick="@(_ =>
+                              {
+                                  validationModel.ReplayAfter = null;
+                              })">
+                Empty
+            </MatButton>
+        </p>
         <MatButton Raised="true" OnClick="Reset">Reset</MatButton>
         <MatButton Type="submit" Raised="true">Replay</MatButton>
     </EditForm>
