@@ -1,6 +1,7 @@
 ﻿using Elders.Cronus.Dashboard.Models;
 using Microsoft.AspNetCore.Components;
 using Microsoft.Extensions.Logging;
+using Microsoft.JSInterop;
 using System;
 using System.ComponentModel.DataAnnotations;
 using System.Threading.Tasks;
@@ -17,6 +18,9 @@ namespace Elders.Cronus.Dashboard.Components
 
         [Inject]
         protected CronusClient Cronus { get; set; }
+
+        [Inject]
+        protected IJSRuntime JSRuntime { get; set; }
 
         [Inject]
         public ILogger<ConnectionsBase> Logger { get; set; }
@@ -54,6 +58,7 @@ namespace Elders.Cronus.Dashboard.Components
             };
 
             await Cronus.ReplayPublicEventAsync(App.Connection, model);
+            await JSRuntime.InvokeAsync<object>("alert", "Signal has been successfully sent");
         }
 
         protected void Reset()
