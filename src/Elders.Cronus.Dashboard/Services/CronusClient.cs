@@ -207,6 +207,25 @@ namespace Elders.Cronus.Dashboard.Models
             return true;
         }
 
+        public async Task<bool> ReplayPublicEventAsync(Connection connection, ReplayPublicEventRequest model)
+        {
+            log.LogInformation($"Replay public event {model.SourceEventTypeId}");
+
+            string resource = connection.CronusEndpoint + "/ReplayPublicEvent";
+
+            HttpRequestMessage request = CreateJsonPostRequest(model, resource);
+
+            if (string.IsNullOrEmpty(connection.oAuth.ServerEndpoint) == false)
+            {
+                var accessToken = await token.GetAccessTokenAsync(connection);
+                request.Headers.Authorization = new System.Net.Http.Headers.AuthenticationHeaderValue("bearer", accessToken);
+            }
+
+            await ExecuteRequestAsync<object>(request);
+
+            return true;
+        }
+
         public async Task<AggregateDto> GetAggregate(Connection connection, string aggregateId)
         {
             if (string.IsNullOrEmpty(aggregateId)) throw new ArgumentNullException(nameof(aggregateId));
@@ -487,6 +506,19 @@ namespace Elders.Cronus.Dashboard.Models
         public string[] RecipientHandlers { get; set; }
 
         public bool IsPublicEvent { get; set; }
+    }
+
+    public class ReplayPublicEventRequest
+    {
+        public string Tenant { get; set; }
+
+        public string RecipientBoundedContext { get; set; }
+
+        public string RecipientHandlers { get; set; }
+
+        public string SourceEventTypeId { get; set; }
+
+        public DateTimeOffset? ReplayAfter { get; set; }
     }
 
     public class Response<T>
