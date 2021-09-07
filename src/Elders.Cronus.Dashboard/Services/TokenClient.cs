@@ -21,6 +21,7 @@ namespace Elders.Cronus.Dashboard.Models
         {
             try
             {
+                log.LogInformation("Requesting access token...");
                 HttpRequestMessage getTokenRequest = new HttpRequestMessage(HttpMethod.Post, connection.oAuth.ServerEndpoint);
                 getTokenRequest.Headers.Authorization = new System.Net.Http.Headers.AuthenticationHeaderValue("basic", connection.oAuth.BasicAuthorization);
                 Dictionary<string, string> parameters = new Dictionary<string, string>();
