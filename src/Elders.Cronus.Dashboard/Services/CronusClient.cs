@@ -46,6 +46,7 @@ namespace Elders.Cronus.Dashboard.Models
             HttpRequestMessage request = new HttpRequestMessage(HttpMethod.Get, connection.CronusEndpoint + "/projections");
             if (string.IsNullOrEmpty(connection.oAuth.ServerEndpoint) == false)
             {
+
                 var accessToken = await token.GetAccessTokenAsync(connection);
                 request.Headers.Authorization = new System.Net.Http.Headers.AuthenticationHeaderValue("bearer", accessToken);
             }
@@ -57,16 +58,23 @@ namespace Elders.Cronus.Dashboard.Models
 
         public async Task<Response<IndexCollection>> GetIndicesAsync(Connection connection)
         {
-            HttpRequestMessage request = new HttpRequestMessage(HttpMethod.Get, connection.CronusEndpoint + "/indices");
-            if (string.IsNullOrEmpty(connection.oAuth.ServerEndpoint) == false)
+            using (HttpRequestMessage request = new HttpRequestMessage(HttpMethod.Get, connection.CronusEndpoint + "/indices"))
             {
-                var accessToken = await token.GetAccessTokenAsync(connection);
-                request.Headers.Authorization = new System.Net.Http.Headers.AuthenticationHeaderValue("bearer", accessToken);
+                if (string.IsNullOrEmpty(connection.oAuth.ServerEndpoint) == false)
+                {
+                    var accessToken = await token.GetAccessTokenAsync(connection);
+                    log.LogInformation(accessToken);
+                    request.Headers.Authorization = new System.Net.Http.Headers.AuthenticationHeaderValue("Bearer", accessToken);
+                    foreach (var header in request.Headers)
+                    {
+                        log.LogInformation(header.Key + ": " + string.Join(' ', header.Value));
+                    }
+                }
+
+                var response = await ExecuteRequestAsync<Response<IndexCollection>>(request);
+
+                return response.Data;
             }
-
-            var response = await ExecuteRequestAsync<Response<IndexCollection>>(request);
-
-            return response.Data;
         }
 
         public async Task<DomainDto> GetDomainAsync(Connection connection)
