@@ -133,30 +133,20 @@ namespace Elders.Cronus.Dashboard.Models
             return true;
         }
 
-        public async Task<bool> CancelProjectionRebuildAsync(Connection connection, Projection projection)
+        /// <summary>
+        /// This was the way we canceled projection versions before. It would cancel the latest version.
+        /// </summary>
+        /// <param name="connection"></param>
+        /// <param name="projection"></param>
+        /// <returns></returns>
+        public async Task<bool> CancelProjectionLatestVersionAsync(Connection connection, Projection projection)
         {
-            log.LogInformation("Canceling...");
+            return await CancelProjectionAsync(connection, projection, projection.LatestVersion);
+        }
 
-            string resource = connection.CronusEndpoint + "/projection/cancel";
-
-            var rebuildRequest = new CancelProjectionRebuildRequest()
-            {
-                ProjectionContractId = projection.ProjectionContractId,
-                Version = projection.LatestVersion,
-
-            };
-
-            HttpRequestMessage request = CreateJsonPostRequest(rebuildRequest, resource);
-
-            if (string.IsNullOrEmpty(connection.oAuth.ServerEndpoint) == false)
-            {
-                var accessToken = await token.GetAccessTokenAsync(connection);
-                request.Headers.Authorization = new System.Net.Http.Headers.AuthenticationHeaderValue("bearer", accessToken);
-            }
-
-            await ExecuteRequestAsync<object>(request);
-
-            return true;
+        public async Task<bool> CancelSpecificProjectionAsync(Connection connection, Projection projection, ProjectionVersion version)
+        {
+            return await CancelProjectionAsync(connection, projection, version);
         }
 
         public async Task<bool> FinalizeIndexRebuildAsync(Connection connection, string indexContractId)
@@ -305,6 +295,32 @@ namespace Elders.Cronus.Dashboard.Models
             var result = await ExecuteRequestAsync<Response<ProjectionCommitsDto>>(request);
 
             return result.Data.Result;
+        }
+
+        private async Task<bool> CancelProjectionAsync(Connection connection, Projection projection, ProjectionVersion version)
+        {
+            log.LogInformation($"Canceling... {version}");
+
+            string resource = connection.CronusEndpoint + "/projection/cancel";
+
+            var rebuildRequest = new CancelProjectionRebuildRequest()
+            {
+                ProjectionContractId = projection.ProjectionContractId,
+                Version = version,
+
+            };
+
+            HttpRequestMessage request = CreateJsonPostRequest(rebuildRequest, resource);
+
+            if (string.IsNullOrEmpty(connection.oAuth.ServerEndpoint) == false)
+            {
+                var accessToken = await token.GetAccessTokenAsync(connection);
+                request.Headers.Authorization = new System.Net.Http.Headers.AuthenticationHeaderValue("bearer", accessToken);
+            }
+
+            await ExecuteRequestAsync<object>(request);
+
+            return true;
         }
     }
 

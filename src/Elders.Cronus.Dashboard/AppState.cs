@@ -13,6 +13,7 @@ namespace Elders.Cronus.Dashboard
         public event Func<Connection, Task> OnConnectionChanged;
         public event Func<oAuth, Task> OnTenantChanged;
         public event Func<List<Connection>, Task> OnConnectionsUpdated;
+        public event Func<ProjectionVersion, Task> OnVersionSelected;
 
         public Connection Connection { get; private set; }
         public string Tenant { get; private set; }
@@ -48,6 +49,11 @@ namespace Elders.Cronus.Dashboard
             NotifyConnectionsUpdated(connections);
         }
 
+        public void SelectVersion(ProjectionVersion version)
+        {
+            NotifyVersionSelected(version);
+        }
+
         private void NotifyStateChanged() => OnChange?.Invoke();
 
         private Task NotifyConnectionChanged(Connection connection) => OnConnectionChanged?.Invoke(connection);
@@ -55,5 +61,7 @@ namespace Elders.Cronus.Dashboard
         private Task NotifyTenantChanged(oAuth tenant) => OnTenantChanged?.Invoke(tenant);
 
         private Task NotifyConnectionsUpdated(List<Connection> connections) => OnConnectionsUpdated?.Invoke(connections);
+
+        private Task NotifyVersionSelected(ProjectionVersion version) => OnVersionSelected?.Invoke(version);
     }
 }

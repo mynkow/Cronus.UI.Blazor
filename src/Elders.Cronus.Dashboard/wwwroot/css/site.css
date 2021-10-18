@@ -223,4 +223,9 @@ app {
     ul.event-list li.selected {
         background-color: #e9ecef;
     }
+
+    div.highlighted {
+        display: block;
+        background-color: black;
+    }
 }
