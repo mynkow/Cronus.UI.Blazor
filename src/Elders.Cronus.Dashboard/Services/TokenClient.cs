@@ -19,19 +19,28 @@ namespace Elders.Cronus.Dashboard.Models
 
         public async Task<string> GetAccessTokenAsync(Connection connection)
         {
-            HttpRequestMessage getTokenRequest = new HttpRequestMessage(HttpMethod.Post, connection.oAuth.ServerEndpoint);
-            getTokenRequest.Headers.Authorization = new System.Net.Http.Headers.AuthenticationHeaderValue("basic", connection.oAuth.BasicAuthorization);
-            Dictionary<string, string> parameters = new Dictionary<string, string>();
-            parameters.Add("grant_type", "client_credentials");
+            try
+            {
+                HttpRequestMessage getTokenRequest = new HttpRequestMessage(HttpMethod.Post, connection.oAuth.ServerEndpoint);
+                getTokenRequest.Headers.Authorization = new System.Net.Http.Headers.AuthenticationHeaderValue("basic", connection.oAuth.BasicAuthorization);
+                Dictionary<string, string> parameters = new Dictionary<string, string>();
+                parameters.Add("grant_type", "client_credentials");
 
-            parameters.Add("scope", connection.oAuth.Scope);
+                parameters.Add("scope", connection.oAuth.Scope);
 
-            getTokenRequest.Content = new FormUrlEncodedContent(parameters);
-            var response = await httpClient.SendAsync(getTokenRequest).ConfigureAwait(false);
-            var result = await response.Content.ReadAsStringAsync().ConfigureAwait(false);
-            var obj = JsonSerializer.Deserialize<TokenResult>(result);
-            log.LogDebug(obj.access_token);
-            return obj.access_token;
+                getTokenRequest.Content = new FormUrlEncodedContent(parameters);
+                var response = await httpClient.SendAsync(getTokenRequest).ConfigureAwait(false);
+                var result = await response.Content.ReadAsStringAsync().ConfigureAwait(false);
+                var obj = JsonSerializer.Deserialize<TokenResult>(result);
+                log.LogDebug(obj.access_token);
+                return obj.access_token;
+            }
+            catch (System.Exception ex)
+            {
+                log.LogInformation($"Exception while trying to get access token: {ex.Message}");
+                return string.Empty;
+            }
+
         }
 
         public class TokenResult

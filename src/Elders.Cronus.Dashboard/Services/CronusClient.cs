@@ -21,16 +21,24 @@ namespace Elders.Cronus.Dashboard.Models
 
         public async Task<List<string>> GetTenantsAsync(Connection connection)
         {
-            HttpRequestMessage request = new HttpRequestMessage(HttpMethod.Get, connection.CronusEndpoint + "/domain/tenants");
-            if (string.IsNullOrEmpty(connection.oAuth.ServerEndpoint) == false)
+            try
             {
-                var accessToken = await token.GetAccessTokenAsync(connection);
-                request.Headers.Authorization = new System.Net.Http.Headers.AuthenticationHeaderValue("bearer", accessToken);
+                HttpRequestMessage request = new HttpRequestMessage(HttpMethod.Get, connection.CronusEndpoint + "/domain/tenants");
+                if (string.IsNullOrEmpty(connection.oAuth.ServerEndpoint) == false)
+                {
+                    var accessToken = await token.GetAccessTokenAsync(connection);
+                    request.Headers.Authorization = new System.Net.Http.Headers.AuthenticationHeaderValue("bearer", accessToken);
+                }
+
+                var response = await ExecuteRequestAsync<List<string>>(request);
+
+                return response.Data;
             }
-
-            var response = await ExecuteRequestAsync<List<string>>(request);
-
-            return response.Data;
+            catch (Exception ex)
+            {
+                log.LogInformation($"Probably the domain for Cronus Client is not the right one. s{ex.Message}");
+                return new List<string>();
+            }
         }
 
         public async Task<Response<ProjectionCollection>> GetProjectionsAsync(Connection connection)
@@ -125,30 +133,20 @@ namespace Elders.Cronus.Dashboard.Models
             return true;
         }
 
-        public async Task<bool> CancelProjectionRebuildAsync(Connection connection, Projection projection)
+        /// <summary>
+        /// This was the way we canceled projection versions before. It would cancel the latest version.
+        /// </summary>
+        /// <param name="connection"></param>
+        /// <param name="projection"></param>
+        /// <returns></returns>
+        public async Task<bool> CancelProjectionLatestVersionAsync(Connection connection, Projection projection)
         {
-            log.LogInformation("Canceling...");
+            return await CancelProjectionAsync(connection, projection, projection.LatestVersion);
+        }
 
-            string resource = connection.CronusEndpoint + "/projection/cancel";
-
-            var rebuildRequest = new CancelProjectionRebuildRequest()
-            {
-                ProjectionContractId = projection.ProjectionContractId,
-                Version = projection.LatestVersion,
-
-            };
-
-            HttpRequestMessage request = CreateJsonPostRequest(rebuildRequest, resource);
-
-            if (string.IsNullOrEmpty(connection.oAuth.ServerEndpoint) == false)
-            {
-                var accessToken = await token.GetAccessTokenAsync(connection);
-                request.Headers.Authorization = new System.Net.Http.Headers.AuthenticationHeaderValue("bearer", accessToken);
-            }
-
-            await ExecuteRequestAsync<object>(request);
-
-            return true;
+        public async Task<bool> CancelSpecificProjectionAsync(Connection connection, Projection projection, ProjectionVersion version)
+        {
+            return await CancelProjectionAsync(connection, projection, version);
         }
 
         public async Task<bool> FinalizeIndexRebuildAsync(Connection connection, string indexContractId)
@@ -187,6 +185,25 @@ namespace Elders.Cronus.Dashboard.Models
             };
 
             HttpRequestMessage request = CreateJsonPostRequest(rebuildRequest, resource);
+
+            if (string.IsNullOrEmpty(connection.oAuth.ServerEndpoint) == false)
+            {
+                var accessToken = await token.GetAccessTokenAsync(connection);
+                request.Headers.Authorization = new System.Net.Http.Headers.AuthenticationHeaderValue("bearer", accessToken);
+            }
+
+            await ExecuteRequestAsync<object>(request);
+
+            return true;
+        }
+
+        public async Task<bool> ReplayPublicEventAsync(Connection connection, ReplayPublicEventRequest model)
+        {
+            log.LogInformation($"Replay public event {model.SourceEventTypeId}");
+
+            string resource = connection.CronusEndpoint + "/ReplayPublicEvent";
+
+            HttpRequestMessage request = CreateJsonPostRequest(model, resource);
 
             if (string.IsNullOrEmpty(connection.oAuth.ServerEndpoint) == false)
             {
@@ -278,6 +295,32 @@ namespace Elders.Cronus.Dashboard.Models
             var result = await ExecuteRequestAsync<Response<ProjectionCommitsDto>>(request);
 
             return result.Data.Result;
+        }
+
+        private async Task<bool> CancelProjectionAsync(Connection connection, Projection projection, ProjectionVersion version)
+        {
+            log.LogInformation($"Canceling... {version}");
+
+            string resource = connection.CronusEndpoint + "/projection/cancel";
+
+            var rebuildRequest = new CancelProjectionRebuildRequest()
+            {
+                ProjectionContractId = projection.ProjectionContractId,
+                Version = version,
+
+            };
+
+            HttpRequestMessage request = CreateJsonPostRequest(rebuildRequest, resource);
+
+            if (string.IsNullOrEmpty(connection.oAuth.ServerEndpoint) == false)
+            {
+                var accessToken = await token.GetAccessTokenAsync(connection);
+                request.Headers.Authorization = new System.Net.Http.Headers.AuthenticationHeaderValue("bearer", accessToken);
+            }
+
+            await ExecuteRequestAsync<object>(request);
+
+            return true;
         }
     }
 
@@ -479,6 +522,19 @@ namespace Elders.Cronus.Dashboard.Models
         public string[] RecipientHandlers { get; set; }
 
         public bool IsPublicEvent { get; set; }
+    }
+
+    public class ReplayPublicEventRequest
+    {
+        public string Tenant { get; set; }
+
+        public string RecipientBoundedContext { get; set; }
+
+        public string RecipientHandlers { get; set; }
+
+        public string SourceEventTypeId { get; set; }
+
+        public DateTimeOffset? ReplayAfter { get; set; }
     }
 
     public class Response<T>

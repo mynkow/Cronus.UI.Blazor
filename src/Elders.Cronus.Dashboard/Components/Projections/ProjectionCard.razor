@@ -8,27 +8,27 @@
     <div class="card">
         <div class="card-header">
             <div class="row">
-                @if (Projection.LatestVersion.Status == ProjectionStatus.Building)
-                {
-                    <div class="text-left col-lg-10">
-                        <div style="font-size:xx-small">@progressString</div>
-                        @if (progress == 0)
-                        {
-                            <MatProgressBar Progress="0" Buffer="0.01"></MatProgressBar>
-                        }
-                        else
-                        {
-                            <MatProgressBar Progress="@progress"></MatProgressBar>
-                        }
+                @*@if (Projection.LatestVersion.Status == ProjectionStatus.Building)
+                    {*@
+                <div class="text-left col-lg-10">
+                    <div style="font-size:xx-small">@progressString</div>
+                    @if (progress == 0)
+                    {
+                        <MatProgressBar Progress="0" Buffer="0.01"></MatProgressBar>
+                    }
+                    else
+                    {
+                        <MatProgressBar Progress="@progress"></MatProgressBar>
+                    }
 
-                    </div>
-                    <div class="text-left col-lg-2">
-                        <IconButton Icon="media-stop" ToolTip="Cancel" Click="@(async () => await CancelAsync(Projection))"></IconButton>
-                    </div>
-                }
+                </div>
+                <div class="text-left col-lg-2">
+                    <IconButton Icon="media-stop" ToolTip="Cancel" Click="@(async () => await CancelAsync(Projection,SelectedVersion))"></IconButton>
+                </div>
+                @*                }*@
 
                 <div class="text-left col-lg-8">
-                    <ProjectionVersionBadge Version="@Projection.LatestVersion" LiveVersion="@Projection.LiveVersion"></ProjectionVersionBadge>
+                    <ProjectionVersionBadge Projection="@Projection" Version="@Projection.LatestVersion" LiveVersion="@Projection.LiveVersion" AllVersions="@Projection.Versions"></ProjectionVersionBadge>
                     <span>@Projection.ProjectionName</span>
                     <div>
                         <span style="font-size:small"><cite>@Projection.ProjectionContractId</cite></span>
@@ -54,70 +54,73 @@
 }
 
 @code {
-
     [Parameter]
     public Projection Projection { get; set; }
+
+    [Parameter]
+    public ProjectionVersion SelectedVersion { get; set; }
 
     HubConnection hubConnection;
 
     double progress = 0;
     string progressString = "0 %";
 
+
     protected async override Task OnInitializedAsync()
     {
         App.OnChange += StateHasChanged;
 
-        hubConnection = new HubConnectionBuilder()
-            .WithUrl(App.Connection.CronusEndpoint + "/hub/projections")
-            .WithAutomaticReconnect()
-            .Build();
+        //hubConnection = new HubConnectionBuilder()
+        //.WithUrl(App.Connection.CronusEndpoint + "/hub/projections")
+        //.WithAutomaticReconnect()
+        //.Build();
 
-        hubConnection.On<string, long, long>("RebuildProgress", (projectionTypeId, processed, total) =>
-        {
-            Log.LogInformation("RebuildProgress: " + projectionTypeId + " " + processed + "/" + total);
-            if (Projection.ProjectionContractId.Equals(projectionTypeId, StringComparison.OrdinalIgnoreCase) == false)
-                return;
+        //hubConnection.On<string, long, long>("RebuildProgress", (projectionTypeId, processed, total) =>
+        //{
+        //    Log.LogInformation("RebuildProgress: " + projectionTypeId + " " + processed + "/" + total);
+        //    if (Projection.ProjectionContractId.Equals(projectionTypeId, StringComparison.OrdinalIgnoreCase) == false)
+        //        return;
 
-            unchecked
-            {
-                double percentage = (processed * 100) / total;
-                progressString = $"{percentage} % ( {processed} / {total} )";
-                progress = percentage / 100;
-            }
+        //    unchecked
+        //    {
+        //        double percentage = (processed * 100) / total;
+        //        progressString = $"{percentage} % ( {processed} / {total} )";
+        //        progress = percentage / 100;
+        //    }
 
-            StateHasChanged();
-        });
+        //    StateHasChanged();
+        //});
 
-        hubConnection.On<string>("RebuildStarted", (projectionTypeId) =>
-        {
-            Log.LogInformation("RebuildStarted: " + projectionTypeId);
+        //hubConnection.On<string>("RebuildStarted", (projectionTypeId) =>
+        //{
+        //    Log.LogInformation("RebuildStarted: " + projectionTypeId);
 
-            if (Projection.ProjectionContractId.Equals(projectionTypeId, StringComparison.OrdinalIgnoreCase) == false)
-                return;
+        //    if (Projection.ProjectionContractId.Equals(projectionTypeId, StringComparison.OrdinalIgnoreCase) == false)
+        //        return;
 
-            progressString = $"0 % ( {0} / -- )";
-            progress = 0;
+        //    progressString = $"0 % ( {0} / -- )";
+        //    progress = 0;
 
-            Projection.LatestVersion.Status = ProjectionStatus.Building;
+        //    Projection.LatestVersion.Status = ProjectionStatus.Building;
 
-            StateHasChanged();
-        });
+        //    StateHasChanged();
+        //});
 
-        hubConnection.On<string>("RebuildFinished", (projectionTypeId) =>
-        {
-            Log.LogInformation("RebuildFinished: " + projectionTypeId);
+        //hubConnection.On<string>("RebuildFinished", (projectionTypeId) =>
+        //{
+        //    Log.LogInformation("RebuildFinished: " + projectionTypeId);
 
-            if (Projection.ProjectionContractId.Equals(projectionTypeId, StringComparison.OrdinalIgnoreCase) == false)
-                return;
+        //    if (Projection.ProjectionContractId.Equals(projectionTypeId, StringComparison.OrdinalIgnoreCase) == false)
+        //        return;
 
-            progress = 1;
+        //    progress = 1;
 
-            Projection.LatestVersion.Status = ProjectionStatus.Live;
+        //    Projection.LatestVersion.Status = ProjectionStatus.Live;
 
-            StateHasChanged();
-        });
+        //    StateHasChanged();
+        //});
 
-        await hubConnection.StartAsync();
+        //await hubConnection.StartAsync();
     }
 
     public Task RebuildAsync(Projection projection)
@@ -130,9 +133,9 @@
         return Cronus.ReplayProjectionAsync(App.Connection, Projection);
     }
 
-    public Task CancelAsync(Projection projection)
+    public Task CancelAsync(Projection projection, ProjectionVersion version)
     {
-        return Cronus.CancelProjectionRebuildAsync(App.Connection, Projection);
+        return Cronus.CancelSpecificProjectionAsync(App.Connection, Projection, version);
     }
 
     public async ValueTask DisposeAsync()

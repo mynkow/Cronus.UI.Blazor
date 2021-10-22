@@ -4,28 +4,64 @@
     <span class="badge badge-success">@GetDisplayName(LiveVersion)</span>
 }
 
+<br />
+
 @if (Version.Status == ProjectionStatus.Live && LiveVersion.Revision != Version.Revision)
 {
     <span class="badge badge-success">@GetDisplayName(Version)</span>
+    <br />
 }
 else if (Version.Status == ProjectionStatus.Building)
 {
     <span class="badge badge-primary">@GetDisplayName(Version)</span>
+    <br />
 }
 else if (Version.Status == ProjectionStatus.NotPresent)
 {
     <span class="badge badge-secondary">@GetDisplayName(Version)</span>
+    <br />
 }
 else if (Version.Status == ProjectionStatus.Timedout)
 {
     <span class="badge badge-danger">@GetDisplayName(Version)</span>
+    <br />
 }
 else if (Version.Status == ProjectionStatus.Canceled)
 {
     <span class="badge badge-dark">@GetDisplayName(Version)</span>
+    <br />
 }
 
+@foreach (var version in AllVersions)
+{
+    if (version.Status == ProjectionStatus.Rebuilding)
+    {
+        <span class="border badge badge-info">@GetDisplayName(version)</span>
+        <span class="d-inline"><IconButton Icon="media-stop" ToolTip="Cancel" Click="@(async () => await CancelAsync(Projection,version))"></IconButton></span>
+    }
+    else if (version.Status == ProjectionStatus.Replaying || version.Status == ProjectionStatus.Building)
+    {
+        <span class="border badge badge-primary">@GetDisplayName(version)</span>
+        <span class="d-inline"><IconButton Icon="media-stop" ToolTip="Cancel" Click="@(async () => await CancelAsync(Projection,version))"></IconButton></span>
+    }
+}
+
+
 @code {
+
+    // Put all versions and display only the ones that are rebuilding/building/replaying
+
+    [Inject]
+    public ILogger<ProjectionVersionBadge> logger { get; set; }
+
+    [Inject]
+    public CronusClient Cronus { get; set; }
+
+    [Inject]
+    public AppState App { get; set; }
+
+    [Parameter]
+    public Projection Projection { get; set; }
 
     [Parameter]
     public ProjectionVersion Version { get; set; }
@@ -33,8 +69,25 @@ else if (Version.Status == ProjectionStatus.Canceled)
     [Parameter]
     public ProjectionVersion LiveVersion { get; set; }
 
+    [Parameter]
+    public List<ProjectionVersion> AllVersions { get; set; }
+
+    [Parameter]
+    public ProjectionVersion SelectedVersion { get; set; }
+
     string GetDisplayName(ProjectionVersion version)
     {
         return version.ToString();
+    }
+
+    void SelectVersion(ProjectionVersion selectedVersion)
+    {
+        SelectedVersion = selectedVersion;
+        App.SelectVersion(SelectedVersion);
+    }
+
+    public Task CancelAsync(Projection projection, ProjectionVersion version)
+    {
+        return Cronus.CancelSpecificProjectionAsync(App.Connection, Projection, version);
     }
 }

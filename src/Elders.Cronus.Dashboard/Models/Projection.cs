@@ -21,5 +21,14 @@ namespace Elders.Cronus.Dashboard.Models
         public ProjectionVersion LiveVersion => Versions.Where(x => x.Status.Equals(ProjectionStatus.Live)).LastOrDefault();
 
         public ProjectionVersion LatestVersion => Versions.OrderByDescending(x => x.Revision).First();
+
+        public List<ProjectionVersion> RebuildingVersions => Versions.Where(x => x.Status.Equals(ProjectionStatus.Rebuilding)).ToList();
+
+        public List<ProjectionVersion> ReplayingVersions => Versions.Where(x => x.Status.Equals(ProjectionStatus.Replaying)).ToList();
+
+        /// <summary>
+        /// For backwards compatibility (Replaying used to be building)
+        /// </summary>
+        public List<ProjectionVersion> BuildingVersions => Versions.Where(x => x.Status.Equals(ProjectionStatus.Building)).ToList();
     }
 }

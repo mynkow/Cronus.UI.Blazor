@@ -4,9 +4,9 @@
 @inject CronusClient Cronus
 
 <h1>Edit Tenant</h1>
+<h2><span class="badge badge-primary">@Tenant</span></h2>
 
 <fieldset>
-    <MatTextField @bind-Value="@Tenant" Label="Tenant" FullWidth="true" Required="true"></MatTextField>
     <MatTextField @bind-Value="@ServerEndpoint" Label="Server" FullWidth="true" Required="true"></MatTextField>
     <MatTextField @bind-Value="@Client" Label="Client" FullWidth="true" Required="true"></MatTextField>
     <MatTextField @bind-Value="@Secret" Label="Secret" FullWidth="true" Required="true" Type="password"></MatTextField>
