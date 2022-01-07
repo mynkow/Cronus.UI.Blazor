@@ -7,10 +7,10 @@
 {
     <div class="card">
         <div class="card-header">
-            <div class="row">
-                @*@if (Projection.LatestVersion.Status == ProjectionStatus.Building)
-                    {*@
-                <div class="text-left col-lg-10">
+            @if (Projection.LatestVersion.Status == ProjectionStatus.Replaying)
+            {
+                <div class="text-left col-lg-13" style="top:-35px">
+                    <br>
                     <div style="font-size:xx-small">@progressString</div>
                     @if (progress == 0)
                     {
@@ -22,22 +22,27 @@
                     }
 
                 </div>
-                <div class="text-left col-lg-2">
-                    <IconButton Icon="media-stop" ToolTip="Cancel" Click="@(async () => await CancelAsync(Projection,SelectedVersion))"></IconButton>
-                </div>
-                @*                }*@
-
-                <div class="text-left col-lg-8">
-                    <ProjectionVersionBadge Projection="@Projection" Version="@Projection.LatestVersion" LiveVersion="@Projection.LiveVersion" AllVersions="@Projection.Versions"></ProjectionVersionBadge>
+            }
+            <div class="row">
+                <div class="text-left col-lg-7">
                     <span>@Projection.ProjectionName</span>
                     <div>
                         <span style="font-size:small"><cite>@Projection.ProjectionContractId</cite></span>
                     </div>
+
+                    <div class="d-inline">
+                        <ProjectionVersionBadge Projection="@Projection" Version="@Projection.LatestVersion" LiveVersion="@Projection.LiveVersion" AllVersions="@Projection.Versions"></ProjectionVersionBadge>
+                    </div>
                 </div>
-                <div class="text-right col-lg-4">
-                    @if (Projection.LatestVersion.Status != ProjectionStatus.Building)
+
+                <div class="text-right col-lg-5">
+                    @if (Projection.LatestVersion.Status != ProjectionStatus.Building && Projection.LatestVersion.Status != ProjectionStatus.Replaying)
                     {
                         <IconButton Icon="media-play" ToolTip="Replays the projection and creates a new version. You should use this when your projection contains events you do not want." Click="@(async () => await ReplayAsync(Projection))"></IconButton>
+                    }
+                    else
+                    {
+                        <span class="d-inline"><IconButton Icon="media-stop" ToolTip="Cancel" Click="@(async () => await CancelAsync(Projection,Projection.LatestVersion))"></IconButton></span>
                     }
 
                     @if (Projection.IsReplayable && Projection.LatestVersion.Status != ProjectionStatus.Building)
@@ -46,8 +51,8 @@
                     }
 
                     <a href="/projections/@Projection.ProjectionContractId"><Icon Identifier="magnifying-glass"></Icon></a>
-                </div>
 
+                </div>
             </div>
         </div>
     </div>
@@ -65,62 +70,63 @@
     double progress = 0;
     string progressString = "0 %";
 
-
     protected async override Task OnInitializedAsync()
     {
         App.OnChange += StateHasChanged;
 
-        //hubConnection = new HubConnectionBuilder()
-        //.WithUrl(App.Connection.CronusEndpoint + "/hub/projections")
-        //.WithAutomaticReconnect()
-        //.Build();
+        Log.LogInformation("Initializing signalR...");
 
-        //hubConnection.On<string, long, long>("RebuildProgress", (projectionTypeId, processed, total) =>
-        //{
-        //    Log.LogInformation("RebuildProgress: " + projectionTypeId + " " + processed + "/" + total);
-        //    if (Projection.ProjectionContractId.Equals(projectionTypeId, StringComparison.OrdinalIgnoreCase) == false)
-        //        return;
+        hubConnection = new HubConnectionBuilder()
+        .WithUrl(App.Connection.CronusEndpoint + "/hub/projections")
+        .WithAutomaticReconnect()
+        .Build();
 
-        //    unchecked
-        //    {
-        //        double percentage = (processed * 100) / total;
-        //        progressString = $"{percentage} % ( {processed} / {total} )";
-        //        progress = percentage / 100;
-        //    }
+        hubConnection.On<string, long, long>("RebuildProgress", (projectionTypeId, processed, total) =>
+        {
+            Log.LogInformation("RebuildProgress: " + projectionTypeId + " " + processed + "/" + total);
+            if (Projection.ProjectionContractId.Equals(projectionTypeId, StringComparison.OrdinalIgnoreCase) == false)
+                return;
 
-        //    StateHasChanged();
-        //});
+            unchecked
+            {
+                double percentage = (processed * 100) / total;
+                progressString = $"{percentage} % ( {processed} / {total} )";
+                progress = (percentage / 100);
+            }
 
-        //hubConnection.On<string>("RebuildStarted", (projectionTypeId) =>
-        //{
-        //    Log.LogInformation("RebuildStarted: " + projectionTypeId);
+            StateHasChanged();
+        });
 
-        //    if (Projection.ProjectionContractId.Equals(projectionTypeId, StringComparison.OrdinalIgnoreCase) == false)
-        //        return;
+        hubConnection.On<string>("RebuildStarted", (projectionTypeId) =>
+        {
+            Log.LogInformation("RebuildStarted: " + projectionTypeId);
 
-        //    progressString = $"0 % ( {0} / -- )";
-        //    progress = 0;
+            if (Projection.ProjectionContractId.Equals(projectionTypeId, StringComparison.OrdinalIgnoreCase) == false)
+                return;
 
-        //    Projection.LatestVersion.Status = ProjectionStatus.Building;
+            progressString = $"0 % ( {0} / -- )";
+            progress = 0;
 
-        //    StateHasChanged();
-        //});
+            Projection.LatestVersion.Status = ProjectionStatus.Building;
 
-        //hubConnection.On<string>("RebuildFinished", (projectionTypeId) =>
-        //{
-        //    Log.LogInformation("RebuildFinished: " + projectionTypeId);
+            StateHasChanged();
+        });
 
-        //    if (Projection.ProjectionContractId.Equals(projectionTypeId, StringComparison.OrdinalIgnoreCase) == false)
-        //        return;
+        hubConnection.On<string>("RebuildFinished", (projectionTypeId) =>
+        {
+            Log.LogInformation("RebuildFinished: " + projectionTypeId);
 
-        //    progress = 1;
+            if (Projection.ProjectionContractId.Equals(projectionTypeId, StringComparison.OrdinalIgnoreCase) == false)
+                return;
 
-        //    Projection.LatestVersion.Status = ProjectionStatus.Live;
+            progress = 1;
 
-        //    StateHasChanged();
-        //});
+            Projection.LatestVersion.Status = ProjectionStatus.Live;
 
-        //await hubConnection.StartAsync();
+            StateHasChanged();
+        });
+
+        await hubConnection.StartAsync();
     }
 
     public Task RebuildAsync(Projection projection)
@@ -136,10 +142,13 @@
     public Task CancelAsync(Projection projection, ProjectionVersion version)
     {
         return Cronus.CancelSpecificProjectionAsync(App.Connection, Projection, version);
+
     }
 
     public async ValueTask DisposeAsync()
     {
+        Log.LogInformation("Disposing signalR...");
         await hubConnection.DisposeAsync();
+
     }
 }
