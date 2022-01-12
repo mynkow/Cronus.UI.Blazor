@@ -41,7 +41,20 @@
         <td>
             <MatButton Outlined="true" OnClick="@(async () => await @GetToken(context))">Get Token</MatButton>
             <MatButton Outlined="true" TrailingIcon="edit" Link="@($"/connection/{@Name}/{context.Tenant}")">Edit</MatButton>
+            @if (AccessToken == string.Empty)
+            {
+                <span class="badge badge-light " style="display:none"></span>
+            }
+            else if (AccessToken != null)
+            {
+                <span class="badge rounded-pill bg-success">Correct Endpoint</span>
+            }
+            else
+            {
+                <span class="badge rounded-pill bg-danger">Invalid Endpoint</span>
+            }
         </td>
+
     </MatTableRow>
 </MatTable>
 
