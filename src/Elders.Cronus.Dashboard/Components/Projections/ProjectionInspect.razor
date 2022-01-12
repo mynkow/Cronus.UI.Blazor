@@ -15,7 +15,8 @@ else
         <ProjectionVersionBadge Projection="@Projection" Version="@Projection.LatestVersion" LiveVersion="@Projection.LiveVersion" AllVersions="@Projection.Versions"></ProjectionVersionBadge>
         <hr class="solid">
         <form class="form-inline" style="align-items: flex-start">
-            <input type="text" @bind="@projectionId" class="form-control mb-2" style="width:500px" placeholder="urn:pruvit:profile:961137">
+            <input type="text" @bind="@projectionId" class="form-control mb-2" style="width:500px" placeholder="urn:">
+
             <div>
                 <button type="button" class="btn btn-primary" style="margin-right: 10px; margin-left: 10px;" @onclick="@(async ()=> await GetProjectionAsync())">State </button>
             </div>
@@ -103,7 +104,7 @@ else
 
     List<ProjectionCommitDto> commits = new List<ProjectionCommitDto>();
 
-    string projectionId = "urn:";
+    string projectionId = string.Empty;
     string state = "";
     string details = string.Empty;
     string eventsLabel = "Events";
@@ -131,16 +132,20 @@ else
 
     async Task GetProjectionAsync()
     {
-        ProjectionStateDto projection = await Cronus.GetProjectionAsync(App.Connection, Projection.ProjectionContractId, projectionId);
-        if (projection is null == false && projection.State is null == false)
+        if (projectionId != string.Empty)
         {
-            state = await JSRuntime.InvokeAsync<string>("JSON.stringify", projection.State, null, 4);
-            StateHasChanged();
+            ProjectionStateDto projection = await Cronus.GetProjectionAsync(App.Connection, Projection.ProjectionContractId, projectionId);
+            if (projection is null == false && projection.State is null == false)
+            {
+                state = await JSRuntime.InvokeAsync<string>("JSON.stringify", projection.State, null, 4);
+                StateHasChanged();
+            }
+            else
+            {
+                state = "";
+            }
         }
-        else
-        {
-            state = "";
-        }
+        else state = "Enter URN";
     }
 
     async Task GetProjectionEventsAsync()
