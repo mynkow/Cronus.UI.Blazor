@@ -36,16 +36,16 @@
                 </div>
 
                 <div class="text-right col-lg-5">
-                    @if (Projection.LatestVersion.Status != ProjectionStatus.Building && Projection.LatestVersion.Status != ProjectionStatus.Replaying)
+                    @if (Projection.LatestVersion.Status != ProjectionStatus.Building && Projection.LatestVersion.Status != ProjectionStatus.Replaying && Projection.LiveVersion.Hash != "ver")//api should return if the projection is repl
                     {
                         <IconButton Icon="media-play" ToolTip="Replays the projection and creates a new version. You should use this when your projection contains events you do not want." Click="@(async () => await ReplayAsync(Projection))"></IconButton>
                     }
-                    else
+                    @if(Projection.LatestVersion.Status == ProjectionStatus.Building || Projection.LatestVersion.Status == ProjectionStatus.Replaying)
                     {
-                        <span class="d-inline"><IconButton Icon="media-stop" ToolTip="Cancel" Click="@(async () => await CancelAsync(Projection,Projection.LatestVersion))"></IconButton></span>
+                    <span class="d-inline"><IconButton Icon="media-stop" ToolTip="Cancel" Click="@(async () => await CancelAsync(Projection,Projection.LatestVersion))"></IconButton></span>
                     }
 
-                    @if (Projection.IsReplayable && Projection.LatestVersion.Status != ProjectionStatus.Building)
+                    @if (Projection.IsReplayable && Projection.LatestVersion.Status != ProjectionStatus.Building)//API does not return if the projection is replayable
                     {
                         <IconButton Icon="loop-square" ToolTip="Rebuilds the projection version. You should use this when there are missing events." Click="@(async () => await RebuildAsync(Projection))"></IconButton>
                     }
