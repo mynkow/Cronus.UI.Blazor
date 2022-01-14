@@ -9,7 +9,7 @@
                 <ConnectionSelector />
             </MatAppBarSection>
             <MatAppBarSection Align="@MatAppBarSectionAlign.End">
-                <MatIconButton Icon="favorite"></MatIconButton>
+                <MatIconButton Icon="favorite" Link="https://github.com/Elders/Cronus"></MatIconButton>
             </MatAppBarSection>
         </MatAppBarRow>
     </MatAppBar>
@@ -21,7 +21,7 @@
                     <MatNavMenu>
                         <MatNavItem href="connections"><MatIcon Icon="bolt"></MatIcon>&nbsp; Connections </MatNavItem>
                         <MatDivider></MatDivider>
-                        <MatNavSubMenu Expanded="true">
+                        <MatNavSubMenu>
                             <MatNavSubMenuHeader>
                                 <MatNavItem AllowSelection="false"><MatIcon Icon="wb_sunny"></MatIcon>&nbsp; Domain</MatNavItem>
                             </MatNavSubMenuHeader>
@@ -31,7 +31,7 @@
                                 <MatNavItem Href="domain-ports">&nbsp; Ports</MatNavItem>
                                 <MatNavItem Href="domain-projections">&nbsp; Projections</MatNavItem>
                                 <MatNavItem Href="domain-sagas">&nbsp; Sagas</MatNavItem>
-                                <MatNavItem>&nbsp; Triggers</MatNavItem>
+                                @*<MatNavItem>&nbsp; Triggers</MatNavItem>*@
                             </MatNavSubMenuList>
                         </MatNavSubMenu>
                         <MatDivider></MatDivider>
@@ -52,4 +52,5 @@
         </div>
     </MatAppBarContent>
 </MatAppBarContainer>
+
 

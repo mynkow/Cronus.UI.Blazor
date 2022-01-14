@@ -94,6 +94,10 @@
 
             StateHasChanged();
         }
+        else
+        {
+            commits.Clear();
+        }
     }
 
     public async Task<string> FormatJsonAsync(object data)

@@ -60,6 +60,8 @@ namespace Elders.Cronus.Dashboard.Components
         [Parameter]
         public bool IsEndpointValid { get; set; }
 
+        public string AccessToken = String.Empty;
+
         protected override async Task OnInitializedAsync()
         {
             await LoadDataAsync();
@@ -148,9 +150,9 @@ namespace Elders.Cronus.Dashboard.Components
             Log.LogDebug("GetToken()");
 
             Connection testConnection = new Connection(Name, CronusEndpoint, oAuth);
-            var result = await Token.GetAccessTokenAsync(testConnection);
+            AccessToken = await Token.GetAccessTokenAsync(testConnection);
 
-            Log.LogDebug(result);
+            Log.LogDebug(AccessToken);
         }
 
         protected async Task GetTenants()

@@ -1,35 +1,32 @@
-﻿
-@if (LiveVersion is null == false)
+﻿@if (LiveVersion is null == false)
 {
     <span class="badge badge-success">@GetDisplayName(LiveVersion)</span>
 }
 
-<br />
-
 @if (Version.Status == ProjectionStatus.Live && LiveVersion.Revision != Version.Revision)
 {
     <span class="badge badge-success">@GetDisplayName(Version)</span>
-    <br />
+
 }
 else if (Version.Status == ProjectionStatus.Building)
 {
     <span class="badge badge-primary">@GetDisplayName(Version)</span>
-    <br />
+
 }
 else if (Version.Status == ProjectionStatus.NotPresent)
 {
     <span class="badge badge-secondary">@GetDisplayName(Version)</span>
-    <br />
+
 }
 else if (Version.Status == ProjectionStatus.Timedout)
 {
     <span class="badge badge-danger">@GetDisplayName(Version)</span>
-    <br />
+
 }
 else if (Version.Status == ProjectionStatus.Canceled)
 {
     <span class="badge badge-dark">@GetDisplayName(Version)</span>
-    <br />
+
 }
 
 @foreach (var version in AllVersions)
@@ -42,7 +39,6 @@ else if (Version.Status == ProjectionStatus.Canceled)
     else if (version.Status == ProjectionStatus.Replaying || version.Status == ProjectionStatus.Building)
     {
         <span class="border badge badge-primary">@GetDisplayName(version)</span>
-        <span class="d-inline"><IconButton Icon="media-stop" ToolTip="Cancel" Click="@(async () => await CancelAsync(Projection,version))"></IconButton></span>
     }
 }
 
