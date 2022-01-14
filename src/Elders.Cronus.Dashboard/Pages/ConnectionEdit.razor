@@ -27,7 +27,6 @@
             <MatSortHeader>Tenant</MatSortHeader>
             <MatSortHeader>Authority Address</MatSortHeader>
             <MatSortHeader>Client</MatSortHeader>
-            <MatSortHeader>Secret</MatSortHeader>
             <MatSortHeader>Scope</MatSortHeader>
             <MatSortHeader>Actions</MatSortHeader>
         </MatSortHeaderRow>
@@ -36,7 +35,6 @@
         <td>@context.Tenant</td>
         <td>@context.ServerEndpoint</td>
         <td>@context.Client</td>
-        <td>@context.Secret</td>
         <td>@context.Scope</td>
         <td>
             <MatButton Outlined="true" OnClick="@(async () => await @GetToken(context))">Get Token</MatButton>
