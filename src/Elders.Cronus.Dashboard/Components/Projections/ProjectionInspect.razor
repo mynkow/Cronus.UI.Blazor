@@ -138,11 +138,13 @@ else
             if (projection is null == false && projection.State is null == false)
             {
                 state = await JSRuntime.InvokeAsync<string>("JSON.stringify", projection.State, null, 4);
+                commits = new List<ProjectionCommitDto>();
                 StateHasChanged();
             }
             else
             {
-                state = "";
+                state = "Invalid URN";
+                commits = new List<ProjectionCommitDto>();
             }
         }
         else state = "Enter URN";
