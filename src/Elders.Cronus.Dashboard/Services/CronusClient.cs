@@ -4,6 +4,7 @@ using System.Linq;
 using System.Net.Http;
 using System.Runtime.InteropServices;
 using System.Threading.Tasks;
+using Microsoft.AspNetCore.Components;
 using Microsoft.Extensions.Logging;
 
 namespace Elders.Cronus.Dashboard.Models
@@ -12,7 +13,8 @@ namespace Elders.Cronus.Dashboard.Models
     {
         private readonly TokenClient token;
         private readonly ILogger<CronusClient> log;
-
+        [Inject]
+        public NavigationManager NavManager { get; set; }
         public CronusClient(HttpClient client, TokenClient token, ILogger<CronusClient> log) : base(client)
         {
             this.token = token;
@@ -44,7 +46,7 @@ namespace Elders.Cronus.Dashboard.Models
         public async Task<Response<ProjectionCollection>> GetProjectionsAsync(Connection connection)
         {
             HttpRequestMessage request = new HttpRequestMessage(HttpMethod.Get, connection.CronusEndpoint + "/projections");
-            if (string.IsNullOrEmpty(connection.oAuth.ServerEndpoint) == false)
+            if (string.IsNullOrEmpty(connection.oAuth.ServerEndpoint) == false && string.IsNullOrEmpty(connection.oAuth.Tenant) == false)
             {
 
                 var accessToken = await token.GetAccessTokenAsync(connection);
@@ -112,7 +114,6 @@ namespace Elders.Cronus.Dashboard.Models
             }
 
             await ExecuteRequestAsync<object>(request);
-
             return true;
         }
 
@@ -137,6 +138,7 @@ namespace Elders.Cronus.Dashboard.Models
             }
 
             await ExecuteRequestAsync<object>(request);
+
 
             return true;
         }

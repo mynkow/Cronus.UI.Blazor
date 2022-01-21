@@ -2,7 +2,6 @@
 using System.Linq;
 using System.Threading.Tasks;
 using Blazored.LocalStorage;
-//using Blazor.Extensions.Storage;
 using Elders.Cronus.Dashboard.Models;
 using Elders.Cronus.Dashboard.Pages;
 using Microsoft.AspNetCore.Components;
@@ -23,6 +22,9 @@ namespace Elders.Cronus.Dashboard.Components
 
         [Inject]
         public CronusClient Cronus { get; set; }
+
+        [Inject]
+        public NavigationManager NavManager { get; set; }
 
         [Parameter]
         public string ConnectionName { get; set; }
@@ -50,19 +52,19 @@ namespace Elders.Cronus.Dashboard.Components
         {
             App.Connect(connection);
             ConnectionName = connection.Name;
-
+            NavManager.NavigateTo("/");
+            TenantName = App.oAuth?.Tenant ?? "Select Tenant...";
             List<string> configuredTenantsInTheService = await Cronus.GetTenantsAsync(connection);
             List<oAuth> intersection = connection.oAuths.Where(x => configuredTenantsInTheService.Contains(x.Tenant)).ToList();
 
             oAuths = intersection;
-            StateHasChanged();
         }
 
         protected async Task OnAuthSelected(oAuth oAuth)
         {
             App.SelectTenant(oAuth);
             TenantName = oAuth.Tenant;
-
+            NavManager.NavigateTo("/projections");
             StateHasChanged();
         }
 
