@@ -7,22 +7,22 @@
 {
     <div class="card">
         <div class="card-header">
-            @if (Projection.LatestVersion.Status == ProjectionStatus.Replaying)
-            {
-                <div class="text-left col-lg-13" style="top:-35px">
-                    <br>
+            <div class="text-left col-lg-13" style="top:-35px">
+                <br>
+                @if (Projection.LatestVersion.Status == ProjectionStatus.Replaying)
+                {
                     <div style="font-size:xx-small">@progressString</div>
-                    @if (progress == 0)
-                    {
-                        <MatProgressBar Progress="0" Buffer="0.01"></MatProgressBar>
-                    }
-                    else
-                    {
+                    <MatProgressBar Progress="@progress"></MatProgressBar>
+                }
+                else if (Projection.LatestVersion.Status == ProjectionStatus.Building)
+                {
+                    <div style="font-size:xx-small">@progressString</div>
+                    <MatThemeProvider Theme="@rebuildProgressTheme">
                         <MatProgressBar Progress="@progress"></MatProgressBar>
-                    }
+                    </MatThemeProvider>
+                }
+            </div>
 
-                </div>
-            }
             <div class="row">
                 <div class="text-left col-lg-7">
                     <span>@Projection.ProjectionName</span>
@@ -40,9 +40,9 @@
                     {
                         <IconButton Icon="media-play" ToolTip="Replays the projection and creates a new version. You should use this when your projection contains events you do not want." Click="@(async () => await ReplayAsync(Projection))"></IconButton>
                     }
-                    @if(Projection.LatestVersion.Status == ProjectionStatus.Building || Projection.LatestVersion.Status == ProjectionStatus.Replaying)
+                    @if (Projection.LatestVersion.Status == ProjectionStatus.Building || Projection.LatestVersion.Status == ProjectionStatus.Replaying)
                     {
-                    <span class="d-inline"><IconButton Icon="media-stop" ToolTip="Cancel" Click="@(async () => await CancelAsync(Projection,Projection.LatestVersion))"></IconButton></span>
+                        <span class="d-inline"><IconButton Icon="media-stop" ToolTip="Cancel" Click="@(async () => await CancelAsync(Projection,Projection.LatestVersion))"></IconButton></span>
                     }
 
                     @if (Projection.IsReplayable && Projection.LatestVersion.Status != ProjectionStatus.Building)//API does not return if the projection is replayable
@@ -67,6 +67,11 @@
 
     HubConnection hubConnection;
 
+    MatTheme rebuildProgressTheme = new MatTheme()
+        {
+            Primary = MatThemeColors.DeepOrange._500.Value,
+        };
+
     double progress = 0;
     string progressString = "0 %";
 
@@ -83,7 +88,6 @@
 
         hubConnection.On<string, long, long>("RebuildProgress", (projectionTypeId, processed, total) =>
         {
-            Log.LogInformation("RebuildProgress: " + projectionTypeId + " " + processed + "/" + total);
             if (Projection.ProjectionContractId.Equals(projectionTypeId, StringComparison.OrdinalIgnoreCase) == false)
                 return;
 
