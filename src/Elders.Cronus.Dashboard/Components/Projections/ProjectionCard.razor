@@ -36,13 +36,20 @@
                 </div>
 
                 <div class="text-right col-lg-5">
-                    @if (Projection.LatestVersion.Status != ProjectionStatus.Building && Projection.LatestVersion.Status != ProjectionStatus.Replaying && Projection.LiveVersion.Hash != "ver")//api should return if the projection is repl
+                    @if (Projection.LatestVersion.Status != ProjectionStatus.Building && Projection.LatestVersion.Status != ProjectionStatus.Replaying && Projection.LiveVersion?.Hash != "ver")//api should return if the projection is repl
                     {
                         <IconButton Icon="media-play" ToolTip="Replays the projection and creates a new version. You should use this when your projection contains events you do not want." Click="@(async () => await ReplayAsync(Projection))"></IconButton>
                     }
                     @if (Projection.LatestVersion.Status == ProjectionStatus.Building || Projection.LatestVersion.Status == ProjectionStatus.Replaying)
                     {
-                        <span class="d-inline"><IconButton Icon="media-stop" ToolTip="Cancel" Click="@(async () => await CancelAsync(Projection,Projection.LatestVersion))"></IconButton></span>
+                        <span class="d-inline">
+                            <IconButton Icon="media-stop" ToolTip="Cancel" Click="@(async () => await CancelAsync(Projection,Projection.LatestVersion))">
+
+                            </IconButton>
+                            <IconButton Icon="media-" ToolTip="Finalize" Click="@(async () => await FinalizeAsync(Projection,Projection.LatestVersion))">
+
+                            </IconButton>
+                        </span>
                     }
 
                     @if (Projection.IsReplayable && Projection.LatestVersion.Status != ProjectionStatus.Building)//API does not return if the projection is replayable
@@ -131,6 +138,7 @@
         });
 
         await hubConnection.StartAsync();
+        Log.LogInformation("SignalR hub started");
     }
 
     public Task RebuildAsync(Projection projection)
@@ -146,12 +154,16 @@
     public Task CancelAsync(Projection projection, ProjectionVersion version)
     {
         return Cronus.CancelSpecificProjectionAsync(App.Connection, Projection, version);
+    }
 
+    public Task FinalizeAsync(Projection projection, ProjectionVersion version)
+    {
+        return Cronus.FinalizeProjectionAsync(App.Connection, Projection, version);
     }
 
     public async ValueTask DisposeAsync()
     {
-        Log.LogInformation("Disposing signalR...");
+        Log.LogInformation("Disposing SignalR hub...");
         await hubConnection.DisposeAsync();
 
     }

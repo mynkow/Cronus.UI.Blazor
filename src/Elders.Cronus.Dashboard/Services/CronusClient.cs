@@ -332,6 +332,31 @@ namespace Elders.Cronus.Dashboard.Models
 
             return true;
         }
+
+        public async Task<bool> FinalizeProjectionAsync(Connection connection, Projection projection, ProjectionVersion version)
+        {
+            log.LogInformation($"Finalizing... {version}");
+
+            string resource = connection.CronusEndpoint + "/projection/finalize";
+
+            var rebuildRequest = new FinalizeProjectionRebuildRequest()
+            {
+                ProjectionContractId = projection.ProjectionContractId,
+                Version = version
+            };
+
+            HttpRequestMessage request = CreateJsonPostRequest(rebuildRequest, resource);
+
+            if (string.IsNullOrEmpty(connection.oAuth.ServerEndpoint) == false)
+            {
+                var accessToken = await token.GetAccessTokenAsync(connection);
+                request.Headers.Authorization = new System.Net.Http.Headers.AuthenticationHeaderValue("bearer", accessToken);
+            }
+
+            await ExecuteRequestAsync<object>(request);
+
+            return true;
+        }
     }
 
     public class DomainDto
@@ -503,6 +528,15 @@ namespace Elders.Cronus.Dashboard.Models
     }
 
     public class CancelProjectionRebuildRequest
+    {
+        public string ProjectionContractId { get; set; }
+
+        public ProjectionVersion Version { get; set; }
+
+        public string Reason { get; set; } = "Cause I can";
+    }
+
+    public class FinalizeProjectionRebuildRequest
     {
         public string ProjectionContractId { get; set; }
 
