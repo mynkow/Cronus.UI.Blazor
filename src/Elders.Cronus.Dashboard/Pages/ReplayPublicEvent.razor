@@ -1,4 +1,5 @@
 ﻿@page "/replay-public"
+@using MudBlazor
 @inherits ReplayPublicEventBase
 
 @if (HasValidToken is null)
@@ -7,42 +8,76 @@
 }
 else if (HasValidToken == true)
 {
-    <EditForm Model="validationModel" OnValidSubmit="Success">
-        <DataAnnotationsValidator />
-        <p>
-            <MatTextField Label="Tenant" @bind-Value="validationModel.Tenant" class="col-lg-6" />
-            <ValidationMessage For="@(() => validationModel.Tenant)" />
-        </p>
+    <MudPaper Class="pa-8 ma-2" Elevation="3">
+        <EditForm Model="validationModel" OnValidSubmit="Success">
+            <DataAnnotationsValidator />
+            @if (LiveTenants.Any())
+            {
+                <p>
+                    <MudSelect T="string" Label="Tenant" @bind-Value="validationModel.LiveTenant" AnchorOrigin="Origin.BottomCenter " MultiSelection="false">
+                        @foreach (var tenant in LiveTenants)
+                        {
+                            <MudSelectItem Value="@(tenant)" />
+                        }
+                    </MudSelect>
+                    <ValidationMessage For="@(() => validationModel.LiveTenant)" />
+                </p>
+            }
+            else
+            {
+                <p>
+                    <MudTextField Label="Tenant" @bind-Value="validationModel.LiveTenant" />
+                    <ValidationMessage For="@(() => validationModel.LiveTenant)" />
+                </p>
+            }
+            @if (LiveBoundedContexts.Any())
+            {
+                <p>
+                    <MudSelect T="string" Label="RecipientBoundedContext" @bind-Value="validationModel.LiveBoundedContext" AnchorOrigin="Origin.BottomCenter" MultiSelection="false">
+                        @foreach (var bc in LiveBoundedContexts)
+                        {
+                            <MudSelectItem Value="@(bc)" />
+                        }
+                    </MudSelect>
+                    <ValidationMessage For="@(() => validationModel.LiveBoundedContext)" />
+                </p>
+            }
+            else
+            {
+                <p>
+                    <MudTextField Label="RecipientBoundedContext" @bind-Value="validationModel.LiveBoundedContext" />
+                    <ValidationMessage For="@(() => validationModel.LiveBoundedContext)" />
+                </p>
+            }
 
-        <p>
-            <MatTextField Label="RecipientBoundedContext" @bind-Value="validationModel.RecipientBoundedContext" class="col-lg-6" />
-            <ValidationMessage For="@(() => validationModel.RecipientBoundedContext)" />
-        </p>
+            <p>
+                <MudTextField Label="RecipientHandler" @bind-Value="validationModel.RecipientHandler" />
+                <ValidationMessage For="@(() => validationModel.RecipientHandler)" />
+            </p>
 
-        <p>
-            <MatTextField Label="RecipientHandlers" @bind-Value="validationModel.RecipientHandlers" class="col-lg-6" />
-            <ValidationMessage For="@(() => validationModel.RecipientHandlers)" />
-        </p>
+            <p>
+                <MudTextField Label="SourceEventTypeId" @bind-Value="validationModel.SourceEventTypeId" />
+                <ValidationMessage For="@(() => validationModel.SourceEventTypeId)" />
+            </p>
+            <p>
+                <MudDatePicker Label="Replay After" @bind-Date="validationModel.ReplayAfter" EnableTime="true"></MudDatePicker>
 
-        <p>
-            <MatTextField Label="SourceEventTypeId" @bind-Value="validationModel.SourceEventTypeId" class="col-lg-6" />
-            <ValidationMessage For="@(() => validationModel.SourceEventTypeId)" />
-        </p>
-        <p>
-            <MatDatePicker Outlined="true" Label="Replay After" @bind-Value="@validationModel.ReplayAfter" EnableTime="true"></MatDatePicker>
-
-            <MatButton OnClick="@(_ =>
+                <MudButton Variant="Variant.Outlined" Color="Color.Success" EndIcon="@Icons.TwoTone.HourglassEmpty" OnClick="@(_ =>
                               {
                                   validationModel.ReplayAfter = null;
-                              })">
-                Empty
-            </MatButton>
-        </p>
-        <MatButton Raised="true" OnClick="Reset">Reset</MatButton>
-        <MatButton Type="submit" Raised="true">Replay</MatButton>
-    </EditForm>
+                              })" Class="mt-4">
+                    Empty
+                </MudButton>
+            </p>
+            <MudButton OnClick="Reset" Variant="Variant.Outlined" Color="Color.Success" EndIcon="@Icons.TwoTone.LockReset" Class="mr-2">Reset</MudButton>
+            <MudButton ButtonType="ButtonType.Submit" Variant="Variant.Outlined" Color="Color.Success" EndIcon="@Icons.TwoTone.Replay">Replay</MudButton>
+        </EditForm>
+    </MudPaper>
 }
 else
 {
     <p>Please check your connection!</p>
+}
+
+@code {
 }

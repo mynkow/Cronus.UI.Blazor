@@ -1,11 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Net.Http;
-using System.Runtime.InteropServices;
-using System.Threading.Tasks;
-using Microsoft.AspNetCore.Components;
-using Microsoft.Extensions.Logging;
+﻿using Microsoft.AspNetCore.Components;
 
 namespace Elders.Cronus.Dashboard.Models
 {
@@ -224,6 +217,50 @@ namespace Elders.Cronus.Dashboard.Models
             await ExecuteRequestAsync<object>(request);
 
             return true;
+        }
+
+        public async Task<List<string>> GetLiveServicesAsync(Connection connection)
+        {
+            try
+            {
+                HttpRequestMessage request = new HttpRequestMessage(HttpMethod.Get, connection.CronusEndpoint + "/GetLiveBoundedContexts");
+                if (string.IsNullOrEmpty(connection.oAuth.ServerEndpoint) == false)
+                {
+                    var accessToken = await token.GetAccessTokenAsync(connection);
+                    request.Headers.Authorization = new System.Net.Http.Headers.AuthenticationHeaderValue("bearer", accessToken);
+                }
+
+                var response = await ExecuteRequestAsync<List<string>>(request);
+
+                return response.Data;
+            }
+            catch (Exception ex)
+            {
+                log.LogInformation($"Probably the domain for Cronus Client is not the right one. s{ex.Message}");
+                return new List<string>();
+            }
+        }
+
+        public async Task<List<string>> GetLiveTenantsAsync(Connection connection)
+        {
+            try
+            {
+                HttpRequestMessage request = new HttpRequestMessage(HttpMethod.Get, connection.CronusEndpoint + "/GetTenantContexts");
+                if (string.IsNullOrEmpty(connection.oAuth.ServerEndpoint) == false)
+                {
+                    var accessToken = await token.GetAccessTokenAsync(connection);
+                    request.Headers.Authorization = new System.Net.Http.Headers.AuthenticationHeaderValue("bearer", accessToken);
+                }
+
+                var response = await ExecuteRequestAsync<List<string>>(request);
+
+                return response.Data;
+            }
+            catch (Exception ex)
+            {
+                log.LogInformation($"Probably the domain for Cronus Client is not the right one. s{ex.Message}");
+                return new List<string>();
+            }
         }
 
         public async Task<AggregateDto> GetAggregate(Connection connection, string aggregateId)
@@ -536,9 +573,9 @@ namespace Elders.Cronus.Dashboard.Models
 
     public class ReplayPublicEventRequest
     {
-        public string Tenant { get; set; }
+        public string LiveTenant { get; set; }
 
-        public string RecipientBoundedContext { get; set; }
+        public string LiveBoundedContext { get; set; }
 
         public string RecipientHandlers { get; set; }
 
