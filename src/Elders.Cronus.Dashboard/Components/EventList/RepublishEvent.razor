@@ -3,10 +3,10 @@
 @inject IJSRuntime JSRuntime
 @inject ILogger<RepublishEvent> Log
 
-<MatButton OnClick="OpenDialog" Raised="true">REPUBLISH</MatButton>
+<MudButton @onclick="OpenDialog" Variant="Variant.Outlined" Color="Color.Success" class="ml-2">REPUBLISH</MudButton>
 
-<MatDialog @bind-IsOpen="@dialogIsOpen">
-    <MatDialogTitle>
+<MudDialog @bind-IsVisible="@dialogIsOpen">
+    <TitleContent>
         @if (Event.IsPublicEvent)
         {
             <span>Public Event</span>
@@ -15,8 +15,8 @@
         {
             <span>Select Handlers</span>
         }
-    </MatDialogTitle>
-    <MatDialogContent>
+    </TitleContent>
+    <DialogContent>
         @if (Event.IsPublicEvent)
         {
             <p>You are about to republish a public event. It will be re-delivered to all connected services/BCs interested in that event!</p>
@@ -26,21 +26,21 @@
             <p>You are about to republish an event. Please select which handlers may handle the event:</p>
             @foreach (var element in selectElements)
             {
-                <MatCheckbox Value="@element.Selected"
-                             ValueChanged="@((bool value) => OnValueChanged(element, value))"
-                             ValueExpression="@(() => element.Selected)"
-                             Label="@element.DisplayName">
-                </MatCheckbox>
+                <MudCheckBox Value="@element.Selected"
+                     CheckedChanged="@((bool value) => OnValueChanged(element, value))"
+                     ValueExpression="@(() => element.Selected)"
+                     Label="@element.DisplayName">
+                </MudCheckBox>
                 <br />
             }
         }
 
-    </MatDialogContent>
-    <MatDialogActions>
-        <MatButton OnClick="@(e => { dialogIsOpen = false; })">Cancel</MatButton>
-        <MatButton OnClick="@(async () => { await RepublishEventAsync(); dialogIsOpen = false; })">REPUBLISH</MatButton>
-    </MatDialogActions>
-</MatDialog>
+    </DialogContent>
+    <DialogActions>
+        <MudButton OnClick="@(e => { dialogIsOpen = false; })" Variant="Variant.Outlined" Color="Color.Success">Cancel</MudButton>
+        <MudButton OnClick="@(async () => { await RepublishEventAsync(); dialogIsOpen = false; })" Variant="Variant.Outlined" Color="Color.Success">REPUBLISH</MudButton>
+    </DialogActions>
+</MudDialog>
 
 @code {
     private bool dialogIsOpen = false;

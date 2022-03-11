@@ -4,15 +4,14 @@
 @inject ILogger<ProjectionsList> Logger;
 
 <div hidden="@(projections?.Count == 0)" class="top-row px-4">
+
     <div class="px-4">
-        <input class="input-text" value="Filter" />
-    </div>
-    <div class="px-4">
+        <span style="font-size:22px;">STATUS: </span>
         <span class="badge badge-success">Live</span>
         <span class="badge badge-primary">Building</span>
         <span class="badge badge-secondary">NotPresent</span>
         <span class="badge badge-danger">Timedout</span>
-        <span class="badge badge-dark">Canceled</span>
+        <span class="badge badge-warning text-dark">Canceled</span>
     </div>
 </div>
 

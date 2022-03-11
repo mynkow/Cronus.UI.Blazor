@@ -4,9 +4,9 @@
 <h1>New Connection</h1>
 
 <fieldset>
-    <MatTextField @bind-Value="@Name" Label="Name" FullWidth="true" Required="true"></MatTextField>
-    <MatTextField @bind-Value="@CronusEndpoint" Label="Cronus Endpoint" FullWidth="true" Required="true"></MatTextField>
-    <MatButton Outlined="true" OnClick="@CheckConnection">Check</MatButton>
+    <MudTextField @bind-Value="@Name" Label="Name" FullWidth="true" Required="true"></MudTextField>
+    <MudTextField @bind-Value="@CronusEndpoint" Label="Cronus Endpoint" FullWidth="true" Required="true"></MudTextField>
+    <MudButton Variant="Variant.Outlined" Color="Color.Success" EndIcon="@Icons.Filled.Check" OnClick="@CheckConnection" Class="mb-2 mt-2 mr-2">Check</MudButton>
     @if (IsEndpointValid)
     {
         <span class="badge rounded-pill bg-success">Correct Endpoint</span>
@@ -18,4 +18,4 @@
 </fieldset>
 
 @*<MatButton Outlined="true" OnClick="@GetToken">Get Token</MatButton>*@
-<MatButton Outlined="true" TrailingIcon="save" OnClick="@AddConnection">Add Connection</MatButton>
+<MudButton Variant="Variant.Outlined" Color="Color.Success" EndIcon="@Icons.Filled.Save" OnClick="@AddConnection">Add Connection</MudButton>

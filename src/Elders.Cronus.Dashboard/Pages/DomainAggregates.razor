@@ -3,47 +3,47 @@
 @inject CronusClient Cronus
 @inject IJSRuntime JSRuntime
 
-<h2 class="mat-h2">Aggregates</h2>
+<h2>Aggregates</h2>
 
-<div class="mat-layout-grid">
+<div>
 
-    <MatTable Items="@Domain?.Aggregates" LoadInitialData="true" FilterByColumnName="Name" PageSize="9999" ShowPaging="false" Striped="false" AllowSelection="true" SelectionChanged="SelectionChangedEvent" class="mat-elevation-z5">
-        <MatTableHeader>
-            <th>Name</th>
-            <th>Description</th>
-        </MatTableHeader>
-        <MatTableRow>
-            <td>@context.Name</td>
-            <td>@context.Name</td>
-        </MatTableRow>
-    </MatTable>
+    <MudTable Items="@Domain?.Aggregates" LoadInitialData="true" PageSize="9999" Hover="true" ShowPaging="false" Striped="false" MultiSelection="false" AllowSelection="true" Elevation="3" @bind-SelectedItem="@Aggregate">
+        <HeaderContent>
+            <MudTh>Name</MudTh>
+            <MudTh>Description</MudTh>
+        </HeaderContent>
+        <RowTemplate>
+            <MudTd>@context.Name</MudTd>
+            <MudTd>@context.Name</MudTd>
+        </RowTemplate>
+    </MudTable>
 
-    <div class="mat-layout-grid-inner">
-        <div class="mat-layout-grid-cell mat-layout-grid-cell-span-6">
-            <h3 class="mat-h3">@Aggregate?.Name Commands</h3>
-            <MatTable Items="@Aggregate?.Commands" LoadInitialData="true" FilterByColumnName="Name" PageSize="9999" ShowPaging="false" Striped="false" AllowSelection="true" class="mat-elevation-z5">
-                <MatTableHeader>
-                    <th>Name</th>
-                    <th>ID</th>
-                </MatTableHeader>
-                <MatTableRow>
-                    <td>@context.Name</td>
-                    <td><i>@context.Id</i></td>
-                </MatTableRow>
-            </MatTable>
+    <div>
+        <div class="mt-8">
+            <h3>@Aggregate?.Name Commands</h3>
+            <MudTable Items="@Aggregate?.Commands" LoadInitialData="true" FilterByColumnName="Name" PageSize="9999" ShowPaging="false" Striped="false" AllowSelection="true" Elevation="3">
+                <HeaderContent>
+                    <MudTh>Name</MudTh>
+                    <MudTh>ID</MudTh>
+                </HeaderContent>
+                <RowTemplate>
+                    <MudTd>@context.Name</MudTd>
+                    <MudTd><i>@context.Id</i></MudTd>
+                </RowTemplate>
+            </MudTable>
         </div>
-        <div class="mat-layout-grid-cell mat-layout-grid-cell-span-6">
-            <h3 class="mat-h3">@Aggregate?.Name Events</h3>
-            <MatTable Items="@Aggregate?.Events" LoadInitialData="true" FilterByColumnName="Name" PageSize="9999" ShowPaging="false" Striped="false" AllowSelection="true" class="mat-elevation-z5">
-                <MatTableHeader>
-                    <th>Name</th>
-                    <th>ID</th>
-                </MatTableHeader>
-                <MatTableRow>
-                    <td>@context.Name</td>
-                    <td><i>@context.Id</i></td>
-                </MatTableRow>
-            </MatTable>
+        <div class="mt-8">
+            <h3>@Aggregate?.Name Events</h3>
+            <MudTable Items="@Aggregate?.Events" LoadInitialData="true" FilterByColumnName="Name" PageSize="9999" ShowPaging="false" Striped="false" AllowSelection="true" Elevation="3">
+                <HeaderContent>
+                    <MudTh>Name</MudTh>
+                    <MudTh>ID</MudTh>
+                </HeaderContent>
+                <RowTemplate>
+                    <MudTd>@context.Name</MudTd>
+                    <MudTd><i>@context.Id</i></MudTd>
+                </RowTemplate>
+            </MudTable>
         </div>
     </div>
 </div>
@@ -57,15 +57,6 @@
     protected override async Task OnInitializedAsync()
     {
         Domain = await Cronus.GetDomainAsync(@App.Connection);
-    }
-
-    public void SelectionChangedEvent(object row)
-    {
-        if (row != null)
-        {
-            Aggregate = (DomainAggregateDto)row;
-        }
-
         this.StateHasChanged();
     }
 }

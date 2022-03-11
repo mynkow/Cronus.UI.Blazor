@@ -1,54 +1,55 @@
 @inherits LayoutComponentBase
 
-<MatAppBarContainer Style="width:100%">
-    <MatAppBar>
-        <MatAppBarRow>
-            <MatAppBarSection>
-                <MatIconButton Icon="menu"></MatIconButton>
-                <MatAppBarTitle>Cronus Dashboard &nbsp;</MatAppBarTitle>
-                <ConnectionSelector />
-            </MatAppBarSection>
-            <MatAppBarSection Align="@MatAppBarSectionAlign.End">
-                <MatIconButton Icon="favorite" Link="https://github.com/Elders/Cronus"></MatIconButton>
-            </MatAppBarSection>
-        </MatAppBarRow>
-    </MatAppBar>
+<div>
+    <MudThemeProvider IsDarkMode="true">
 
-    <MatAppBarContent>
-        <div class="mat-layout-grid">
-            <div class="mat-layout-grid-inner">
-                <div class="mat-layout-grid-cell mat-layout-grid-cell-span-2">
-                    <MatNavMenu>
-                        <MatNavItem href="connections"><MatIcon Icon="bolt"></MatIcon>&nbsp; Connections </MatNavItem>
-                        <MatDivider></MatDivider>
-                        <MatNavSubMenu>
-                            <MatNavSubMenuHeader>
-                                <MatNavItem AllowSelection="false"><MatIcon Icon="wb_sunny"></MatIcon>&nbsp; Domain</MatNavItem>
-                            </MatNavSubMenuHeader>
-                            <MatNavSubMenuList>
-                                <MatNavItem Href="domain-aggregates">&nbsp; Aggregates</MatNavItem>
-                                <MatNavItem Href="domain-gateways">&nbsp; Gateways</MatNavItem>
-                                <MatNavItem Href="domain-ports">&nbsp; Ports</MatNavItem>
-                                <MatNavItem Href="domain-projections">&nbsp; Projections</MatNavItem>
-                                <MatNavItem Href="domain-sagas">&nbsp; Sagas</MatNavItem>
-                                @*<MatNavItem>&nbsp; Triggers</MatNavItem>*@
-                            </MatNavSubMenuList>
-                        </MatNavSubMenu>
-                        <MatDivider></MatDivider>
-                        <MatNavItem href="eventstore"><MatIcon Icon="book"></MatIcon>&nbsp; Event Store </MatNavItem>
-                        <MatDivider></MatDivider>
-                        <MatNavItem href="indices"><MatIcon Icon="rowing"></MatIcon>&nbsp; Indices </MatNavItem>
-                        <MatDivider></MatDivider>
-                        <MatNavItem href="projections"><MatIcon Icon="dashboard"></MatIcon>&nbsp; Projections </MatNavItem>
-                        <MatDivider></MatDivider>
-                        <MatNavItem href="replay-public"><MatIcon Icon="publish"></MatIcon>&nbsp; Replay Public Event </MatNavItem>
-                        <MatDivider></MatDivider>
-                    </MatNavMenu>
-                </div>
-                <div class="mat-layout-grid-cell mat-layout-grid-cell-span-10">
-                    @Body
-                </div>
+    </MudThemeProvider>
+    <MudDialogProvider />
+    <MudSnackbarProvider />
+
+    <MudLayout>
+        <MudAppBar Elevation="1" Style="@($"padding: 10px")">
+            <MudIconButton Icon="@Icons.Material.Filled.Menu" Color="Color.Inherit" Align="MatAppBarSectionAlign.Start" OnClick="@((e) => DrawerToggle())" />
+            <MudText Typo="Typo.h5" Class="ml-3" Color="Color.Success">Cronus Dashboard &nbsp;</MudText>
+            <ConnectionSelector />
+            <MudSpacer />
+            <MudIconButton Link="https://github.com/Elders/Cronus" Icon="@Icons.Custom.Brands.GitHub" Color="Color.Inherit" Align="MatAppBarSectionAlign.End" />
+        </MudAppBar>
+        <MudDrawer @bind-Open="_drawerOpen" ClipMode="DrawerClipMode.Always" Elevation="2" Style="@($"top: 86px")">
+            @*NavMenu*@
+            <MudNavMenu Color="Color.Success">
+                <MudNavLink Href="connections" Icon="@Icons.Filled.Bolt">Connections</MudNavLink>
+                <MudDivider />
+                <MudNavGroup Icon="@Icons.Filled.WbSunny" Title="Domain" Expanded="false">
+                    <MudNavLink Href="/domain-aggregates">Aggregates</MudNavLink>
+                    <MudNavLink Href="/domain-gateways">Gateways</MudNavLink>
+                    <MudNavLink Href="/domain-ports">Ports</MudNavLink>
+                    <MudNavLink Href="/domain-projections">Projections</MudNavLink>
+                    <MudNavLink Href="/domain-sagas">Sagas</MudNavLink>
+                </MudNavGroup>
+                <MudNavLink Href="eventstore" Icon="@Icons.Filled.Book">Event Store</MudNavLink>
+                <MudNavLink Href="indices" Icon="@Icons.Filled.Rowing">Indices</MudNavLink>
+                <MudNavLink Href="projections" Icon="@Icons.Filled.Dashboard">Projections</MudNavLink>
+                <MudNavLink Href="replay-public" Icon="@Icons.Filled.Publish">Replay Public Event</MudNavLink>
+            </MudNavMenu>
+        </MudDrawer>
+        <MudMainContent Style="@($"top: 86px")">
+            @*<MudImage Fluid="true" Src="https://raw.githubusercontent.com/Elders/logo/master/cronus/black.png" Alt="Swedish Farm House" Class="rounded-lg" />*@
+            <div class="ml-5 mt-10 mr-5">
+                @Body
             </div>
-        </div>
-    </MatAppBarContent>
-</MatAppBarContainer>
+        </MudMainContent>
+    </MudLayout>
+</div>
+
+
+
+@code {
+    bool _drawerOpen = true;
+
+
+    void DrawerToggle()
+    {
+        _drawerOpen = !_drawerOpen;
+    }
+}

@@ -5,21 +5,15 @@
 
 @if (Projection is null == false)
 {
-    <div class="card">
+    <div class="card" style="background-color:#27272fff">
         <div class="card-header">
             <div class="text-left col-lg-13" style="top:-35px">
                 <br>
-                @if (Projection.LatestVersion.Status == ProjectionStatus.Replaying)
+
+                @if (Projection.LatestVersion.Status == ProjectionStatus.Building || Projection.LatestVersion.Status == ProjectionStatus.Rebuilding || Projection.LatestVersion.Status == ProjectionStatus.Replaying)
                 {
                     <div style="font-size:xx-small">@progressString</div>
-                    <MatProgressBar Progress="@progress"></MatProgressBar>
-                }
-                else if (Projection.LatestVersion.Status == ProjectionStatus.Building)
-                {
-                    <div style="font-size:xx-small">@progressString</div>
-                    <MatThemeProvider Theme="@rebuildProgressTheme">
-                        <MatProgressBar Progress="@progress"></MatProgressBar>
-                    </MatThemeProvider>
+                    <MudProgressLinear Progress="@progress"></MudProgressLinear>
                 }
             </div>
 
@@ -38,20 +32,19 @@
                 <div class="text-right col-lg-5">
                     @if (Projection.LatestVersion.Status != ProjectionStatus.Building && Projection.LatestVersion.Status != ProjectionStatus.Replaying && Projection.LiveVersion.Hash != "ver")//api should return if the projection is repl
                     {
-                        <IconButton Icon="media-play" ToolTip="Replays the projection and creates a new version. You should use this when your projection contains events you do not want." Click="@(async () => await ReplayAsync(Projection))"></IconButton>
+                        <MudIconButton Icon="@Icons.Filled.PlayArrow" Color="Color.Success" ToolTip="Replays the projection and creates a new version. You should use this when your projection contains events you do not want." OnClick="@(async () => await ReplayAsync(Projection))"></MudIconButton>
                     }
                     @if (Projection.LatestVersion.Status == ProjectionStatus.Building || Projection.LatestVersion.Status == ProjectionStatus.Replaying)
                     {
-                        <span class="d-inline"><IconButton Icon="media-stop" ToolTip="Cancel" Click="@(async () => await CancelAsync(Projection,Projection.LatestVersion))"></IconButton></span>
+                        <span class="d-inline"><MudIconButton Icon="@Icons.Filled.Stop" Color="Color.Success" ToolTip="Cancel" OnClick="@(async () => await CancelAsync(Projection,Projection.LatestVersion))"></MudIconButton></span>
                     }
 
                     @if (Projection.IsReplayable && Projection.LatestVersion.Status != ProjectionStatus.Building)//API does not return if the projection is replayable
                     {
-                        <IconButton Icon="loop-square" ToolTip="Rebuilds the projection version. You should use this when there are missing events." Click="@(async () => await RebuildAsync(Projection))"></IconButton>
+                        <MudIconButton Icon="@Icons.Filled.Loop" Color="Color.Success" ToolTip="Rebuilds the projection version. You should use this when there are missing events." OnClick="@(async () => await RebuildAsync(Projection))" Class="mr-2"></MudIconButton>
                     }
 
-                    <a href="/projections/@Projection.ProjectionContractId"><Icon Identifier="magnifying-glass"></Icon></a>
-
+                    <a href="/projections/@Projection.ProjectionContractId"><MudIcon Icon="@Icons.Filled.Search"></MudIcon></a>
                 </div>
             </div>
         </div>
@@ -67,9 +60,24 @@
 
     HubConnection hubConnection;
 
-    MatTheme rebuildProgressTheme = new MatTheme()
+    MudTheme RebuildProgressTheme = new MudTheme()
         {
-            Primary = MatThemeColors.DeepOrange._500.Value,
+            Palette = new Palette()
+            {
+                Primary = Colors.Blue.Default,
+                Secondary = Colors.Green.Accent4,
+                AppbarBackground = Colors.Red.Default,
+            },
+            PaletteDark = new Palette()
+            {
+                Primary = Colors.Blue.Lighten1
+            },
+
+            LayoutProperties = new LayoutProperties()
+            {
+                DrawerWidthLeft = "260px",
+                DrawerWidthRight = "300px"
+            }
         };
 
     double progress = 0;
@@ -87,19 +95,19 @@
         .Build();
 
         hubConnection.On<string, long, long>("RebuildProgress", (projectionTypeId, processed, total) =>
-        {
-            if (Projection.ProjectionContractId.Equals(projectionTypeId, StringComparison.OrdinalIgnoreCase) == false)
-                return;
+       {
+           if (Projection.ProjectionContractId.Equals(projectionTypeId, StringComparison.OrdinalIgnoreCase) == false)
+               return;
 
-            unchecked
-            {
-                double percentage = (processed * 100) / total;
-                progressString = $"{percentage} % ( {processed} / {total} )";
-                progress = (percentage / 100);
-            }
+           unchecked
+           {
+               double percentage = (processed * 100) / total;
+               progressString = $"{percentage} % ( {processed} / {total} )";
+               progress = (percentage / 100);
+           }
 
-            StateHasChanged();
-        });
+           StateHasChanged();
+       });
 
         hubConnection.On<string>("RebuildStarted", (projectionTypeId) =>
         {

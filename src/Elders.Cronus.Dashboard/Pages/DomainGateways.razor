@@ -3,27 +3,27 @@
 @inject CronusClient Cronus
 @inject IJSRuntime JSRuntime
 
-    <h2 class="mat-h2">Gateways</h2>
+<h2>Gateways</h2>
 
-    <div class="mat-layout-grid">
+<div>
 
-        <MatTable Items="@Domain?.Gateways" PageLabel="dfjgh" LoadInitialData="true" FilterByColumnName="Name" PageSize="9999" ShowPaging="false" Striped="false" AllowSelection="true" class="mat-elevation-z5">
-            <MatTableHeader>
-                <th>Name</th>
-                <th>ID</th>
-            </MatTableHeader>
-            <MatTableRow>
-                <td>@context.Name</td>
-                <td>@context.Id</td>
-            </MatTableRow>
-        </MatTable>
-    </div>
+    <MudTable Items="@Domain?.Gateways" PageLabel="dfjgh" LoadInitialData="true" FilterByColumnName="Name" PageSize="9999" ShowPaging="false" Striped="false" MultiSelection="false" AllowSelection="true" Elevation="3">
+        <HeaderContent>
+            <MudTh>Name</MudTh>
+            <MudTh>ID</MudTh>
+        </HeaderContent>
+        <RowTemplate>
+            <MudTd>@context.Name</MudTd>
+            <MudTd>@context.Id</MudTd>
+        </RowTemplate>
+    </MudTable>
+</div>
 
     @code {
-        DomainDto Domain { get; set; }
+    DomainDto Domain { get; set; }
 
-        protected override async Task OnInitializedAsync()
-        {
-            Domain = await Cronus.GetDomainAsync(@App.Connection);
-        }
+    protected override async Task OnInitializedAsync()
+    {
+        Domain = await Cronus.GetDomainAsync(@App.Connection);
+    }
     }

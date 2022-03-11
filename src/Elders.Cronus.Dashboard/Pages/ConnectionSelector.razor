@@ -1,25 +1,19 @@
 ﻿@inherits ConnectionSelectorBase
-<div>
-    <button class="btn btn-primary dropdown-toggle" type="button" id="dropdownMenuButton" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
-        @ConnectionName
-    </button>
-    <div class="dropdown-menu" aria-labelledby="dropdownMenuButton">
+<link href="https://use.fontawesome.com/releases/v5.14.0/css/all.css" rel="stylesheet">
 
+<div class="d-flex gap-4">
+    <MudSelect T="Connection" @bind-Value="Connection" Label="Select Connection" SelectedValuesChanged="OnConnectionSelected" Variant="Variant.Outlined" MultiSelection="false" Style="@($"min-width: 234px")">
         @foreach (var connection in connections)
         {
-            <a class="dropdown-item cursor-pointer" @onclick="@(async () => await OnConnectionClick(connection))">@connection.Name</a>
+            <MudSelectItem T="Connection" Value="@connection" Width="256px" Elevation="0">@connection.Name</MudSelectItem>
         }
-    </div>
-    <div class="btn-group connection">
-        <button class="btn btn-primary dropdown-toggle" type="button" id="dropdownMenuButton" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
-            @TenantName
-        </button>
-        <div class="dropdown-menu" aria-labelledby="dropdownMenuButton">
+    </MudSelect>
 
-            @foreach (var oAuth in oAuths)
-            {
-                <a class="dropdown-item cursor-pointer" @onclick="@(async () => await OnAuthSelected(oAuth))">@oAuth.Tenant</a>
-            }
-        </div>
-    </div>
+    <MudSelect T="oAuth" Label="Select Tenant" SelectedValuesChanged="OnTenantChanged" id="dropdownMenuButton" Variant="Variant.Outlined" Style="@($"min-width: 234px")">
+        @foreach (var oAuth in oAuths)
+        {
+            <MudSelectItem T="oAuth" Value="oAuth" Width="256px" Elevation="0">@oAuth.Tenant</MudSelectItem>
+        }
+    </MudSelect>
+
 </div>
