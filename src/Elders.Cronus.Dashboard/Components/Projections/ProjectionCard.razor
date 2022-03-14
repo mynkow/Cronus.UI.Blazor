@@ -13,7 +13,7 @@
                 @if (Projection.LatestVersion.Status == ProjectionStatus.Building || Projection.LatestVersion.Status == ProjectionStatus.Rebuilding || Projection.LatestVersion.Status == ProjectionStatus.Replaying)
                 {
                     <div style="font-size:xx-small">@progressString</div>
-                    <MudProgressLinear Progress="@progress"></MudProgressLinear>
+                    <MudProgressLinear Color="Color.Primary" Value="@progress" />
                 }
             </div>
 
@@ -103,7 +103,7 @@
            {
                double percentage = (processed * 100) / total;
                progressString = $"{percentage} % ( {processed} / {total} )";
-               progress = (percentage / 100);
+               progress = percentage;
            }
 
            StateHasChanged();
@@ -131,7 +131,7 @@
             if (Projection.ProjectionContractId.Equals(projectionTypeId, StringComparison.OrdinalIgnoreCase) == false)
                 return;
 
-            progress = 1;
+            progress = 100;
 
             Projection.LatestVersion.Status = ProjectionStatus.Live;
 

@@ -43,7 +43,11 @@ namespace Elders.Cronus.Dashboard.Components
 
             Connection = App.Connection;
             LiveBoundedContexts = await Cronus.GetLiveServicesAsync(Connection).ConfigureAwait(false);
-            LiveTenants = await Cronus.GetLiveTenantsAsync(Connection).ConfigureAwait(false);
+            if (LiveBoundedContexts is not null)
+            {
+                LiveTenants = await Cronus.GetLiveTenantsAsync(Connection).ConfigureAwait(false);
+            }
+
             StateHasChanged();
         }
 

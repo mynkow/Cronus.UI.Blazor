@@ -11,7 +11,7 @@ else if (HasValidToken == true)
     <MudPaper Class="pa-8 ma-2" Elevation="3">
         <EditForm Model="validationModel" OnValidSubmit="Success">
             <DataAnnotationsValidator />
-            @if (LiveTenants.Any())
+            @if (LiveTenants is not null && LiveTenants.Any())
             {
                 <p>
                     <MudSelect T="string" Label="Tenant" @bind-Value="validationModel.LiveTenant" AnchorOrigin="Origin.BottomCenter " MultiSelection="false">
@@ -30,7 +30,7 @@ else if (HasValidToken == true)
                     <ValidationMessage For="@(() => validationModel.LiveTenant)" />
                 </p>
             }
-            @if (LiveBoundedContexts.Any())
+            @if (LiveBoundedContexts is not null && LiveBoundedContexts.Any())
             {
                 <p>
                     <MudSelect T="string" Label="RecipientBoundedContext" @bind-Value="validationModel.LiveBoundedContext" AnchorOrigin="Origin.BottomCenter" MultiSelection="false">
