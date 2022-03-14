@@ -6,12 +6,11 @@
 <div hidden="@(projections?.Count == 0)" class="top-row px-4">
 
     <div class="px-4">
-        <span style="font-size:22px;">STATUS: </span>
-        <span class="badge badge-success">Live</span>
-        <span class="badge badge-primary">Building</span>
-        <span class="badge badge-secondary">NotPresent</span>
-        <span class="badge badge-danger">Timedout</span>
-        <span class="badge badge-warning text-dark">Canceled</span>
+        <MudChip Size="Size.Small" Color="Color.Success">Live</MudChip>
+        <MudChip Size="Size.Small" Color="Color.Primary">Replaying</MudChip>
+        <MudChip Size="Size.Small" Variant="Variant.Text" Color="Color.Error">Timedout</MudChip>
+        <MudChip Size="Size.Small">NotPresent</MudChip>
+        <MudChip Size="Size.Small" Variant="Variant.Outlined">Canceled</MudChip>
     </div>
 </div>
 

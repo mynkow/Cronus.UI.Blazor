@@ -13,7 +13,7 @@
                 @if (Projection.LatestVersion.Status == ProjectionStatus.Building || Projection.LatestVersion.Status == ProjectionStatus.Rebuilding || Projection.LatestVersion.Status == ProjectionStatus.Replaying)
                 {
                     <div style="font-size:xx-small">@progressString</div>
-                    <MudProgressLinear Color="Color.Primary" Value="@progress" />
+                    <MudProgressLinear Color="Color.Primary" Rounded="true" Size="Size.Medium" Value="@progress" />
                 }
             </div>
 
@@ -21,7 +21,7 @@
                 <div class="text-left col-lg-7">
                     <span>@Projection.ProjectionName</span>
                     <div>
-                        <span style="font-size:small"><cite>@Projection.ProjectionContractId</cite></span>
+                        <MudText style="font-size:small" Font-Size="Size.Small" Typo="Typo.body2" Color="Color.Primary"><cite>@Projection.ProjectionContractId</cite></MudText>
                     </div>
 
                     <div class="d-inline">
