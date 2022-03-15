@@ -1,4 +1,4 @@
-﻿@inject AppState App
+@inject AppState App
 @inject CronusClient Cronus
 @implements IAsyncDisposable
 @inject ILogger<Projection> Log
@@ -13,7 +13,7 @@
                 @if (Projection.LatestVersion.Status == ProjectionStatus.Building || Projection.LatestVersion.Status == ProjectionStatus.Rebuilding || Projection.LatestVersion.Status == ProjectionStatus.Replaying)
                 {
                     <div style="font-size:xx-small">@progressString</div>
-                    <MudProgressLinear Color="Color.Primary" Rounded="true" Size="Size.Medium" Value="@progress" />
+                    <MudProgressLinear Color="Color.Warning" Rounded="true" Size="Size.Medium" Value="@progress" />
                 }
             </div>
 
@@ -30,7 +30,7 @@
                 </div>
 
                 <div class="text-right col-lg-5">
-                    @if (Projection.LatestVersion.Status != ProjectionStatus.Building && Projection.LatestVersion.Status != ProjectionStatus.Replaying && Projection.LiveVersion.Hash != "ver")//api should return if the projection is repl
+                    @if (Projection.LatestVersion.Status != ProjectionStatus.Building && Projection.LatestVersion.Status != ProjectionStatus.Replaying && Projection.LiveVersion?.Hash != "ver")//api should return if the projection is repl
                     {
                         <MudIconButton Icon="@Icons.Filled.PlayArrow" Color="Color.Success" ToolTip="Replays the projection and creates a new version. You should use this when your projection contains events you do not want." OnClick="@(async () => await ReplayAsync(Projection))"></MudIconButton>
                     }
@@ -139,6 +139,7 @@
         });
 
         await hubConnection.StartAsync();
+        Log.LogInformation("SignalR hub started");
     }
 
     public Task RebuildAsync(Projection projection)
@@ -154,12 +155,16 @@
     public Task CancelAsync(Projection projection, ProjectionVersion version)
     {
         return Cronus.CancelSpecificProjectionAsync(App.Connection, Projection, version);
+    }
 
+    public Task FinalizeAsync(Projection projection, ProjectionVersion version)
+    {
+        return Cronus.FinalizeProjectionAsync(App.Connection, Projection, version);
     }
 
     public async ValueTask DisposeAsync()
     {
-        Log.LogInformation("Disposing signalR...");
+        Log.LogInformation("Disposing SignalR hub...");
         await hubConnection.DisposeAsync();
 
     }
