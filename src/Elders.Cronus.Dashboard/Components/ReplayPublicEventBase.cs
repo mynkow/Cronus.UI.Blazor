@@ -36,7 +36,7 @@ namespace Elders.Cronus.Dashboard.Components
         public List<string> LiveBoundedContexts { get; set; }
 
         [Parameter]
-        public List<string> Events { get; set; }
+        public List<DomainEventDto> Events { get; set; }
 
         protected ReplayPublicEventValidator validationModel = new ReplayPublicEventValidator();
 
@@ -52,9 +52,9 @@ namespace Elders.Cronus.Dashboard.Components
                 LiveTenants = await Cronus.GetLiveTenantsAsync(Connection).ConfigureAwait(false);
             }
 
-            Events = new List<string>();
+            Events = new List<DomainEventDto>();
             var Domain = await Cronus.GetDomainAsync(@App.Connection).ConfigureAwait(false);
-            var projectionEvents = Domain.Projections.Select(p => p.Events).Select(proj => proj.Select(d => d.Name));
+            var projectionEvents = Domain.Projections.Select(p => p.Events);
 
             foreach (var events in projectionEvents)
             {

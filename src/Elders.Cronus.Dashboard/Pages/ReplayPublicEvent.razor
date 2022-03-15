@@ -60,9 +60,10 @@ else if (HasValidToken == true)
             {
                 <p>
                     <MudSelect T="string" Label="SourceEventTypeId" @bind-Value="validationModel.SourceEventTypeId" AnchorOrigin="Origin.BottomCenter" MultiSelection="false">
-                        @foreach (string eventType in Events)
+                        @foreach (var ev in Events)
                         {
-                            <MudSelectItem Value="@(eventType)" />
+                            <MudSelectItem Value="@(ev.Id)">@(ev.Name)</MudSelectItem>
+
                         }
                     </MudSelect>
                     <ValidationMessage For="@(() => validationModel.SourceEventTypeId)" />

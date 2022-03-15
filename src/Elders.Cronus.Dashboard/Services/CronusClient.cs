@@ -445,6 +445,7 @@ namespace Elders.Cronus.Dashboard.Models
         public List<DomainEventDto> Events { get; set; }
     }
 
+
     public class DomainEventDto : IMessageDto
     {
         public string Id { get; set; }
