@@ -1,6 +1,7 @@
 ﻿@page "/replay-public"
 @using MudBlazor
 @inherits ReplayPublicEventBase
+@inject CronusClient Cronus
 
 @if (HasValidToken is null)
 {
@@ -8,7 +9,7 @@
 }
 else if (HasValidToken == true)
 {
-    <MudPaper Class="pa-8 ma-2" Elevation="3">
+    <MudPaper Width="400px" Class="pa-8 ma-2" Elevation="3">
         <EditForm Model="validationModel" OnValidSubmit="Success">
             <DataAnnotationsValidator />
             @if (LiveTenants is not null && LiveTenants.Any())
@@ -55,10 +56,26 @@ else if (HasValidToken == true)
                 <ValidationMessage For="@(() => validationModel.RecipientHandler)" />
             </p>
 
-            <p>
-                <MudTextField Label="SourceEventTypeId" @bind-Value="validationModel.SourceEventTypeId" />
-                <ValidationMessage For="@(() => validationModel.SourceEventTypeId)" />
-            </p>
+            @if (Events is not null && Events.Any())
+            {
+                <p>
+                    <MudSelect T="string" Label="SourceEventTypeId" @bind-Value="validationModel.SourceEventTypeId" AnchorOrigin="Origin.BottomCenter" MultiSelection="false">
+                        @foreach (string eventType in Events)
+                        {
+                            <MudSelectItem Value="@(eventType)" />
+                        }
+                    </MudSelect>
+                    <ValidationMessage For="@(() => validationModel.SourceEventTypeId)" />
+                </p>
+            }
+            else
+            {
+                <p>
+                    <MudTextField Label="SourceEventTypeId" @bind-Value="validationModel.SourceEventTypeId" />
+                    <ValidationMessage For="@(() => validationModel.SourceEventTypeId)" />
+                </p>
+            }
+
             <p>
                 <MudDatePicker Label="Replay After" @bind-Date="validationModel.ReplayAfter" EnableTime="true"></MudDatePicker>
 
@@ -79,5 +96,3 @@ else
     <p>Please check your connection!</p>
 }
 
-@code {
-}

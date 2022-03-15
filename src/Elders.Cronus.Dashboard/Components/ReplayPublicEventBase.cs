@@ -1,5 +1,6 @@
 ﻿using Elders.Cronus.Dashboard.Models;
 using Microsoft.AspNetCore.Components;
+using Microsoft.Extensions.Logging;
 using Microsoft.JSInterop;
 using System.ComponentModel.DataAnnotations;
 
@@ -34,6 +35,9 @@ namespace Elders.Cronus.Dashboard.Components
         [Parameter]
         public List<string> LiveBoundedContexts { get; set; }
 
+        [Parameter]
+        public List<string> Events { get; set; }
+
         protected ReplayPublicEventValidator validationModel = new ReplayPublicEventValidator();
 
         protected override async Task OnInitializedAsync()
@@ -46,6 +50,15 @@ namespace Elders.Cronus.Dashboard.Components
             if (LiveBoundedContexts is not null)
             {
                 LiveTenants = await Cronus.GetLiveTenantsAsync(Connection).ConfigureAwait(false);
+            }
+
+            Events = new List<string>();
+            var Domain = await Cronus.GetDomainAsync(@App.Connection).ConfigureAwait(false);
+            var projectionEvents = Domain.Projections.Select(p => p.Events).Select(proj => proj.Select(d => d.Name));
+
+            foreach (var events in projectionEvents)
+            {
+                Events.AddRange(events);
             }
 
             StateHasChanged();
