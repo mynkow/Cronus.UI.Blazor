@@ -4,10 +4,18 @@
 @inject IJSRuntime JSRuntime
 @inject ILogger<EventStore> Log
 
+
 <div class="pin">
-    <MudTextField @bind-Value="@AggregateId" Label="Aggregate ID" style="width:800px"></MudTextField>
-    <MudIconButton Icon="@Icons.Material.Filled.Search" OnClick="@(async ()=> await GetAggregateAsync())"></MudIconButton>
+    <MudGrid>
+        <MudItem xs="12" sm="8">
+            <MudTextField @bind-Value="@AggregateId" Label="Aggregate ID"></MudTextField>
+        </MudItem>
+        <MudItem xs="12" sm="1">
+            <MudIconButton Icon="@Icons.Material.Filled.Search" OnClick="@(async ()=> await GetAggregateAsync())" Style="@("margin-top:10px")"></MudIconButton>
+        </MudItem>
+    </MudGrid>
 </div>
+
 
 <MudExpansionPanels Elevation="3">
     @foreach (var commit in commits)
@@ -18,38 +26,65 @@
                     <h5 class="mat-subtitle1">Commit revision @commit.AggregateRootRevision - @commit.Timestamp.ToString("MMM d'th' yyyy, hh:mm:ss.fff")</h5>
                 </TitleContent>
                 <ChildContent>
-                    @foreach (var theEvent in commit.Events)
-                    {
-                        @if (@theEvent.IsEntityEvent)
+                    <MudExpansionPanels>
+                        @foreach (var theEvent in commit.Events)
                         {
-                            <span style="color:maroon;font-size: 125%">
-                                @theEvent.EventPosition
-                                <Icon Identifier="bookmark" />
-                                @theEvent?.EventName
-                            </span>
+                            @if (@theEvent.IsEntityEvent)
+                            {
+                                <MudExpansionPanel>
+                                    <TitleContent>
+                                        <span style="color:maroon;">
+                                            @theEvent.EventPosition
+                                            <MudIcon Icon="@Icons.Material.Filled.Bookmark" />
+                                            @theEvent?.EventName
+                                        </span>
+                                    </TitleContent>
+                                    <ChildContent>
+                                        <RepublishEvent AggregateId="@AggregateId" Event="@theEvent" AggregateCommit="commit"></RepublishEvent>
+                                        <div class="json-box">
+                                            <pre Style="@($"color:{Colors.LightGreen.Accent3};")">@theEvent.EventData</pre>
+                                        </div>
+                                    </ChildContent>
+                                </MudExpansionPanel>
+                            }
+                            else if (@theEvent.IsPublicEvent)
+                            {
+                                <MudExpansionPanel>
+                                    <TitleContent>
+                                        <span style="color:royalblue;">
+                                            @theEvent.EventPosition
+                                            <MudIcon Icon="@Icons.Material.Filled.Bookmark" />
+                                            @theEvent?.EventName
+                                        </span>
+                                    </TitleContent>
+                                    <ChildContent>
+                                        <RepublishEvent AggregateId="@AggregateId" Event="@theEvent" AggregateCommit="commit"></RepublishEvent>
+                                        <div class="json-box">
+                                            <pre Style="@($"color:{Colors.LightGreen.Accent3};")">@theEvent.EventData</pre>
+                                        </div>
+                                    </ChildContent>
+                                </MudExpansionPanel>
+                            }
+                            else
+                            {
+                                <MudExpansionPanel>
+                                    <TitleContent>
+                                        <span style="color:forestgreen;">
+                                            @theEvent.EventPosition
+                                            <MudIcon Icon="@Icons.Material.Filled.Bookmark" />
+                                            @theEvent?.EventName
+                                        </span>
+                                    </TitleContent>
+                                    <ChildContent>
+                                        <RepublishEvent AggregateId="@AggregateId" Event="@theEvent" AggregateCommit="commit"></RepublishEvent>
+                                        <div class="json-box">
+                                            <pre Style="@($"color:{Colors.LightGreen.Accent3};")">@theEvent.EventData</pre>
+                                        </div>
+                                    </ChildContent>
+                                </MudExpansionPanel>
+                            }
                         }
-                        else if (@theEvent.IsPublicEvent)
-                        {
-                            <span style="color:royalblue;font-size: 125%">
-                                @theEvent.EventPosition
-                                <Icon Identifier="bookmark" />
-                                @theEvent?.EventName
-                            </span>
-                        }
-                        else
-                        {
-                            <span style="color:forestgreen;font-size: 125%">
-                                @theEvent.EventPosition
-                                <Icon Identifier="bookmark" />
-                                @theEvent?.EventName
-                            </span>
-                        }
-
-                        <RepublishEvent AggregateId="@AggregateId" Event="@theEvent" AggregateCommit="commit"></RepublishEvent>
-                        <div class="json-box">
-                            <pre Style="@($"color:{Colors.LightGreen.Accent3};")">@theEvent.EventData</pre>
-                        </div>
-                    }
+                    </MudExpansionPanels>
                 </ChildContent>
             </MudExpansionPanel>
         </MudExpansionPanels>

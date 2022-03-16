@@ -1,11 +1,8 @@
 @inherits LayoutComponentBase
 
 <div>
-    <MudThemeProvider IsDarkMode="true">
-
-    </MudThemeProvider>
-    <MudDialogProvider />
-    <MudSnackbarProvider />
+    <MudThemeProvider IsDarkMode="true"></MudThemeProvider>
+    <MudDialogProvider /><MudSnackbarProvider />
 
     <MudLayout>
         <MudAppBar Elevation="1" Style="@($"padding: 10px")">
@@ -42,11 +39,8 @@
     </MudLayout>
 </div>
 
-
-
 @code {
     bool _drawerOpen = true;
-
 
     void DrawerToggle()
     {
