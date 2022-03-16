@@ -52,13 +52,15 @@ namespace Elders.Cronus.Dashboard.Components
                 LiveTenants = await Cronus.GetLiveTenantsAsync(Connection).ConfigureAwait(false);
             }
 
+            const string excludeProjections = "Projection";
+            const string excludeIndex = "Index";
             Events = new List<DomainEventDto>();
             var Domain = await Cronus.GetDomainAsync(@App.Connection).ConfigureAwait(false);
             var projectionEvents = Domain.Projections.Select(p => p.Events);
 
             foreach (var events in projectionEvents)
             {
-                Events.AddRange(events);
+                Events.AddRange(events.Where(x => x.Name.Contains(excludeProjections) == false && x.Name.Contains(excludeIndex) == false));
             }
 
             StateHasChanged();

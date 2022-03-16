@@ -59,14 +59,17 @@ else if (HasValidToken == true)
             @if (Events is not null && Events.Any())
             {
                 <p>
-                    <MudSelect T="string" Label="SourceEventTypeId" @bind-Value="validationModel.SourceEventTypeId" AnchorOrigin="Origin.BottomCenter" MultiSelection="false">
+                    <ValidationMessage For="@(() => validationModel.SourceEventTypeId)" />
+                    <MudSelect Style="@($"height: auto")" T="string" Label="SourceEventTypeId" @bind-Value="validationModel.SourceEventTypeId" AnchorOrigin="Origin.BottomCenter" MultiSelection="false">
                         @foreach (var ev in Events)
                         {
-                            <MudSelectItem Value="@(ev.Id)">@(ev.Name)</MudSelectItem>
+                            <MudSelectItem Value="@(ev.Id)">
+                                @(ev.Name)
+                                <MudText style="font-size:small" Font-Size="Size.Small" Typo="Typo.body2" Color="Color.Primary"><cite>(@(ev.Id))</cite></MudText>
+                            </MudSelectItem>
 
                         }
                     </MudSelect>
-                    <ValidationMessage For="@(() => validationModel.SourceEventTypeId)" />
                 </p>
             }
             else
