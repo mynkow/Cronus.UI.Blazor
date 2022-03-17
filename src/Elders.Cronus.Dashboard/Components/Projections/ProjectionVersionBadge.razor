@@ -53,9 +53,11 @@ else if (Version.Status == ProjectionStatus.Canceled)
     [Parameter]
     public ProjectionVersion SelectedVersion { get; set; }
 
+    public static int RerenderedCount { get; set; }
+
     string GetDisplayName(ProjectionVersion version)
     {
-        return version.ToString();
+        return version.ToString() + " -> rerendered: " + ++RerenderedCount;
     }
 
     void SelectVersion(ProjectionVersion selectedVersion)

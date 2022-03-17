@@ -57,7 +57,7 @@ namespace Elders.Cronus.Dashboard.Components
         {
             var connection = connections.FirstOrDefault();
             App.Connect(connection);
-            //ConnectionName = connection.Name;
+            await App.ConnectToSignalRAsync();
             NavManager.NavigateTo("/");
             TenantName = App.oAuth?.Tenant ?? "Select Tenant...";
             List<string> configuredTenantsInTheService = await Cronus.GetTenantsAsync(connection);

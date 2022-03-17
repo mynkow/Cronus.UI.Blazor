@@ -1,6 +1,5 @@
 @inject AppState App
 @inject CronusClient Cronus
-@implements IAsyncDisposable
 @inject ILogger<Projection> Log
 
 @if (Projection is null == false)
@@ -12,8 +11,7 @@
 
                 @if (Projection.LatestVersion.Status == ProjectionStatus.Building || Projection.LatestVersion.Status == ProjectionStatus.Rebuilding || Projection.LatestVersion.Status == ProjectionStatus.Replaying)
                 {
-                    <div style="font-size:xx-small">@progressString</div>
-                    <MudProgressLinear Color="Color.Warning" Rounded="true" Size="Size.Medium" Value="@progress" />
+                    <ProjectionProgressBar Projection="@Projection"></ProjectionProgressBar>
                 }
             </div>
 
@@ -58,90 +56,6 @@
     [Parameter]
     public ProjectionVersion SelectedVersion { get; set; }
 
-    HubConnection hubConnection;
-
-    MudTheme RebuildProgressTheme = new MudTheme()
-        {
-            Palette = new Palette()
-            {
-                Primary = Colors.Blue.Default,
-                Secondary = Colors.Green.Accent4,
-                AppbarBackground = Colors.Red.Default,
-            },
-            PaletteDark = new Palette()
-            {
-                Primary = Colors.Blue.Lighten1
-            },
-
-            LayoutProperties = new LayoutProperties()
-            {
-                DrawerWidthLeft = "260px",
-                DrawerWidthRight = "300px"
-            }
-        };
-
-    double progress = 0;
-    string progressString = "0 %";
-
-    protected async override Task OnInitializedAsync()
-    {
-        App.OnChange += StateHasChanged;
-
-        Log.LogInformation("Initializing signalR...");
-
-        hubConnection = new HubConnectionBuilder()
-        .WithUrl(App.Connection.CronusEndpoint + "/hub/projections")
-        .WithAutomaticReconnect()
-        .Build();
-
-        hubConnection.On<string, long, long>("RebuildProgress", (projectionTypeId, processed, total) =>
-       {
-           if (Projection.ProjectionContractId.Equals(projectionTypeId, StringComparison.OrdinalIgnoreCase) == false)
-               return;
-
-           unchecked
-           {
-               double percentage = (processed * 100) / total;
-               progressString = $"{percentage} % ( {processed} / {total} )";
-               progress = percentage;
-           }
-
-           StateHasChanged();
-       });
-
-        hubConnection.On<string>("RebuildStarted", (projectionTypeId) =>
-        {
-            Log.LogInformation("RebuildStarted: " + projectionTypeId);
-
-            if (Projection.ProjectionContractId.Equals(projectionTypeId, StringComparison.OrdinalIgnoreCase) == false)
-                return;
-
-            progressString = $"0 % ( {0} / -- )";
-            progress = 0;
-
-            Projection.LatestVersion.Status = ProjectionStatus.Building;
-
-            StateHasChanged();
-        });
-
-        hubConnection.On<string>("RebuildFinished", (projectionTypeId) =>
-        {
-            Log.LogInformation("RebuildFinished: " + projectionTypeId);
-
-            if (Projection.ProjectionContractId.Equals(projectionTypeId, StringComparison.OrdinalIgnoreCase) == false)
-                return;
-
-            progress = 100;
-
-            Projection.LatestVersion.Status = ProjectionStatus.Live;
-
-            StateHasChanged();
-        });
-
-        await hubConnection.StartAsync();
-        Log.LogInformation("SignalR hub started");
-    }
-
     public Task RebuildAsync(Projection projection)
     {
         return Cronus.RebuildProjectionAsync(App.Connection, Projection);
@@ -162,10 +76,33 @@
         return Cronus.FinalizeProjectionAsync(App.Connection, Projection, version);
     }
 
-    public async ValueTask DisposeAsync()
+    protected override async Task OnInitializedAsync()
     {
-        Log.LogInformation("Disposing SignalR hub...");
-        await hubConnection.DisposeAsync();
+        App.OnChange += StateHasChanged;
 
+        App.HubConnection.On<string>("RebuildStarted", (projectionTypeId) =>
+       {
+           Log.LogInformation("RebuildStarted: " + projectionTypeId);
+
+           if (Projection.ProjectionContractId.Equals(projectionTypeId, StringComparison.OrdinalIgnoreCase) == false)
+               return;
+
+           Projection.LatestVersion.Status = ProjectionStatus.Rebuilding;
+
+           StateHasChanged();
+       });
+
+        App.HubConnection.On<string>("RebuildFinished", (projectionTypeId) =>
+        {
+            Log.LogInformation("RebuildFinished: " + projectionTypeId);
+
+            if (Projection.ProjectionContractId.Equals(projectionTypeId, StringComparison.OrdinalIgnoreCase) == false)
+                return;
+
+            Projection.LatestVersion.Status = ProjectionStatus.Live;
+            Projection.LatestVersion.Revision++;
+
+            StateHasChanged();
+        });
     }
 }

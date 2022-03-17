@@ -1,0 +1,58 @@
+﻿@inject AppState App
+@inject CronusClient Cronus
+@inject ILogger<Projection> _logger
+
+<div style="font-size:xx-small">@progressString</div>
+<MudProgressLinear Color="Color.Warning" Rounded="true" Size="Size.Medium" Value="@progress" />
+
+
+@code {
+    [Parameter]
+    public Projection Projection { get; set; }
+
+    private double progress = 0;
+    private string progressString = "0 %";
+
+    protected override async Task OnInitializedAsync()
+    {
+        App.OnChange += StateHasChanged;
+
+        App.HubConnection.On<string, long, long>("RebuildProgress", (projectionTypeId, processed, total) =>
+            {
+                if (Projection.ProjectionContractId.Equals(projectionTypeId, StringComparison.OrdinalIgnoreCase) == false)
+                    return;
+
+                unchecked
+                {
+                    double percentage = (processed * 100) / total;
+                    progressString = $"{percentage} % ( {processed} / {total} )";
+                    progress = percentage;
+                }
+
+                StateHasChanged();
+            });
+
+        App.HubConnection.On<string>("RebuildStarted", (projectionTypeId) =>
+        {
+            if (Projection.ProjectionContractId.Equals(projectionTypeId, StringComparison.OrdinalIgnoreCase) == false)
+                return;
+
+            progressString = $"0 % ( {0} / -- )";
+            progress = 0;
+
+            StateHasChanged();
+
+        });
+
+        App.HubConnection.On<string>("RebuildFinished", (projectionTypeId) =>
+        {
+            if (Projection.ProjectionContractId.Equals(projectionTypeId, StringComparison.OrdinalIgnoreCase) == false)
+                return;
+
+            progress = 100;
+
+            StateHasChanged();
+
+        });
+    }
+}
