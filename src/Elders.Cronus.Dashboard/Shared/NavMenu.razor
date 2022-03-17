@@ -1,73 +1,71 @@
-﻿<MatAppBarContainer>
-    <MatAppBar Fixed="true">
-        <MatAppBarRow>
-            <MatAppBarSection Align="@MatAppBarSectionAlign.Start">
-                <MatIconButton Icon="menu"></MatIconButton>
-                <MatAppBarTitle>Cronus Dashboard</MatAppBarTitle>
-            </MatAppBarSection>
-            <MatAppBarSection Align="@MatAppBarSectionAlign.Start">
-                <ConnectionSelector />
-            </MatAppBarSection>
-            <MatAppBarSection Align="@MatAppBarSectionAlign.End">
-                <MatIconButton Icon="favorite"></MatIconButton>
-            </MatAppBarSection>
-        </MatAppBarRow>
-    </MatAppBar>
+﻿@* <MudAppBar Fixed="true">
+    <MudDrawer>
+    <TitleContent Align="@MatAppBarSectionAlign.Start">
+    <MudIconButton Icon="menu"></MudIconButton>
+    <TitleContent>Cronus Dashboard</TitleContent>
+    </MatAppBarSection>
+    <MatAppBarSection Align="@MatAppBarSectionAlign.Start">
+    <ConnectionSelector/>
+    </MatAppBarSection>
+    <MatAppBarSection Align="@MatAppBarSectionAlign.End">
+    <MudIconButton Icon="favorite"></MudIconButton>
+    </TitleContent>
+    </MudDrawer>
+    </MudAppBar>
 
-    <MatAppBarContent>
-        <div class="mat-layout-grid">
-            <div class="mat-layout-grid-inner">
-                <div class="mat-layout-grid-cell mat-layout-grid-cell-span-11">
-                    <MatNavMenu>
-                        <MatNavItem href="connections"><MatIcon Icon="bolt"></MatIcon>&nbsp; Connections </MatNavItem>
-                        <MatDivider></MatDivider>
-                        <MatNavItem href="domain"><MatIcon Icon="wb_sunny"></MatIcon>&nbsp; Domain </MatNavItem>
-                        <MatDivider></MatDivider>
-                        <MatNavItem href="eventstore"><MatIcon Icon="book"></MatIcon>&nbsp; Event Store </MatNavItem>
-                        <MatDivider></MatDivider>
-                        <MatNavItem href="projections"><MatIcon Icon="dashboard"></MatIcon>&nbsp; Projections </MatNavItem>
-                        <MatDivider></MatDivider>
-                    </MatNavMenu>
-                </div>
-            </div>
-        </div>
-    </MatAppBarContent>
-</MatAppBarContainer>
+    <ChildContent>
+    <div class="mat-layout-grid">
+    <div class="mat-layout-grid-inner">
+    <div class="mat-layout-grid-cell mat-layout-grid-cell-span-11">
+    <MudNavMenu>
+    <MudItem Href="connections"><MudIcon Icon="@Icons.TwoTone.OfflineBolt"></MudIcon>&nbsp; Connections </MudItem>
+    <MudDivider></MudDivider>
+    <MudItem Href="domain"><MudIcon Icon="@Icons.TwoTone.WbSunny"></MudIcon>&nbsp; Domain </MudItem>
+    <MudDivider></MudDivider>
+    <MudItem Href="eventstore"><MudIcon Icon="@Icons.TwoTone.Book"></MudIcon>&nbsp; Event Store </MudItem>
+    <MudDivider></MudDivider>
+    <MudItem Href="projections"><MudIcon Icon="@Icons.TwoTone.Dashboard"></MudIcon>&nbsp; Projections </MudItem>
+    <MudDivider></MudDivider>
+    </MudNavMenu>
+    </div>
+    </div>
+    </div>
+    </ChildContent>*@
 
 @*<div class="top-row pl-4 navbar navbar-dark">
     <a class="navbar-brand" href="">Cronus Dashboard</a>
     <button class="navbar-toggler" @onclick="ToggleNavMenu">
-        <span class="navbar-toggler-icon"></span>
+    <span class="navbar-toggler-icon"></span>
     </button>
-</div>
+    </div>
 
-<div class=@(collapseNavMenu ? "collapse" : null) @onclick="ToggleNavMenu">
+    <div class=@(collapseNavMenu ? "collapse" : null) @onclick="ToggleNavMenu">
     <ul class="nav flex-column">
-        <li class="nav-item px-3">
-            <NavLink class="nav-link" href="connections">
-                <span class="oi oi-bolt" aria-hidden="true"></span> Connections
-            </NavLink>
-        </li>
-        <li class="nav-item px-3">
-            <NavLink class="nav-link" href="domain">
-                <span class="oi oi-sun" aria-hidden="true"></span> Domain
-            </NavLink>
-            <NavLink class="nav-link" href="domain-po">
-                <span class="oi oi-sun" aria-hidden="true"></span> Domain - Ports
-            </NavLink>
-        </li>
-        <li class="nav-item px-3">
-            <NavLink class="nav-link" href="eventstore">
-                <span class="oi oi-book" aria-hidden="true"></span> Event Store
-            </NavLink>
-        </li>
-        <li class="nav-item px-3">
-            <NavLink class="nav-link" href="projections">
-                <span class="oi oi-grid-four-up" aria-hidden="true"></span> Projections
-            </NavLink>
-        </li>
+    <li class="nav-item px-3">
+    <NavLink class="nav-link" href="connections">
+    <span class="oi oi-bolt" aria-hidden="true"></span> Connections
+    </NavLink>
+    </li>
+    <li class="nav-item px-3">
+    <NavLink class="nav-link" href="domain">
+    <span class="oi oi-sun" aria-hidden="true"></span> Domain
+    </NavLink>
+    <NavLink class="nav-link" href="domain-po">
+    <span class="oi oi-sun" aria-hidden="true"></span> Domain - Ports
+    </NavLink>
+    </li>
+    <li class="nav-item px-3">
+    <NavLink class="nav-link" href="eventstore">
+    <span class="oi oi-book" aria-hidden="true"></span> Event Store
+    </NavLink>
+    </li>
+    <li class="nav-item px-3">
+    <NavLink class="nav-link" href="projections">
+    <span class="oi oi-grid-four-up" aria-hidden="true"></span> Projections
+    </NavLink>
+    </li>
     </ul>
-</div>*@
+    </div>*@
 
 @code {
     bool collapseNavMenu = true;

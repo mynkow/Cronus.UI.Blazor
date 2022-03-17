@@ -4,38 +4,38 @@
 @inject IJSRuntime JSRuntime
 @inject ILogger<DomainPorts> Log
 
-<h2 class="mat-h2">Ports</h2>
+<h2>Ports</h2>
 
-<div class="mat-layout-grid">
+<div>
 
-    <MatTable Items="@Domain?.Ports" LoadInitialData="true" FilterByColumnName="Name" PageSize="9999" ShowPaging="false" Striped="false" AllowSelection="true" SelectionChanged="SelectionChangedEvent" class="mat-elevation-z5">
-        <MatTableHeader>
-            <th>Name</th>
-            <th>ID</th>
-        </MatTableHeader>
-        <MatTableRow>
-            <td>@context.Name</td>
-            <td>@context.Id</td>
-        </MatTableRow>
-    </MatTable>
+    <MudTable Items="@Domain?.Ports" LoadInitialData="true" FilterByColumnName="Name" PageSize="9999" ShowPaging="false" Striped="false" AllowSelection="true" MultiSelection="false" @bind-SelectedItem="@Port" Elevation="3">
+        <HeaderContent>
+            <MudTh>Name</MudTh>
+            <MudTh>ID</MudTh>
+        </HeaderContent>
+        <RowTemplate>
+            <MudTd>@context.Name</MudTd>
+            <MudTd>@context.Id</MudTd>
+        </RowTemplate>
+    </MudTable>
 
-    <div class="mat-layout-grid-inner">
-        <div class="mat-layout-grid-cell mat-layout-grid-cell-span-6">
-            <h3 class="mat-h3">@Port?.Name Events</h3>
-            <MatTable Items="@Port?.Events" LoadInitialData="true" FilterByColumnName="Name" PageSize="9999" ShowPaging="false" Striped="false" AllowSelection="true" class="mat-elevation-z5">
-                <MatTableHeader>
-                    <th>Name</th>
-                    <th>ID</th>
-                    <th>Actions</th>
-                </MatTableHeader>
-                <MatTableRow>
-                    <td>@context.Name</td>
-                    <td><i>@context.Id</i></td>
-                    <td>
-                        <MatButton Outlined="true" TrailingIcon="delete" OnClick="@(async () => await OnGG())">Request all public event</MatButton>
-                    </td>
-                </MatTableRow>
-            </MatTable>
+    <div>
+        <div class="mt-8">
+            <h3>@Port?.Name Events</h3>
+            <MudTable Items="@Port?.Events" LoadInitialData="true" FilterByColumnName="Name" PageSize="9999" ShowPaging="false" Striped="false" AllowSelection="true" Elevation="3">
+                <HeaderContent>
+                    <MudTh>Name</MudTh>
+                    <MudTh>ID</MudTh>
+                    <MudTh>Actions</MudTh>
+                </HeaderContent>
+                <RowTemplate>
+                    <MudTd>@context.Name</MudTd>
+                    <MudTd><i>@context.Id</i></MudTd>
+                    <MudTd>
+                        <MudButton Variant="Variant.Outlined" EndIcon="@Icons.Filled.Delete" Color="Color.Success" OnClick="@(async () => await OnGG())">Request all public event</MudButton>
+                    </MudTd>
+                </RowTemplate>
+            </MudTable>
         </div>
     </div>
 </div>
@@ -48,19 +48,6 @@
     protected override async Task OnInitializedAsync()
     {
         Domain = await Cronus.GetDomainAsync(@App.Connection);
-    }
-
-    public void SelectionChangedEvent(object row)
-    {
-        Log.LogInformation("SelectionChangedEvent");
-
-        if (row != null)
-        {
-            Log.LogInformation("row found");
-            Port = (DomainPortDto)row;
-            Log.LogInformation("row casted");
-        }
-
         this.StateHasChanged();
     }
 

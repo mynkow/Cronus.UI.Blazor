@@ -2,9 +2,7 @@
 using Microsoft.AspNetCore.Components;
 using Microsoft.Extensions.Logging;
 using Microsoft.JSInterop;
-using System;
 using System.ComponentModel.DataAnnotations;
-using System.Threading.Tasks;
 
 namespace Elders.Cronus.Dashboard.Components
 {
@@ -28,12 +26,44 @@ namespace Elders.Cronus.Dashboard.Components
         [Parameter]
         public bool? HasValidToken { get; set; }
 
+        [Parameter]
+        public Connection Connection { get; set; }
+
+        [Parameter]
+        public List<string> LiveTenants { get; set; }
+
+        [Parameter]
+        public List<string> LiveBoundedContexts { get; set; }
+
+        [Parameter]
+        public List<DomainEventDto> Events { get; set; }
+
         protected ReplayPublicEventValidator validationModel = new ReplayPublicEventValidator();
 
         protected override async Task OnInitializedAsync()
         {
             App.OnTenantChanged += OnTenantChange;
             HasValidToken = await IsTokenValid();
+
+            Connection = App.Connection;
+            LiveBoundedContexts = await Cronus.GetLiveServicesAsync(Connection).ConfigureAwait(false);
+            if (LiveBoundedContexts is not null)
+            {
+                LiveTenants = await Cronus.GetLiveTenantsAsync(Connection).ConfigureAwait(false);
+            }
+
+            const string excludeProjections = "Projection";
+            const string excludeIndex = "Index";
+            Events = new List<DomainEventDto>();
+            var Domain = await Cronus.GetDomainAsync(@App.Connection).ConfigureAwait(false);
+            var projectionEvents = Domain.Projections.Select(p => p.Events);
+
+            foreach (var events in projectionEvents)
+            {
+                Events.AddRange(events.Where(x => x.Name.Contains(excludeProjections) == false && x.Name.Contains(excludeIndex) == false));
+            }
+
+            StateHasChanged();
         }
 
         protected async Task OnTenantChange(oAuth oAuth)
@@ -50,9 +80,9 @@ namespace Elders.Cronus.Dashboard.Components
 
             var model = new ReplayPublicEventRequest()
             {
-                Tenant = validationModel.Tenant,
-                RecipientBoundedContext = validationModel.RecipientBoundedContext,
-                RecipientHandlers = validationModel.RecipientHandlers,
+                LiveTenant = validationModel.LiveTenant,
+                LiveBoundedContext = validationModel.LiveBoundedContext,
+                RecipientHandlers = validationModel.RecipientHandler,
                 SourceEventTypeId = validationModel.SourceEventTypeId,
                 ReplayAfter = replayAfter
             };
@@ -63,9 +93,9 @@ namespace Elders.Cronus.Dashboard.Components
 
         protected void Reset()
         {
-            validationModel.Tenant = null;
-            validationModel.RecipientBoundedContext = null;
-            validationModel.RecipientHandlers = null;
+            validationModel.LiveTenant = null;
+            validationModel.LiveBoundedContext = null;
+            validationModel.RecipientHandler = null;
             validationModel.SourceEventTypeId = null;
         }
 
@@ -81,13 +111,13 @@ namespace Elders.Cronus.Dashboard.Components
         protected class ReplayPublicEventValidator
         {
             [Required]
-            public string Tenant { get; set; }
+            public string LiveTenant { get; set; }
 
             [Required]
-            public string RecipientBoundedContext { get; set; }
+            public string LiveBoundedContext { get; set; }
 
             [Required]
-            public string RecipientHandlers { get; set; }
+            public string RecipientHandler { get; set; }
 
             [Required]
             public string SourceEventTypeId { get; set; }

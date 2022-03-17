@@ -3,32 +3,32 @@
 @inject CronusClient Cronus
 @inject IJSRuntime JSRuntime
 
-<h2 class="mat-h2">Projections</h2>
+<h2>Projections</h2>
 
-<div class="mat-layout-grid">
-    <MatTable Items="@Domain?.Projections" PageLabel="dfjgh" LoadInitialData="true" FilterByColumnName="Name" PageSize="9999" ShowPaging="false" Striped="false" AllowSelection="true" SelectionChanged="SelectionChangedEvent" class="mat-elevation-z5">
-        <MatTableHeader>
-            <th>Name</th>
-            <th>ID</th>
-        </MatTableHeader>
-        <MatTableRow>
-            <td>@context.Name</td>
-            <td>@context.Id</td>
-        </MatTableRow>
-    </MatTable>
-    <div class="mat-layout-grid-inner">
-        <div class="mat-layout-grid-cell mat-layout-grid-cell-span-6">
+<div>
+    <MudTable Items="@Domain?.Projections" PageLabel="dfjgh" LoadInitialData="true" FilterByColumnName="Name" PageSize="9999" ShowPaging="false" Striped="false" MultiSelection="false" AllowSelection="true" Elevation="3" @bind-SelectedItem="@Projection">
+        <HeaderContent>
+            <MudTh>Name</MudTh>
+            <MudTh>ID</MudTh>
+        </HeaderContent>
+        <RowTemplate>
+            <MudTd>@context.Name</MudTd>
+            <MudTd>@context.Id</MudTd>
+        </RowTemplate>
+    </MudTable>
+    <div>
+        <div class="mt-4">
             <h2>@Projection?.Name Events</h2>
-            <MatTable Items="@Projection?.Events" LoadInitialData="true" FilterByColumnName="Name" PageSize="9999" ShowPaging="false" Striped="false" AllowSelection="true" class="mat-elevation-z5">
-                <MatTableHeader>
-                    <th>Name</th>
-                    <th>ID</th>
-                </MatTableHeader>
-                <MatTableRow>
-                    <td>@context.Name</td>
-                    <td><i>@context.Id</i></td>
-                </MatTableRow>
-            </MatTable>
+            <MudTable Items="@Projection?.Events" LoadInitialData="true" FilterByColumnName="Name" PageSize="9999" ShowPaging="false" Striped="false" AllowSelection="true" Elevation="3">
+                <HeaderContent>
+                    <MudTh>Name</MudTh>
+                    <MudTh>ID</MudTh>
+                </HeaderContent>
+                <RowTemplate>
+                    <MudTd>@context.Name</MudTd>
+                    <MudTd><i>@context.Id</i></MudTd>
+                </RowTemplate>
+            </MudTable>
         </div>
     </div>
 </div>
@@ -41,15 +41,6 @@
     protected override async Task OnInitializedAsync()
     {
         Domain = await Cronus.GetDomainAsync(@App.Connection);
-    }
-
-    public void SelectionChangedEvent(object row)
-    {
-        if (row != null)
-        {
-            Projection = (DomainProjectionDto)row;
-        }
-
         this.StateHasChanged();
     }
 }

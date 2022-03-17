@@ -4,21 +4,21 @@
 <h1>Connections</h1>
 <div>
     <NavLink href="connection/new">
-        <span class="oi oi-plus"></span> New Connection
+        <span class="oi oi-plus mb-5 mt-5 ml-3 mr-1" style="color:#1AED97"></span> New Connection
     </NavLink>
 </div>
-<MatTable Items="@connections" LoadInitialData="true" FilterByColumnName="Name" PageSize="9999" ShowPaging="false" Striped="false" AllowSelection="true" class="mat-elevation-z5">
-    <MatTableHeader>
-        <th style="width:20%">Name</th>
-        <th style="width:70%">Endpoint</th>
-        <th style="width:10%">Actions</th>
-    </MatTableHeader>
-    <MatTableRow>
-        <td>@context.Name</td>
-        <td>@context.CronusEndpoint</td>
-        <td>
-            <MatButton Outlined="true" TrailingIcon="edit" Link="@($"/connection/{@context.Name}")">Edit</MatButton>
-            <MatButton Outlined="true" TrailingIcon="delete" OnClick="@(async () => await OnDeleteAsync(context))">Delete</MatButton>
-        </td>
-    </MatTableRow>
-</MatTable>
+<MudTable Items="@connections" LoadInitialData="true" FilterByColumnName="Name" PageSize="9999" ShowPaging="false" Striped="false" AllowSelection="true" class="mat-elevation-z5">
+    <HeaderContent>
+        <MudTh style="width:20%">Name</MudTh>
+        <MudTh style="width:70%">Endpoint</MudTh>
+        <MudTh style="width:10%">Actions</MudTh>
+    </HeaderContent>
+    <RowTemplate>
+        <MudTd>@context.Name</MudTd>
+        <MudTd>@context.CronusEndpoint</MudTd>
+        <MudTd>
+            <MudButton Variant="Variant.Outlined" EndIcon="@Icons.Filled.Edit" Color="Color.Success" Link="@($"/connection/{@context.Name}")">Edit</MudButton>
+            <MudButton Variant="Variant.Outlined" EndIcon="@Icons.Filled.Delete" Color="Color.Success" OnClick="@(async () => await OnDeleteAsync(context))" Class="mt-2">Delete</MudButton>
+        </MudTd>
+    </RowTemplate>
+</MudTable>

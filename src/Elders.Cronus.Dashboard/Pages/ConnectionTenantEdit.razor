@@ -4,12 +4,16 @@
 @inject CronusClient Cronus
 
 <h1>Edit Tenant</h1>
-<h2><span class="badge badge-primary">@Tenant</span></h2>
-<fieldset>
-    <MatTextField @bind-Value="@ServerEndpoint" Label="Server" FullWidth="true" Required="true"> </MatTextField>
-    <MatTextField @bind-Value="@Client" Label="Client" FullWidth="true" Required="true"></MatTextField>
-    <MatTextField @bind-Value="@Secret" Label="Secret" FullWidth="true" Required="true" Type="password"></MatTextField>
-    <MatTextField @bind-Value="@Scope" Label="Scope" FullWidth="true" Required="true"></MatTextField>
-</fieldset>
+<h2><span class="badge badge-secondary">@Tenant</span></h2>
+<MudCard>
+    <MudCardContent>
+        <MudTextField @bind-Value="@ServerEndpoint" Label="Server" FullWidth="true" Required="true"></MudTextField>
+        <MudTextField @bind-Value="@Client" Label="Client" FullWidth="true" Required="true"></MudTextField>
+        <MudTextField @bind-Value="@Secret" Label="Secret" FullWidth="true" Required="true" Type="password"></MudTextField>
+        <MudTextField @bind-Value="@Scope" Label="Scope" FullWidth="true" Required="true"></MudTextField>
+    </MudCardContent>
+    <MudCardContent>
+        <MudButton Variant="Variant.Outlined" Color="Color.Success" EndIcon="@Icons.Filled.Save" OnClick="@(async () => await EditTenant())">Update Tenant</MudButton>
+    </MudCardContent>
+</MudCard>
 
-<MatButton Outlined="true" TrailingIcon="save" OnClick="@(async () => await EditTenant())">Update Tenant</MatButton>

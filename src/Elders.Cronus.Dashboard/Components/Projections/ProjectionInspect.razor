@@ -17,10 +17,12 @@ else
         <form class="form-inline" style="align-items: flex-start">
             <input type="text" @bind="@projectionId" class="form-control mb-2" style="width:500px" placeholder="urn:">
 
-            <div>
-                <button type="button" class="btn btn-primary" style="margin-right: 10px; margin-left: 10px;" @onclick="@(async ()=> await GetProjectionAsync())">State </button>
-            </div>
-            <button type="button" class="btn btn-primary" @onclick="@(async ()=> await GetProjectionEventsAsync())"> Events</button>
+            <MudButton Variant="Variant.Outlined" Color="Color.Success" OnClick="@(async ()=> await GetProjectionAsync())" Class="ml-3">
+                State
+            </MudButton>
+            <MudButton Variant="Variant.Outlined" Color="Color.Success" OnClick="@(async ()=> await GetProjectionEventsAsync())" Class="ml-2">
+                Events
+            </MudButton>
         </form>
     </div>
     <hr class="solid">
@@ -28,67 +30,59 @@ else
     <div class="row">
         <div class="col .w-100">
             <div>
-                <h3 class="mat-subtitle1">State</h3>
-                <pre>@state</pre>
+                <h3>State</h3>
+                <pre style="color:white">@state</pre>
 
             </div>
         </div>
         <div class="col .w-100">
-            <h3 class="mat-subtitle1">Events</h3>
-            <MatAccordion Multi="true">
+            <h3>Events</h3>
+            <MudExpansionPanels>
                 @foreach (var commit in commits)
                 {
-                    <MatAccordion Multi="true">
-                        <MatExpansionPanel>
-                            <MatExpansionPanelSummary>
-                                <MatExpansionPanelHeader>
-                                    <h3 class="mat-subtitle1">@commit.Timestamp.ToString("MMM d'th' yyyy, hh:mm:ss.fff")</h3>
-                                </MatExpansionPanelHeader>
-                            </MatExpansionPanelSummary>
-                            <MatExpansionPanelDetails>
-                                @foreach (var theEvent in commit.Events)
-                                {
-                                    <MatExpansionPanel>
-                                        <MatExpansionPanelSummary>
-                                            <MatExpansionPanelHeader>
-                                                @if (@theEvent.IsEntityEvent)
-                                                {
-                                                    <span style="color:maroon">
-                                                        @theEvent.EventPosition
-                                                        <Icon Identifier="bookmark" />
-                                                        @theEvent?.EventName
-                                                    </span>
-                                                }
-                                                else if (@theEvent.IsPublicEvent)
-                                                {
-                                                    <span style="color:royalblue">
-                                                        @theEvent.EventPosition
-                                                        <Icon Identifier="bookmark" />
-                                                        @theEvent?.EventName
-                                                    </span>
-                                                }
-                                                else
-                                                {
-                                                    <span style="color:forestgreen">
-                                                        @theEvent.EventPosition
-                                                        <Icon Identifier="bookmark" />
-                                                        @theEvent?.EventName
-                                                    </span>
-                                                }
-                                            </MatExpansionPanelHeader>
-                                        </MatExpansionPanelSummary>
-                                        <MatExpansionPanelDetails>
-                                            <div class="json-box">
-                                                <pre>@theEvent.EventData</pre>
-                                            </div>
-                                        </MatExpansionPanelDetails>
-                                    </MatExpansionPanel>
-                                }
-                            </MatExpansionPanelDetails>
-                        </MatExpansionPanel>
-                    </MatAccordion>
+                    <MudExpansionPanel>
+                        <TitleContent>
+                            <h3 class="mat-subtitle1">@commit.Timestamp.ToString("MMM d'th' yyyy, hh:mm:ss.fff")</h3>
+                        </TitleContent>
+                        <ChildContent>
+                            @foreach (var theEvent in commit.Events)
+                            {
+                                <MudExpansionPanels>
+                                    <MudExpansionPanel>
+                                        @if (@theEvent.IsEntityEvent)
+                                        {
+                                            <span style="color:maroon">
+                                                @theEvent.EventPosition
+                                                <Icon Identifier="bookmark" />
+                                                @theEvent?.EventName
+                                            </span>
+                                        }
+                                        else if (@theEvent.IsPublicEvent)
+                                        {
+                                            <span style="color:royalblue">
+                                                @theEvent.EventPosition
+                                                <Icon Identifier="bookmark" />
+                                                @theEvent?.EventName
+                                            </span>
+                                        }
+                                        else
+                                        {
+                                            <span style="color:forestgreen">
+                                                @theEvent.EventPosition
+                                                <Icon Identifier="bookmark" />
+                                                @theEvent?.EventName
+                                            </span>
+                                        }
+                                        <div class="json-box">
+                                            <pre>@theEvent.EventData</pre>
+                                        </div>
+                                    </MudExpansionPanel>
+                                </MudExpansionPanels>
+                            }
+                        </ChildContent>
+                    </MudExpansionPanel>
                 }
-            </MatAccordion>
+            </MudExpansionPanels>
         </div>
     </div>
 }
@@ -143,11 +137,11 @@ else
             }
             else
             {
-                state = "Invalid URN";
+                state = "Invalid URN!";
                 commits = new List<ProjectionCommitDto>();
             }
         }
-        else state = "Enter URN";
+        else state = "Enter URN!";
     }
 
     async Task GetProjectionEventsAsync()

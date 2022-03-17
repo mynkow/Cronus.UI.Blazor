@@ -7,38 +7,36 @@
 
 <fieldset>
 
-    <MatTextField @bind-Value="@Name" Label="Name" FullWidth="true" Required="true"></MatTextField>
-    <MatTextField @bind-Value="@CronusEndpoint" Label="Cronus Endpoint" FullWidth="true" Required="true"></MatTextField>
-    <MatButton Outlined="true" OnClick="@GetTenants">Check</MatButton>
-    <MatButton Outlined="true" TrailingIcon="save" OnClick="@(async () => await EditConnection())">Update Connection</MatButton>
+    <MudTextField @bind-Value="@Name" Label="Name" FullWidth="true" Required="true"></MudTextField>
+    <MudTextField @bind-Value="@CronusEndpoint" Label="Cronus Endpoint" FullWidth="true" Required="true" Class="mb-3"></MudTextField>
+    <MudButton Variant="Variant.Outlined" Color="Color.Success" EndIcon="@Icons.Filled.Check" OnClick="@GetTenants">Check</MudButton>
+    <MudButton Variant="Variant.Outlined" Color="Color.Success" EndIcon="@Icons.Filled.Save" OnClick="@(async () => await EditConnection())" Class="mr-2">Update Connection</MudButton>
     @if (IsEndpointValid)
     {
         <span class="badge rounded-pill bg-success">Correct Endpoint</span>
     }
     else
     {
-        <span class="badge rounded-pill bg-danger">Correct Endpoint</span>
+        <span class="badge rounded-pill bg-danger">Invalid Endpoint</span>
     }
 </fieldset>
 <hr class="solid">
-<MatTable Items="@TenantAuths" class="mat-elevation-z5" PageSize="100" ShowPaging="false" UseSortHeaderRow="true">
-    <MatTableHeader>
-        <MatSortHeaderRow>
-            <MatSortHeader>Tenant</MatSortHeader>
-            <MatSortHeader>Authority Address</MatSortHeader>
-            <MatSortHeader>Client</MatSortHeader>
-            <MatSortHeader>Scope</MatSortHeader>
-            <MatSortHeader>Actions</MatSortHeader>
-        </MatSortHeaderRow>
-    </MatTableHeader>
-    <MatTableRow>
-        <td>@context.Tenant</td>
-        <td>@context.ServerEndpoint</td>
-        <td>@context.Client</td>
-        <td>@context.Scope</td>
-        <td>
-            <MatButton Outlined="true" OnClick="@(async () => await @GetToken(context))">Get Token</MatButton>
-            <MatButton Outlined="true" TrailingIcon="edit" Link="@($"/connection/{@Name}/{context.Tenant}")">Edit</MatButton>
+<MudTable Items="@TenantAuths" class="mat-elevation-z5" PageSize="100" ShowPaging="false" UseSortHeaderRow="true">
+    <HeaderContent>
+        <MudTh>Tenant</MudTh>
+        <MudTh>Authority Address</MudTh>
+        <MudTh>Client</MudTh>
+        <MudTh>Scope</MudTh>
+        <MudTh>Actions</MudTh>
+    </HeaderContent>
+    <RowTemplate>
+        <MudTd>@context.Tenant</MudTd>
+        <MudTd>@context.ServerEndpoint</MudTd>
+        <MudTd>@context.Client</MudTd>
+        <MudTd>@context.Scope</MudTd>
+        <MudTd>
+            <MudButton Variant="Variant.Outlined" Color="Color.Success" EndIcon="@Icons.TwoTone.GetApp" OnClick="@(async () => await @GetToken(context))" Class="mr-2">Get Token</MudButton>
+            <MudButton Variant="Variant.Outlined" Color="Color.Success" EndIcon="@Icons.Filled.Edit" Link="@($"/connection/{@Name}/{context.Tenant}")" Class="mr-2">Edit</MudButton>
             @if (AccessToken == string.Empty)
             {
                 <span class="badge badge-light " style="display:none"></span>
@@ -51,10 +49,10 @@
             {
                 <span class="badge rounded-pill bg-danger">Invalid Endpoint</span>
             }
-        </td>
+        </MudTd>
 
-    </MatTableRow>
-</MatTable>
+    </RowTemplate>
+</MudTable>
 
 
 

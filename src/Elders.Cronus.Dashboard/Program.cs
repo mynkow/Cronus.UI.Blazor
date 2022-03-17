@@ -1,4 +1,5 @@
 ﻿using Elders.Cronus.Dashboard;
+using MudBlazor.Services;
 using Blazored.LocalStorage;
 using Elders.Cronus.Dashboard.Models;
 using Microsoft.AspNetCore.Components.Web;
@@ -24,6 +25,7 @@ builder.Services.AddHttpClient<CronusClient>((sp, client) =>
 
 builder.Services.AddTransient<TokenClient>();
 builder.Services.AddBlazoredLocalStorage();
+builder.Services.AddMudServices();
 
 await builder
     .UseLoadingBar()

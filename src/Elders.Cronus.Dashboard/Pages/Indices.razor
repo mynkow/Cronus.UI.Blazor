@@ -4,68 +4,66 @@
 @inject CronusClient Cronus
 @inject IJSRuntime JSRuntime
 
-<h2 class="mat-h2">Indices</h2>
+<h2>Indices</h2>
 
-<div class="mat-layout-grid">
 
-    <MatTable Items="@IndexCollection?.Indices" PageLabel="dfjgh" LoadInitialData="true" FilterByColumnName="Name" PageSize="9999" ShowPaging="false" Striped="false" AllowSelection="true" SelectionChanged="SelectionChangedEvent" class="mat-elevation-z5">
-        <MatTableHeader>
-            <th>Name</th>
-            <th>Status</th>
-            <th>Actions</th>
-        </MatTableHeader>
-        <MatTableRow>
-            <td>@context.IndexName</td>
-            <td>@context.Status</td>
-            <td>
-                <MatButton Label="Rebuild" OnClick="@(async () => await RebuildIndex(context.IndexContractId))"></MatButton>
-                <MatButton Label="Finalize" OnClick="@(async () => await FinalizeIndex(context.IndexContractId))"></MatButton>
-            </td>
-        </MatTableRow>
-    </MatTable>
+<MudTable Elevation="3" Items="@IndexCollection?.Indices" PageLabel="dfjgh" LoadInitialData="true" FilterByColumnName="Name" PageSize="9999" ShowPaging="false" Striped="false" AllowSelection="true" SelectionChanged="SelectionChangedEvent">
+    <HeaderContent>
+        <MudTh>Name</MudTh>
+        <MudTh>Status</MudTh>
+        <MudTh>Actions</MudTh>
+    </HeaderContent>
+    <RowTemplate>
+        <MudTd>@context.IndexName</MudTd>
+        <MudTd>@context.Status</MudTd>
+        <MudTd>
+            <MudButton Label="Rebuild" Variant="Variant.Outlined" Color="Color.Success" OnClick="@(async () => await RebuildIndex(context.IndexContractId))">Rebuild</MudButton>
+            <MudButton Label="Finalize" Variant="Variant.Outlined" Color="Color.Success" OnClick="@(async () => await FinalizeIndex(context.IndexContractId))">Finalize</MudButton>
+        </MudTd>
+    </RowTemplate>
+</MudTable>
 
     @*<p>
-        <MatButton Label="Menu" OnClick="@OnClick2" @ref="asd"></MatButton>
-        <MatMenu @ref="qwe">
-            <MatList>
-                <MatListItem>Item 1</MatListItem>
-                <MatListItem>Item 2</MatListItem>
-                <MatListItem>Item 3</MatListItem>
-                <MatListItem>Item 4</MatListItem>
-                <MatListItem>Item 5</MatListItem>
-            </MatList>
-        </MatMenu>
+    <MatButton Label="Menu" OnClick="@OnClick2" @ref="asd"></MatButton>
+    <MatMenu @ref="qwe">
+    <MatList>
+    <MatListItem>Item 1</MatListItem>
+    <MatListItem>Item 2</MatListItem>
+    <MatListItem>Item 3</MatListItem>
+    <MatListItem>Item 4</MatListItem>
+    <MatListItem>Item 5</MatListItem>
+    </MatList>
+    </MatMenu>
     </p>*@
 
     @*<div class="mat-layout-grid-inner">
-            <div class="mat-layout-grid-cell mat-layout-grid-cell-span-6">
-                <h3 class="mat-h3">@Aggregate?.Name Commands</h3>
-                <MatTable Items="@Aggregate?.Commands" LoadInitialData="true" FilterByColumnName="Name" PageSize="9999" ShowPaging="false" Striped="false" AllowSelection="true" class="mat-elevation-z5">
-                    <MatTableHeader>
-                        <th>Name</th>
-                        <th>ID</th>
-                    </MatTableHeader>
-                    <MatTableRow>
-                        <td>@context.Name</td>
-                        <td><i>@context.Id</i></td>
-                    </MatTableRow>
-                </MatTable>
-            </div>
-            <div class="mat-layout-grid-cell mat-layout-grid-cell-span-6">
-                <h3 class="mat-h3">@Aggregate?.Name Events</h3>
-                <MatTable Items="@Aggregate?.Events" LoadInitialData="true" FilterByColumnName="Name" PageSize="9999" ShowPaging="false" Striped="false" AllowSelection="true" class="mat-elevation-z5">
-                    <MatTableHeader>
-                        <th>Name</th>
-                        <th>ID</th>
-                    </MatTableHeader>
-                    <MatTableRow>
-                        <td>@context.Name</td>
-                        <td><i>@context.Id</i></td>
-                    </MatTableRow>
-                </MatTable>
-            </div>
-        </div>*@
-</div>
+    <div class="mat-layout-grid-cell mat-layout-grid-cell-span-6">
+    <h3 class="mat-h3">@Aggregate?.Name Commands</h3>
+    <MatTable Items="@Aggregate?.Commands" LoadInitialData="true" FilterByColumnName="Name" PageSize="9999" ShowPaging="false" Striped="false" AllowSelection="true" class="mat-elevation-z5">
+    <MatTableHeader>
+    <th>Name</th>
+    <th>ID</th>
+    </MatTableHeader>
+    <MatTableRow>
+    <td>@context.Name</td>
+    <td><i>@context.Id</i></td>
+    </MatTableRow>
+    </MatTable>
+    </div>
+    <div class="mat-layout-grid-cell mat-layout-grid-cell-span-6">
+    <h3 class="mat-h3">@Aggregate?.Name Events</h3>
+    <MatTable Items="@Aggregate?.Events" LoadInitialData="true" FilterByColumnName="Name" PageSize="9999" ShowPaging="false" Striped="false" AllowSelection="true" class="mat-elevation-z5">
+    <MatTableHeader>
+    <th>Name</th>
+    <th>ID</th>
+    </MatTableHeader>
+    <MatTableRow>
+    <td>@context.Name</td>
+    <td><i>@context.Id</i></td>
+    </MatTableRow>
+    </MatTable>
+    </div>
+    </div>*@
 
 @code {
 
