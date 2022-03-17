@@ -57,7 +57,7 @@ else if (Version.Status == ProjectionStatus.Canceled)
 
     string GetDisplayName(ProjectionVersion version)
     {
-        return version.ToString() + " -> rerendered: " + ++RerenderedCount;
+        return version.ToString();
     }
 
     void SelectVersion(ProjectionVersion selectedVersion)
