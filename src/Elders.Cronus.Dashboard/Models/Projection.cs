@@ -1,7 +1,4 @@
-﻿using System.Collections.Generic;
-using System.Linq;
-
-namespace Elders.Cronus.Dashboard.Models
+﻿namespace Elders.Cronus.Dashboard.Models
 {
     public class Projection
     {
@@ -22,13 +19,10 @@ namespace Elders.Cronus.Dashboard.Models
 
         public ProjectionVersion LatestVersion => Versions.OrderByDescending(x => x.Revision).First();
 
-        public List<ProjectionVersion> RebuildingVersions => Versions.Where(x => x.Status.Equals(ProjectionStatus.Rebuilding)).ToList();
+        public ProjectionVersion RebuildingVersion => Versions.Where(x => x.Status.Equals(ProjectionStatus.Rebuilding) || x.Status.Equals(ProjectionStatus.Building)).LastOrDefault() ?? LiveVersion;
+
+        public List<ProjectionVersion> RebuildingVersions => Versions.Where(x => x.Status.Equals(ProjectionStatus.Rebuilding) || x.Status.Equals(ProjectionStatus.Building)).ToList();
 
         public List<ProjectionVersion> ReplayingVersions => Versions.Where(x => x.Status.Equals(ProjectionStatus.Replaying)).ToList();
-
-        /// <summary>
-        /// For backwards compatibility (Replaying used to be building)
-        /// </summary>
-        public List<ProjectionVersion> BuildingVersions => Versions.Where(x => x.Status.Equals(ProjectionStatus.Building)).ToList();
     }
 }

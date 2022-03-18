@@ -3,12 +3,15 @@
 @inject ILogger<Projection> _logger
 
 <div style="font-size:xx-small">@progressString</div>
-<MudProgressLinear Color="Color.Warning" Rounded="true" Size="Size.Medium" Value="@progress" />
+<MudProgressLinear Color="@Color" Rounded="true" Size="Size.Medium" Value="@progress" />
 
 
 @code {
     [Parameter]
     public Projection Projection { get; set; }
+
+    [Parameter]
+    public Color Color { get; set; }
 
     private double progress = 0;
     private string progressString = "0 %";

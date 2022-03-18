@@ -1,6 +1,4 @@
-﻿using System.Collections.Generic;
-
-namespace Elders.Cronus.Dashboard.Models
+﻿namespace Elders.Cronus.Dashboard.Models
 {
     public class ProjectionCollection
     {

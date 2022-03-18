@@ -41,12 +41,25 @@ namespace Elders.Cronus.Dashboard.Models
             HttpRequestMessage request = new HttpRequestMessage(HttpMethod.Get, connection.CronusEndpoint + "/projections");
             if (string.IsNullOrEmpty(connection.oAuth.ServerEndpoint) == false && string.IsNullOrEmpty(connection.oAuth.Tenant) == false)
             {
-
                 var accessToken = await token.GetAccessTokenAsync(connection);
                 request.Headers.Authorization = new System.Net.Http.Headers.AuthenticationHeaderValue("bearer", accessToken);
             }
 
             var response = await ExecuteRequestAsync<Response<ProjectionCollection>>(request);
+
+            return response.Data;
+        }
+
+        public async Task<Response<Projection>> GetProjectionMetaAsync(Connection connection, string projectionContractId)
+        {
+            HttpRequestMessage request = new HttpRequestMessage(HttpMethod.Get, connection.CronusEndpoint + $"/projection/meta?ProjectionContractId={projectionContractId}");
+            if (string.IsNullOrEmpty(connection.oAuth.ServerEndpoint) == false && string.IsNullOrEmpty(connection.oAuth.Tenant) == false)
+            {
+                var accessToken = await token.GetAccessTokenAsync(connection);
+                request.Headers.Authorization = new System.Net.Http.Headers.AuthenticationHeaderValue("bearer", accessToken);
+            }
+
+            var response = await ExecuteRequestAsync<Response<Projection>>(request);
 
             return response.Data;
         }
