@@ -80,12 +80,18 @@ namespace Elders.Cronus.Dashboard
         {
             _logger.LogInformation("Initializing signalR...");
 
-            HubConnection = new HubConnectionBuilder()
-            .WithUrl(Connection.CronusEndpoint + "/hub/projections")
-            .WithAutomaticReconnect().Build();
+            try
+            {
+                HubConnection = new HubConnectionBuilder()
+                  .WithUrl(Connection.CronusEndpoint + "/hub/projections")
+                  .WithAutomaticReconnect().Build();
 
-            await HubConnection.StartAsync();
-            _logger.LogInformation("SignalR hub started");
+                await HubConnection.StartAsync();
+            }
+            catch (Exception ex)
+            {
+                _logger.LogError($"Unable to establish connection to SignalR server: {ex}");
+            }
         }
 
         public void Dispose()
