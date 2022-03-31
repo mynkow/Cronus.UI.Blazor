@@ -12,7 +12,7 @@
                 {
                     <ProjectionProgressBar Projection="@Projection" Color="Color.Warning"></ProjectionProgressBar>
                 }
-                else if (Projection.RebuildingVersion?.Status == ProjectionStatus.Building || Projection.RebuildingVersion?.Status == ProjectionStatus.Rebuilding)
+                else if (Projection.RebuildingVersion.Status == ProjectionStatus.Building || Projection.RebuildingVersion.Status == ProjectionStatus.Rebuilding)
                 {
                     <ProjectionProgressBar Projection="@Projection" Color="Color.Primary"></ProjectionProgressBar>
                 }
@@ -59,53 +59,82 @@
     [Parameter]
     public ProjectionVersion SelectedVersion { get; set; }
 
+    public string LatestVersionStatus { get; set; }
+
     public Task RebuildAsync(Projection projection)
     {
+        LatestVersionStatus = ProjectionStatus.Rebuilding;
         return Cronus.RebuildProjectionAsync(App.Connection, Projection);
     }
-
+     
     public Task ReplayAsync(Projection projection)
     {
+        LatestVersionStatus = ProjectionStatus.Replaying;
         return Cronus.ReplayProjectionAsync(App.Connection, Projection);
     }
 
     public Task CancelAsync(Projection projection, ProjectionVersion version)
     {
+        LatestVersionStatus = ProjectionStatus.Canceled;
+        StateHasChanged();
         return Cronus.CancelSpecificProjectionAsync(App.Connection, Projection, version);
     }
 
     public Task FinalizeAsync(Projection projection, ProjectionVersion version)
     {
+        StateHasChanged();
         return Cronus.FinalizeProjectionAsync(App.Connection, Projection, version);
     }
 
-    protected async override Task OnInitializedAsync()
+    protected override Task OnInitializedAsync()
     {
         App.OnChange += StateHasChanged;
 
-        App.HubConnection.On<string>("RebuildStarted", async (projectionTypeId) =>
-       {
-           Log.LogInformation("RebuildStarted: " + projectionTypeId);
+        LatestVersionStatus = Projection.LiveVersion.Status;
 
+        App.HubConnection.On<string>("RebuildStarted", (projectionTypeId) =>
+       {
            if (Projection.ProjectionContractId.Equals(projectionTypeId, StringComparison.OrdinalIgnoreCase) == false)
                return;
 
-           var projectionResult = await Cronus.GetProjectionMetaAsync(App.Connection, projectionTypeId).ConfigureAwait(false);
-           Projection.Versions = projectionResult.Result.Versions;
+           if (LatestVersionStatus == ProjectionStatus.Replaying)
+               ShowReplayStatus(projectionTypeId);
+           else if (LatestVersionStatus == ProjectionStatus.Rebuilding)
+               ShowRebuildStatus(projectionTypeId);
 
            StateHasChanged();
        });
 
-        App.HubConnection.On<string>("RebuildFinished", async (projectionTypeId) =>
+        App.HubConnection.On<string>("RebuildFinished", (projectionTypeId) =>
         {
-            Log.LogInformation("RebuildFinished: " + projectionTypeId);
-
             if (Projection.ProjectionContractId.Equals(projectionTypeId, StringComparison.OrdinalIgnoreCase) == false)
                 return;
 
             Projection.LatestVersion.Status = ProjectionStatus.Live;
             Projection.RebuildingVersion.Status = ProjectionStatus.Live;
+
+            Log.LogInformation("RebuildFinished: " + projectionTypeId);
             StateHasChanged();
         });
+
+        return Task.CompletedTask;
+    }
+
+    private void ShowReplayStatus(string projectionTypeId)
+    {
+        Log.LogInformation($"ReplayStarted: {projectionTypeId}");
+
+        ProjectionVersion newVersion = new ProjectionVersion(Projection.LiveVersion.Hash, Projection.LiveVersion.Revision + 1, ProjectionStatus.Replaying);
+        if (Projection.Versions.Contains(newVersion) == false)
+        {
+            Projection.Versions.Add(newVersion);
+        }
+    }
+
+    private void ShowRebuildStatus(string projectionTypeId)
+    {
+        Log.LogInformation($"RebuildStarted: {projectionTypeId}");
+
+        Projection.RebuildingVersion.Status = ProjectionStatus.Rebuilding;
     }
 }

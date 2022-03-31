@@ -19,7 +19,8 @@
 
         public ProjectionVersion LatestVersion => Versions.OrderByDescending(x => x.Revision).First();
 
-        public ProjectionVersion RebuildingVersion => Versions.Where(x => x.Status.Equals(ProjectionStatus.Rebuilding) || x.Status.Equals(ProjectionStatus.Building)).LastOrDefault() ?? LiveVersion;
+        public ProjectionVersion RebuildingVersion => Versions.Where(x => x.Status.Equals(ProjectionStatus.Rebuilding) || x.Status.Equals(ProjectionStatus.Building))
+            .OrderBy(x => x.Revision).LastOrDefault() ?? LiveVersion;
 
         public List<ProjectionVersion> RebuildingVersions => Versions.Where(x => x.Status.Equals(ProjectionStatus.Rebuilding) || x.Status.Equals(ProjectionStatus.Building)).ToList();
 

@@ -97,6 +97,7 @@
     string AggregateId { get; set; }
 
     List<AggregateCommitDto> commits = new List<AggregateCommitDto>();
+
     string details = string.Empty;
 
     async Task GetAggregateAsync()
@@ -121,6 +122,8 @@
         {
             commits.Clear();
         }
+
+        StateHasChanged();
     }
 
     public async Task<string> FormatJsonAsync(object data)
