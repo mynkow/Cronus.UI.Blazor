@@ -135,6 +135,10 @@
     {
         Log.LogInformation($"RebuildStarted: {projectionTypeId}");
 
-        Projection.RebuildingVersion.Status = ProjectionStatus.Rebuilding;
+        ProjectionVersion newVersion = new ProjectionVersion(Projection.LiveVersion.Hash, Projection.LiveVersion.Revision, ProjectionStatus.Rebuilding);
+        if (Projection.Versions.Contains(newVersion) == false)
+        {
+            Projection.Versions.Add(newVersion);
+        }
     }
 }
