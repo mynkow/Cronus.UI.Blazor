@@ -77,9 +77,7 @@ namespace Elders.Cronus.Dashboard
 
 
         public async Task ConnectToSignalRAsync()
-        {
-            _logger.LogInformation("Initializing signalR...");
-
+        {        
             try
             {
                 HubConnection = new HubConnectionBuilder()
@@ -87,11 +85,15 @@ namespace Elders.Cronus.Dashboard
                   .WithAutomaticReconnect().Build();
 
                 await HubConnection.StartAsync();
+
+                _logger.LogInformation("SignalaR initialized.");
             }
             catch (Exception ex)
             {
                 _logger.LogError($"Unable to establish connection to SignalR server: {ex}");
             }
+
+            
         }
 
         public void Dispose()
