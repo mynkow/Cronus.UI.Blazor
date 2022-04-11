@@ -35,8 +35,7 @@ namespace Elders.Cronus.Dashboard.Components
         [Parameter]
         public List<string> LiveBoundedContexts { get; set; }
 
-        [Parameter]
-        public List<DomainEventDto> Events { get; set; }
+        protected List<DomainEventDto> Events { get; set; }
 
         protected ReplayPublicEventValidator validationModel = new ReplayPublicEventValidator();
 
@@ -55,13 +54,9 @@ namespace Elders.Cronus.Dashboard.Components
             const string excludeProjections = "Projection";
             const string excludeIndex = "Index";
             Events = new List<DomainEventDto>();
-            var Domain = await Cronus.GetDomainAsync(@App.Connection).ConfigureAwait(false);
-            var projectionEvents = Domain.Projections.Select(p => p.Events);
+            DomainDto Domain = await Cronus.GetDomainAsync(@App.Connection).ConfigureAwait(false);
 
-            foreach (var events in projectionEvents)
-            {
-                Events.AddRange(events.Where(x => x.Name.Contains(excludeProjections) == false && x.Name.Contains(excludeIndex) == false));
-            }
+            Events.AddRange(Domain.Events.Where(x => x.Name.Contains(excludeProjections) == false && x.Name.Contains(excludeIndex) == false).Distinct());
 
             StateHasChanged();
         }
@@ -87,8 +82,11 @@ namespace Elders.Cronus.Dashboard.Components
                 ReplayAfter = replayAfter
             };
 
-            await Cronus.ReplayPublicEventAsync(App.Connection, model);
-            await JSRuntime.InvokeAsync<object>("alert", "Signal has been successfully sent");
+            bool result = await Cronus.ReplayPublicEventAsync(App.Connection, model);
+            if (result == true)
+                await JSRuntime.InvokeAsync<object>("alert", "Signal has been successfully sent");
+            else
+                await JSRuntime.InvokeAsync<object>("alert", "The signal could not be sent successfully");
         }
 
         protected void Reset()

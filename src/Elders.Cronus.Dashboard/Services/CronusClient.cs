@@ -227,9 +227,9 @@ namespace Elders.Cronus.Dashboard.Models
                 request.Headers.Authorization = new System.Net.Http.Headers.AuthenticationHeaderValue("bearer", accessToken);
             }
 
-            await ExecuteRequestAsync<object>(request);
+            var result = await ExecuteRequestAsync<object>(request);
 
-            return true;
+            return result.Response.IsSuccessStatusCode;
         }
 
         public async Task<List<string>> GetLiveServicesAsync(Connection connection)
@@ -415,11 +415,13 @@ namespace Elders.Cronus.Dashboard.Models
 
         public List<DomainGatewayDto> Gateways { get; set; }
 
-        public List<DomainProjectionDto> Projections { get; set; }
+        public List<DomainProjectionDto> Projections { get; set; } 
 
         public List<DomainPortDto> Ports { get; set; }
 
         public List<DomainSagaDto> Sagas { get; set; }
+
+        public List<DomainEventDto> Events { get; set; }
 
         public IEnumerable<IMessageHandlerDto> FindHandlers(IMessageDto message)
         {

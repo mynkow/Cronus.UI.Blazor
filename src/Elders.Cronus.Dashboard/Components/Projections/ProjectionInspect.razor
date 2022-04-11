@@ -1,7 +1,6 @@
 ﻿@inject AppState App
 @inject CronusClient Cronus
 @inject IJSRuntime JSRuntime
-
 @if (Projection is null)
 {
     <span>Please select a connection...</span>
@@ -16,7 +15,6 @@ else
         <hr class="solid">
         <form class="form-inline" style="align-items: flex-start">
             <input type="text" @bind="@projectionId" class="form-control mb-2" style="width:500px" placeholder="urn:">
-
             <MudButton Variant="Variant.Outlined" Color="Color.Success" OnClick="@(async ()=> await GetProjectionAsync())" Class="ml-3">
                 State
             </MudButton>
@@ -26,13 +24,11 @@ else
         </form>
     </div>
     <hr class="solid">
-
     <div class="row">
         <div class="col .w-100">
             <div>
                 <h3>State</h3>
-                <pre style="color:white">@state</pre>
-
+                <pre Style="@($"color:{Colors.LightGreen.Accent3};")">@state</pre>
             </div>
         </div>
         <div class="col .w-100">
@@ -40,90 +36,92 @@ else
             <MudExpansionPanels>
                 @foreach (var commit in commits)
                 {
-                    <MudExpansionPanel>
-                        <TitleContent>
-                            <h3 class="mat-subtitle1">@commit.Timestamp.ToString("MMM d'th' yyyy, hh:mm:ss.fff")</h3>
-                        </TitleContent>
+            <MudExpansionPanels>
+                <MudExpansionPanel>
+                    <TitleContent>
+                            <h5 class="mat-subtitle1">@commit.Timestamp.ToString("MMM d'th' yyyy, hh:mm:ss.fff")</h5>
+                    </TitleContent>
                         <ChildContent>
+                            <MudExpansionPanels>
                             @foreach (var theEvent in commit.Events)
                             {
-                                <MudExpansionPanels>
-                                    <MudExpansionPanel>
-                                        @if (@theEvent.IsEntityEvent)
-                                        {
+                                  @if (@theEvent.IsEntityEvent)
+                                  {
+                                  <MudExpansionPanel>
+                                    <TitleContent>
                                             <span style="color:maroon">
                                                 @theEvent.EventPosition
-                                                <Icon Identifier="bookmark" />
+                                                <MudIcon Icon="@Icons.Material.Filled.Bookmark" />
                                                 @theEvent?.EventName
                                             </span>
-                                        }
-                                        else if (@theEvent.IsPublicEvent)
-                                        {
+                                    </TitleContent>
+                                   </MudExpansionPanel>
+                                  }
+                                  else if (@theEvent.IsPublicEvent)
+                                  {
+                                   <MudExpansionPanel>
+                                    <TitleContent>
                                             <span style="color:royalblue">
                                                 @theEvent.EventPosition
-                                                <Icon Identifier="bookmark" />
+                                                <MudIcon Icon="@Icons.Material.Filled.Bookmark" />
                                                 @theEvent?.EventName
                                             </span>
-                                        }
-                                        else
-                                        {
+                                    </TitleContent>
+                                   </MudExpansionPanel>
+                                  }
+                                  else
+                                  {
+                                   <MudExpansionPanel>
+                                    <TitleContent>
                                             <span style="color:forestgreen">
                                                 @theEvent.EventPosition
-                                                <Icon Identifier="bookmark" />
+                                                <MudIcon Icon="@Icons.Material.Filled.Bookmark" />
                                                 @theEvent?.EventName
                                             </span>
-                                        }
+                                    </TitleContent>
+                                    <ChildContent>
                                         <div class="json-box">
-                                            <pre>@theEvent.EventData</pre>
+                                            <pre Style="@($"color:{Colors.LightGreen.Accent3};")">@theEvent.EventData</pre>
                                         </div>
-                                    </MudExpansionPanel>
-                                </MudExpansionPanels>
+                                    </ChildContent>
+                                   </MudExpansionPanel>
+                                   }
                             }
-                        </ChildContent>
-                    </MudExpansionPanel>
+                         </MudExpansionPanels>
+                    </ChildContent>
+                   </MudExpansionPanel>
+                 </MudExpansionPanels>
                 }
             </MudExpansionPanels>
         </div>
     </div>
 }
-
 @code {
-
     [Parameter]
     public string Name { get; set; }
-
     Projection Projection;
-
     List<Projection> projections = new List<Projection>();
-
     List<ProjectionCommitDto> commits = new List<ProjectionCommitDto>();
-
     string projectionId = string.Empty;
     string state = "";
     string details = string.Empty;
     string eventsLabel = "Events";
-
     protected override Task OnInitializedAsync()
     {
         App.OnChange += StateHasChanged;
         App.OnConnectionChanged += GetProjectionsList;
-
         return GetProjectionsList(App.Connection);
     }
-
     protected async Task GetProjectionsList(Connection connection)
     {
         if (connection is null == false)
         {
             var result = await Cronus.GetProjectionsAsync(@App.Connection);
             projections = result.Result.Projections;
-
             Projection = projections.Where(x => x.ProjectionContractId == Name).SingleOrDefault();
-
             StateHasChanged();
         }
     }
-
     async Task GetProjectionAsync()
     {
         if (projectionId != string.Empty)
@@ -143,7 +141,6 @@ else
         }
         else state = "Enter URN!";
     }
-
     async Task GetProjectionEventsAsync()
     {
         ProjectionCommitsDto projection = await Cronus.GetProjectionEventsAsync(App.Connection, Projection.ProjectionContractId, projectionId);
@@ -157,20 +154,15 @@ else
                 }
                 commit.Events = commit.Events.OrderByDescending(e => e.EventPosition).ToList();
             }
-
             commits = projection.Commits.OrderByDescending(commit => commit.Timestamp).ToList();
-
             eventsLabel = $"Events ({commits.SelectMany(c => c.Events).Count()})";
-
             StateHasChanged();
         }
         else
         {
             commits.Clear();
         }
-
     }
-
     public async Task<string> FormatJsonAsync(object data)
     {
         return await JSRuntime.InvokeAsync<string>("JSON.stringify", data, null, 4);

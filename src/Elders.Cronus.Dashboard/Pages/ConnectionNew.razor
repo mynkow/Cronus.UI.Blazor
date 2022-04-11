@@ -9,11 +9,11 @@
     <MudButton Variant="Variant.Outlined" Color="Color.Success" EndIcon="@Icons.Filled.Check" OnClick="@CheckConnection" Class="mb-2 mt-2 mr-2">Check</MudButton>
     @if (IsEndpointValid)
     {
-        <span class="badge rounded-pill bg-success">Correct Endpoint</span>
+        <span class="badge rounded-pill bg-success">@DisplayMessage</span>
     }
     else
     {
-        <span class="badge rounded-pill bg-danger">Correct Endpoint</span>
+        <span class="badge rounded-pill bg-danger">@DisplayMessage</span>
     }
 </fieldset>
 

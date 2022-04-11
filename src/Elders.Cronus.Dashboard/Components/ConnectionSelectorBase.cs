@@ -57,13 +57,14 @@ namespace Elders.Cronus.Dashboard.Components
         {
             var connection = connections.FirstOrDefault();
             App.Connect(connection);
-            await App.ConnectToSignalRAsync();
             NavManager.NavigateTo("/");
             TenantName = App.oAuth?.Tenant ?? "Select Tenant...";
             List<string> configuredTenantsInTheService = await Cronus.GetTenantsAsync(connection);
             List<oAuth> intersection = connection.oAuths.Where(x => configuredTenantsInTheService.Contains(x.Tenant)).ToList();
 
             oAuths = intersection;
+            await App.ConnectToSignalRAsync();
+
             StateHasChanged();
         }
 

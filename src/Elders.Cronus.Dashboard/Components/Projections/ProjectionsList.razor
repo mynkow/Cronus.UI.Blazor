@@ -1,5 +1,4 @@
-﻿@implements IDisposable
-@inject AppState App
+﻿@inject AppState App
 @inject CronusClient Cronus
 @inject ILogger<ProjectionsList> Logger;
 
@@ -27,8 +26,6 @@
     [Parameter]
     public ProjectionVersion SelectedVersion { get; set; }
 
-    private System.Threading.Timer timer;
-
     List<Projection> projections = new List<Projection>();
 
     protected override async Task OnInitializedAsync()
@@ -38,8 +35,6 @@
         App.OnVersionSelected += SelectVersion;
 
         await GetProjectionsListAsync(App.Connection);
-
-        timer = new System.Threading.Timer(_ => InvokeAsync(() => GetProjectionsListAsync(App.Connection)), null, 0, 50000);
     }
 
     protected async Task GetProjectionsListAsync(Connection connection)
@@ -58,12 +53,6 @@
         {
             StateHasChanged();
         }
-    }
-
-    void IDisposable.Dispose()
-    {
-        timer?.Dispose();
-        timer = null;
     }
 
     private Task SelectVersion(ProjectionVersion version)

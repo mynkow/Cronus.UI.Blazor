@@ -1,13 +1,7 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Net.Http;
-using System.Threading.Tasks;
-using Blazored.LocalStorage;
+﻿using Blazored.LocalStorage;
 //using Blazor.Extensions.Storage;
 using Elders.Cronus.Dashboard.Models;
 using Microsoft.AspNetCore.Components;
-using Microsoft.Extensions.Logging;
 
 namespace Elders.Cronus.Dashboard.Components
 {
@@ -59,6 +53,9 @@ namespace Elders.Cronus.Dashboard.Components
 
         [Parameter]
         public bool IsEndpointValid { get; set; }
+
+        [Parameter]
+        public string DisplayMessage { get; set; }
 
         public string AccessToken = String.Empty;
 
@@ -139,10 +136,21 @@ namespace Elders.Cronus.Dashboard.Components
 
         protected async Task CheckConnection()
         {
-            List<string> response = await Cronus.GetTenantsAsync(new Connection(Name, CronusEndpoint));
+            Connection newConnection = new Connection(Name, CronusEndpoint);
+            List<Connection> connections = await LocalStorage.GetItemAsync<List<Connection>>(LSKey.Connections).ConfigureAwait(false) ?? new List<Connection>();
 
-            IsEndpointValid = response.Any() ? true : false;
-            StateHasChanged();
+            if (connections.Where(x => x.Name.Equals(newConnection.Name)).Any() == false)
+            {
+                List<string> response = await Cronus.GetTenantsAsync(newConnection).ConfigureAwait(false);
+                IsEndpointValid = response.Any() ? true : false;
+                DisplayMessage = IsEndpointValid ? "Correct Endpoint" : "Incorrect Endpoint";
+            }
+            else
+            {
+                DisplayMessage = "Duplicated Connection";
+                IsEndpointValid = false;
+                StateHasChanged();
+            }
         }
 
         protected async Task GetToken(oAuth oAuth)
@@ -161,6 +169,7 @@ namespace Elders.Cronus.Dashboard.Components
 
             var tenantsForCurrentConnection = await Cronus.GetTenantsAsync(new Connection(Name, CronusEndpoint));
             IsEndpointValid = tenantsForCurrentConnection.Any() ? true : false;
+            DisplayMessage = IsEndpointValid ? "Correct Endpoint" : "Unable to find any live tenants";
 
             foreach (var tenant in tenantsForCurrentConnection)
             {
