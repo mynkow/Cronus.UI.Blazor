@@ -35,6 +35,8 @@ namespace Elders.Cronus.Dashboard.Models
 
         [JsonPropertyName("oAuths")]
         public List<oAuth> oAuths { get; set; }
+
+        public override string ToString() => Name;
     }
 
     public class oAuth
@@ -62,9 +64,11 @@ namespace Elders.Cronus.Dashboard.Models
         [JsonPropertyName("scope")]
         public string Scope { get; set; }
 
-        public string BasicAuthorization => Convert.ToBase64String(Encoding.UTF8.GetBytes($"{Client}:{Secret}"));
-
         [JsonPropertyName("tenant")]
         public string Tenant { get; set; }
+
+        public string BasicAuthorization => Convert.ToBase64String(Encoding.UTF8.GetBytes($"{Client}:{Secret}"));
+
+        public override string ToString() => Tenant;
     }
 }

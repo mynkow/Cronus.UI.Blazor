@@ -23,9 +23,6 @@ namespace Elders.Cronus.Dashboard.Components
         public NavigationManager NavManager { get; set; }
 
         [Parameter]
-        public string ConnectionName { get; set; }
-
-        [Parameter]
         public Connection Connection { get; set; }
 
         [Parameter]
@@ -43,10 +40,12 @@ namespace Elders.Cronus.Dashboard.Components
             App.OnConnectionsUpdated += UpdateConnections;
             App.OnAutoConnect += OnConnectionSelected;
             App.OnTenantChanged += OnAutoTenantChanged;
+            App.OnDisconnect += Disconenct;
             App.OnConnectionChanged += async (Connection connection) =>
             {
                 await OnConnectionSelected(new List<Connection>() { connection });
             };
+            App.OnChange += () => StateHasChanged();
 
             TenantName = App.oAuth?.Tenant ?? "Select Tenant...";
             connections = new List<Connection>();
@@ -59,9 +58,8 @@ namespace Elders.Cronus.Dashboard.Components
         protected async Task OnConnectionSelected(IEnumerable<Connection> connections)
         {
             var connection = connections.FirstOrDefault();
+            Connection = connection;
             await App.ConnectAsync(connection);
-            ConnectionName = connection.Name;
-            NavManager.NavigateTo("/projections");
             TenantName = App.oAuth?.Tenant ?? "Select Tenant...";
             List<string> configuredTenantsInTheService = await Cronus.GetTenantsAsync(connection);
             List<oAuth> intersection = connection.oAuths.Where(x => configuredTenantsInTheService.Contains(x.Tenant)).ToList();
@@ -70,25 +68,42 @@ namespace Elders.Cronus.Dashboard.Components
             StateHasChanged();
         }
 
-        protected void OnTenantChanged(IEnumerable<oAuth> oAuths)
+        protected async Task OnTenantChanged(IEnumerable<oAuth> oAuths)
         {
             var oAuth = oAuths.FirstOrDefault();
-            App.SelectTenant(oAuth);
+            await App.SelectTenantAsync(oAuth);
+            OAuth = oAuth;
             TenantName = oAuth.Tenant;
+
             StateHasChanged();
         }
 
         protected Task OnAutoTenantChanged(oAuth oAuth)
         {
+            OAuth = oAuth;
             TenantName = oAuth.Tenant;
+            NavManager.NavigateTo("/projections");
+            StateHasChanged();
 
             return Task.CompletedTask;
         }
 
-        protected async Task UpdateConnections(List<Connection> updatedConnections)
+        protected Task UpdateConnections(List<Connection> updatedConnections)
         {
             connections = updatedConnections;
             StateHasChanged();
+
+            return Task.CompletedTask;
+        }
+
+        protected Task Disconenct()
+        {
+            Connection = null;
+            OAuth = null;
+            oAuths = null;
+            StateHasChanged();
+
+            return Task.CompletedTask;
         }
     }
 }

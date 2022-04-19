@@ -20,6 +20,7 @@ namespace Elders.Cronus.Dashboard
         public event Func<ProjectionVersion, Task> OnVersionSelected;
         public event Func<ProgressData, Task> OnProgressChanged;
         public event Func<IEnumerable<Connection>, Task> OnAutoConnect;
+        public event Func<Task> OnDisconnect;
 
         public Connection Connection { get; private set; }
         public string Tenant { get; private set; }
@@ -41,12 +42,21 @@ namespace Elders.Cronus.Dashboard
             NotifyStateChanged();
         }
 
-        public void SelectTenant(oAuth selectedoAuth)
+        public async Task Disconnect()
+        {
+            Connection = null;
+            oAuth = null;
+
+            await NotifyOnDisconnetc();
+            NotifyStateChanged();
+        }
+
+        public async Task SelectTenantAsync(oAuth selectedoAuth)
         {
             oAuth = selectedoAuth;
             Connection.oAuth = selectedoAuth;
+            await NotifyTenantChanged(oAuth);
             NotifyStateChanged();
-            NotifyTenantChanged(oAuth);
         }
 
         public void LoadConnections(List<Connection> connections)
@@ -85,6 +95,8 @@ namespace Elders.Cronus.Dashboard
         private Task NotifyProgressChanged(ProgressData progress) => OnProgressChanged?.Invoke(progress);
 
         private Task NotifyAutoConnectionWasMade(Connection connection) => OnAutoConnect?.Invoke(new List<Connection>() { connection });
+
+        private Task NotifyOnDisconnetc() => OnDisconnect?.Invoke();
 
 
         public async Task ConnectToSignalRAsync()
