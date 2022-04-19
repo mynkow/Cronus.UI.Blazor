@@ -75,8 +75,8 @@ namespace Elders.Cronus.Dashboard.Components
 
             var model = new ReplayPublicEventRequest()
             {
-                LiveTenant = validationModel.LiveTenant,
-                LiveBoundedContext = validationModel.LiveBoundedContext,
+                Tenant = validationModel.LiveTenant,
+                RecipientBoundedContext = validationModel.LiveBoundedContext,
                 RecipientHandlers = validationModel.RecipientHandler,
                 SourceEventTypeId = validationModel.SourceEventTypeId,
                 ReplayAfter = replayAfter
@@ -88,6 +88,7 @@ namespace Elders.Cronus.Dashboard.Components
             else
                 await JSRuntime.InvokeAsync<object>("alert", "The signal could not be sent successfully");
         }
+
 
         protected void Reset()
         {

@@ -11,7 +11,7 @@ else if (Version.Status == ProjectionStatus.Replaying)
 {
     <MudChip Size="Size.Small" Color="Color.Primary">@GetDisplayName(Version)</MudChip>
 }
-else if (Projection.RebuildingVersion.Status == ProjectionStatus.Building || Projection.RebuildingVersion.Status == ProjectionStatus.Rebuilding)
+else if (Projection.RebuildingVersion?.Status == ProjectionStatus.Building || Projection.RebuildingVersion?.Status == ProjectionStatus.Rebuilding)
 {
     <MudChip Size="Size.Small" Color="Color.Primary">@GetDisplayName(Projection.RebuildingVersion)</MudChip>
 }

@@ -7,14 +7,16 @@ namespace Elders.Cronus.Dashboard.Models
     {
         public const string Connections = "connections";
         public const string SelectedConnection = "selected-connection";
+        public const string HubConnection = "hub-connection";
     }
 
     public class Connection
     {
-        public Connection(string name, string cronusEndpoint, oAuth oAuth = null)
+        public Connection(string name, string cronusEndpoint, oAuth oAuth = null, bool isAutoConnected = false)
         {
             Name = name;
             CronusEndpoint = cronusEndpoint;
+            IsAutoConnected = isAutoConnected;
             oAuths = new List<oAuth>();
             this.oAuth = oAuth ?? new oAuth();
         }
@@ -27,6 +29,9 @@ namespace Elders.Cronus.Dashboard.Models
 
         [JsonPropertyName("oAuth")]
         public oAuth oAuth { get; set; }
+
+        [JsonPropertyName("isAutoConnected")]
+        public bool IsAutoConnected { get; set; }
 
         [JsonPropertyName("oAuths")]
         public List<oAuth> oAuths { get; set; }

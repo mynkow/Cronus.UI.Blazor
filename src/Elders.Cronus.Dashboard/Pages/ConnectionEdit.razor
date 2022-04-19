@@ -9,6 +9,7 @@
 
     <MudTextField @bind-Value="@Name" Label="Name" FullWidth="true" Required="true"></MudTextField>
     <MudTextField @bind-Value="@CronusEndpoint" Label="Cronus Endpoint" FullWidth="true" Required="true" Class="mb-3"></MudTextField>
+    <MudCheckBox @bind-Checked="@IsAutoConnected" Label="Auto-connect" Color="Color.Primary" Disabled="@IsAutoConnectionAlreadySet()"></MudCheckBox>
     <MudButton Variant="Variant.Outlined" Color="Color.Success" EndIcon="@Icons.Filled.Check" OnClick="@GetTenants">Check</MudButton>
     <MudButton Variant="Variant.Outlined" Color="Color.Success" EndIcon="@Icons.Filled.Save" OnClick="@(async () => await EditConnection())" Class="mr-2">Update Connection</MudButton>
     @if (IsEndpointValid)
