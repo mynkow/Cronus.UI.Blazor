@@ -40,6 +40,9 @@ namespace Elders.Cronus.Dashboard.Components
         public string CronusEndpoint { get; set; }
 
         [Parameter]
+        public bool IsAutoConnected { get; set; }
+
+        [Parameter]
         public string oAuthEndpoint { get; set; }
 
         [Parameter]
@@ -67,6 +70,7 @@ namespace Elders.Cronus.Dashboard.Components
         private const string PathToConnections = "/connections";
         protected List<Connection> connections;
         protected Connection connection;
+        protected bool IsAutoConnectionAlreadySet() => connections.Where(c => c.IsAutoConnected).Any() && connection.IsAutoConnected == false;
 
         protected async Task<bool> LoadDataAsync()
         {
@@ -78,6 +82,7 @@ namespace Elders.Cronus.Dashboard.Components
 
                 Name = connection.Name;
                 CronusEndpoint = connection.CronusEndpoint;
+                IsAutoConnected = connection.IsAutoConnected;
                 oAuthEndpoint = connection.oAuth.ServerEndpoint;
                 oAuthClient = connection.oAuth.Client;
                 oAuthSecret = connection.oAuth.Secret;
@@ -124,6 +129,7 @@ namespace Elders.Cronus.Dashboard.Components
             {
                 Name = Name,
                 CronusEndpoint = CronusEndpoint,
+                IsAutoConnected = IsAutoConnected,
                 oAuth = new oAuth()
                 {
                     ServerEndpoint = oAuthEndpoint,

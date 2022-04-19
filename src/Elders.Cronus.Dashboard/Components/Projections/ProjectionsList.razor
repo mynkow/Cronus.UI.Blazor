@@ -45,7 +45,7 @@
 
             if (App.Connection is null == false || connection is null == false)
             {
-                var result = await Cronus.GetProjectionsAsync(connection ?? App.Connection);
+                Response<ProjectionCollection> result = await Cronus.GetProjectionsAsync(connection ?? App.Connection);
                 projections = result.Result.Projections;
             }
         }

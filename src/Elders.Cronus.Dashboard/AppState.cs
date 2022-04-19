@@ -19,6 +19,7 @@ namespace Elders.Cronus.Dashboard
         public event Func<List<Connection>, Task> OnConnectionsUpdated;
         public event Func<ProjectionVersion, Task> OnVersionSelected;
         public event Func<ProgressData, Task> OnProgressChanged;
+        public event Func<IEnumerable<Connection>, Task> OnAutoConnect;
 
         public Connection Connection { get; private set; }
         public string Tenant { get; private set; }
@@ -26,10 +27,18 @@ namespace Elders.Cronus.Dashboard
         public List<Connection> AvailableConnections { get; private set; }
         public HubConnection HubConnection { get; set; }
 
-        public void Connect(Connection connection)
+        public async Task ConnectAsync(Connection connection)
         {
             Connection = connection;
             oAuth = null;
+
+            await ConnectToSignalRAsync();
+        }
+
+        public async Task AutoConnectAsync(Connection connection)
+        {
+            await NotifyAutoConnectionWasMade(connection);
+            NotifyStateChanged();
         }
 
         public void SelectTenant(oAuth selectedoAuth)
@@ -75,9 +84,11 @@ namespace Elders.Cronus.Dashboard
 
         private Task NotifyProgressChanged(ProgressData progress) => OnProgressChanged?.Invoke(progress);
 
+        private Task NotifyAutoConnectionWasMade(Connection connection) => OnAutoConnect?.Invoke(new List<Connection>() { connection });
+
 
         public async Task ConnectToSignalRAsync()
-        {        
+        {
             try
             {
                 HubConnection = new HubConnectionBuilder()
@@ -92,8 +103,6 @@ namespace Elders.Cronus.Dashboard
             {
                 _logger.LogError($"Unable to establish connection to SignalR server: {ex}");
             }
-
-            
         }
 
         public void Dispose()

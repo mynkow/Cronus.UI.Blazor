@@ -7,6 +7,14 @@
             Versions = new List<ProjectionVersion>();
         }
 
+        public Projection(string projectionContractId, string projectionName, ProjectionVersion version)
+        {
+            Versions = new List<ProjectionVersion>();
+            ProjectionContractId = projectionContractId;
+            ProjectionName = projectionName;
+            Versions.Add(version);
+        }
+
         public string ProjectionContractId { get; set; }
 
         public string ProjectionName { get; set; }

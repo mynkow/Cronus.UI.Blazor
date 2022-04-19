@@ -415,7 +415,7 @@ namespace Elders.Cronus.Dashboard.Models
 
         public List<DomainGatewayDto> Gateways { get; set; }
 
-        public List<DomainProjectionDto> Projections { get; set; } 
+        public List<DomainProjectionDto> Projections { get; set; }
 
         public List<DomainPortDto> Ports { get; set; }
 
@@ -623,9 +623,9 @@ namespace Elders.Cronus.Dashboard.Models
 
     public class ReplayPublicEventRequest
     {
-        public string LiveTenant { get; set; }
+        public string Tenant { get; set; }
 
-        public string LiveBoundedContext { get; set; }
+        public string RecipientBoundedContext { get; set; }
 
         public string RecipientHandlers { get; set; }
 

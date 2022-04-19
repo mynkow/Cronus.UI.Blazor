@@ -1,4 +1,8 @@
+@using Blazored.LocalStorage
+@using Elders.Cronus.Hosting.Heartbeat
 @inherits LayoutComponentBase
+@inject AppState App
+@inject ILogger<MainLayout> logger;
 
 <div>
     <MudThemeProvider IsDarkMode="true"></MudThemeProvider>
@@ -40,6 +44,41 @@
 </div>
 
 @code {
+    [Inject]
+    public ILocalStorageService LocalStorage { get; set; }
+
+    [Inject]
+    public CronusClient Cronus { get; set; }
+
+    protected override async Task OnInitializedAsync()
+    {
+        App.OnChange += StateHasChanged;
+
+        List<Connection> connections = await LocalStorage.GetItemAsync<List<Connection>>(LSKey.Connections);
+
+        foreach (var connection in connections)
+        {
+            if (App.Connection is null)
+            {
+                if (connection.IsAutoConnected)
+                {
+                    try
+                    {
+                        await App.AutoConnectAsync(connection);
+
+                        List<string> configuredTenantsInTheService = await Cronus.GetTenantsAsync(App.Connection);
+                        List<oAuth> tenants = App.Connection.oAuths.Where(x => configuredTenantsInTheService.Contains(x.Tenant)).ToList();
+                        App.SelectTenant(tenants.FirstOrDefault());
+                    }
+                    catch (Exception ex)
+                    {
+                        logger.LogError($"Unable to establish connection to the server. {ex.Message}");
+                    }
+                }
+            }
+        }
+    }
+
     bool _drawerOpen = true;
 
     void DrawerToggle()
