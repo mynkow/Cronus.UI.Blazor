@@ -68,11 +68,12 @@
 
                         List<string> configuredTenantsInTheService = await Cronus.GetTenantsAsync(App.Connection);
                         List<oAuth> tenants = App.Connection.oAuths.Where(x => configuredTenantsInTheService.Contains(x.Tenant)).ToList();
-                        App.SelectTenant(tenants.FirstOrDefault());
+                        await App.SelectTenantAsync(tenants.FirstOrDefault(t => t.ServerEndpoint is not null));
                     }
                     catch (Exception ex)
                     {
                         logger.LogError($"Unable to establish connection to the server. {ex.Message}");
+                        App.Disconnect();
                     }
                 }
             }
