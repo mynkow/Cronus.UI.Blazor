@@ -59,7 +59,7 @@ namespace Elders.Cronus.Dashboard.Components
         {
             var connection = connections.FirstOrDefault();
             Connection = connection;
-            await App.ConnectAsync(connection);
+            App.ConnectAsync(connection); // keep not awaited
             TenantName = App.oAuth?.Tenant ?? "Select Tenant...";
             List<string> configuredTenantsInTheService = await Cronus.GetTenantsAsync(connection);
             List<oAuth> intersection = connection.oAuths.Where(x => configuredTenantsInTheService.Contains(x.Tenant)).ToList();
