@@ -51,12 +51,12 @@ namespace Elders.Cronus.Dashboard.Components
                 LiveTenants = await Cronus.GetLiveTenantsAsync(Connection).ConfigureAwait(false);
             }
 
-            const string excludeProjections = "Projection";
-            const string excludeIndex = "Index";
+            const string onlyPublic = "_Public";
+
             Events = new List<DomainEventDto>();
             DomainDto Domain = await Cronus.GetDomainAsync(@App.Connection).ConfigureAwait(false);
 
-            Events.AddRange(Domain.Events.Where(x => x.Name.Contains(excludeProjections) == false && x.Name.Contains(excludeIndex) == false).Distinct());
+            Events.AddRange(Domain.Events.Where(x => x.Name.Contains(onlyPublic)).Distinct());
 
             StateHasChanged();
         }
