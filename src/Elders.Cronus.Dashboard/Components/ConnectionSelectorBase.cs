@@ -64,6 +64,8 @@ namespace Elders.Cronus.Dashboard.Components
             List<string> configuredTenantsInTheService = await Cronus.GetTenantsAsync(connection);
             List<oAuth> intersection = connection.oAuths.Where(x => configuredTenantsInTheService.Contains(x.Tenant)).ToList();
             oAuths = intersection;
+            OAuth = null;
+            NavManager.NavigateTo("/");
 
             StateHasChanged();
         }
@@ -74,6 +76,8 @@ namespace Elders.Cronus.Dashboard.Components
             await App.SelectTenantAsync(oAuth);
             OAuth = oAuth;
             TenantName = oAuth.Tenant;
+            NavManager.NavigateTo("/");
+            NavManager.NavigateTo("/projections");
 
             StateHasChanged();
         }
