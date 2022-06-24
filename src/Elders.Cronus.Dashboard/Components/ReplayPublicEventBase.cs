@@ -43,20 +43,20 @@ namespace Elders.Cronus.Dashboard.Components
         {
             App.OnTenantChanged += OnTenantChange;
             HasValidToken = await IsTokenValid();
-
             Connection = App.Connection;
-            LiveBoundedContexts = await Cronus.GetLiveServicesAsync(Connection).ConfigureAwait(false);
-            if (LiveBoundedContexts is not null)
-            {
-                LiveTenants = await Cronus.GetLiveTenantsAsync(Connection).ConfigureAwait(false);
-            }
 
-            const string excludeProjections = "Projection";
-            const string excludeIndex = "Index";
             Events = new List<DomainEventDto>();
-            DomainDto Domain = await Cronus.GetDomainAsync(@App.Connection).ConfigureAwait(false);
 
-            Events.AddRange(Domain.Events.Where(x => x.Name.Contains(excludeProjections) == false && x.Name.Contains(excludeIndex) == false).Distinct());
+            Task<DomainDto> domainTask = Cronus.GetDomainAsync(@App.Connection);
+            Task<List<string>> servicesTask = Cronus.GetLiveServicesAsync(Connection);
+            Task<List<string>> tenantsTask = Cronus.GetLiveTenantsAsync(Connection);
+
+            await Task.WhenAll(domainTask, servicesTask, tenantsTask);
+
+            const string onlyPublic = "_Public";
+
+            DomainDto domainResult = domainTask.Result;
+            Events.AddRange(domainTask.Result.Events.Where(x => x.Name.Contains(onlyPublic)).Distinct());
 
             StateHasChanged();
         }

@@ -45,7 +45,17 @@
                     {
                         <span class="d-inline"><MudIconButton Icon="@Icons.Filled.Stop" Color="Color.Success" ToolTip="Cancel" OnClick="@(async () => await CancelAsync(Projection,Projection.LatestVersion))"></MudIconButton></span>
                     }
-                    <a href="/projections/@Projection.ProjectionContractId"><MudIcon Icon="@Icons.Filled.Search"></MudIcon></a>
+
+                    @if(Projection.LatestVersion.Status == ProjectionStatus.NotPresent)
+                    {
+                        <a href="/projections/@Projection.ProjectionContractId" style="pointer-events: none"><MudIcon Icon="@Icons.Filled.Search"></MudIcon></a>
+                    }
+                    else
+                    {
+                         <a href="/projections/@Projection.ProjectionContractId"><MudIcon Icon="@Icons.Filled.Search"></MudIcon></a>
+                    }      
+
+                      
                 </div>
             </div>
         </div>
@@ -76,7 +86,6 @@
     public Task CancelAsync(Projection projection, ProjectionVersion version)
     {
         LatestVersionStatus = ProjectionStatus.Canceled;
-        StateHasChanged();
         return Cronus.CancelSpecificProjectionAsync(App.Connection, Projection, version);
     }
 
@@ -110,8 +119,16 @@
             if (Projection.ProjectionContractId.Equals(projectionTypeId, StringComparison.OrdinalIgnoreCase) == false)
                 return;
 
-            Projection.LatestVersion.Status = ProjectionStatus.Live;
-            Projection.RebuildingVersion.Status = ProjectionStatus.Live;
+            if(LatestVersionStatus == ProjectionStatus.Canceled)
+            {
+                Projection.LatestVersion.Status = ProjectionStatus.Canceled;
+                Projection.RebuildingVersion.Status = ProjectionStatus.Canceled;
+            }
+            else
+            {
+                Projection.LatestVersion.Status = ProjectionStatus.Live;
+                Projection.RebuildingVersion.Status = ProjectionStatus.Live;
+            }
 
             Log.LogInformation("RebuildFinished: " + projectionTypeId);
             StateHasChanged();
