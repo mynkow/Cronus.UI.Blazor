@@ -1,17 +1,14 @@
 ﻿using Blazored.LocalStorage;
 using Elders.Cronus.Dashboard.Models;
 using Microsoft.AspNetCore.Components;
-using Microsoft.Extensions.Logging;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Net.Http;
-using System.Threading.Tasks;
 
 namespace Elders.Cronus.Dashboard.Components
 {
     public class OAuthBase : ComponentBase
     {
+        [Inject]
+        protected AppState App { get; set; }
+
         [Inject]
         protected ILogger<ConnectionBase> Log { get; set; }
 
@@ -89,10 +86,14 @@ namespace Elders.Cronus.Dashboard.Components
                 oAuth changedAuthentication = GetoAuth();
                 connection.oAuths.Remove(oAuth);
                 connection.oAuths.Add(changedAuthentication);
+                connection.oAuth = changedAuthentication;
 
                 connections.Add(connection);
                 await LocalStorage.SetItemAsync(LSKey.Connections, connections);
             }
+
+            App.UpdateConnections(connections);
+            await LoadDataAsync();
 
             StateHasChanged();
             NavigationManager.NavigateTo($"/connection/{ConnectionName}");
