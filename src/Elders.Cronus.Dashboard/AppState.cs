@@ -34,6 +34,7 @@ namespace Elders.Cronus.Dashboard
             oAuth = null;
 
             await ConnectToSignalRAsync();
+            await NotifyConnectionChanged(connection);
         }
 
         public async Task AutoConnectAsync(Connection connection)
@@ -97,7 +98,6 @@ namespace Elders.Cronus.Dashboard
         private Task NotifyAutoConnectionWasMade(Connection connection) => OnAutoConnect?.Invoke(new List<Connection>() { connection });
 
         private Task NotifyOnDisconnetc() => OnDisconnect?.Invoke();
-
 
         public async Task ConnectToSignalRAsync()
         {

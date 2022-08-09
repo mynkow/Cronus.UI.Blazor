@@ -64,6 +64,13 @@ namespace Elders.Cronus.Dashboard.Components
 
         protected override async Task OnInitializedAsync()
         {
+            App.OnConnectionChanged += async (Connection connection) =>
+            {
+                await GetTenants();
+
+                await EditConnection();
+            };
+
             await LoadDataAsync();
         }
 
@@ -90,6 +97,8 @@ namespace Elders.Cronus.Dashboard.Components
             }
 
             await GetTenants();
+
+            await EditConnection();
 
             return true;
         }
