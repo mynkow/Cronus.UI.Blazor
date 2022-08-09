@@ -1,17 +1,15 @@
-﻿using Microsoft.AspNetCore.Components;
-
-namespace Elders.Cronus.Dashboard.Models
+﻿namespace Elders.Cronus.Dashboard.Models
 {
     public class CronusClient : HttpClientBase
     {
         private readonly TokenClient token;
         private readonly ILogger<CronusClient> log;
-        [Inject]
-        public NavigationManager NavManager { get; set; }
-        public CronusClient(HttpClient client, TokenClient token, ILogger<CronusClient> log) : base(client)
+
+        public CronusClient(HttpClient client, TokenClient token, AppState app, ILogger<CronusClient> log) : base(client)
         {
             this.token = token;
             this.log = log;
+            this.auth = app?.Connection?.oAuth;
         }
 
         public async Task<List<string>> GetTenantsAsync(Connection connection)
