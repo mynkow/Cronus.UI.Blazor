@@ -1,12 +1,10 @@
-﻿using System;
-using System.Net.Http;
-using System.Text.Json;
-using System.Threading.Tasks;
+﻿using System.Text.Json;
 
 namespace Elders.Cronus.Dashboard.Models
 {
     public abstract class HttpClientBase
     {
+        public oAuth auth;
         private readonly HttpClient client;
         private readonly JsonSerializerOptions serializerOptions;
 
@@ -26,6 +24,11 @@ namespace Elders.Cronus.Dashboard.Models
         protected async Task<(HttpResponseMessage Response, T Data)> ExecuteRequestAsync<T>(HttpRequestMessage request)
         {
             if (request is null) throw new ArgumentNullException(nameof(request));
+
+            if (request.Headers.Authorization is null && string.IsNullOrEmpty(auth?.Tenant) == false)
+            {
+                request.Headers.Add("tenant", auth.Tenant);
+            }
 
             using (HttpResponseMessage response = await client.SendAsync(request).ConfigureAwait(false))
             {

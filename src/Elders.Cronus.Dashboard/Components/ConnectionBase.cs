@@ -64,10 +64,17 @@ namespace Elders.Cronus.Dashboard.Components
 
         protected override async Task OnInitializedAsync()
         {
+            App.OnConnectionChanged += async (Connection connection) =>
+            {
+                await GetTenants();
+
+                await EditConnection();
+            };
+
             await LoadDataAsync();
         }
 
-        private const string PathToConnections = "/connections";
+        private const string PathToConnection = "/connection";
         protected List<Connection> connections;
         protected Connection connection;
         protected bool IsAutoConnectionAlreadySet() => connections.Where(c => c.IsAutoConnected).Any() && connection.IsAutoConnected == false;
@@ -90,6 +97,8 @@ namespace Elders.Cronus.Dashboard.Components
             }
 
             await GetTenants();
+
+            await EditConnection();
 
             return true;
         }
@@ -120,7 +129,7 @@ namespace Elders.Cronus.Dashboard.Components
             App.UpdateConnections(connections);
 
             StateHasChanged();
-            NavigationManager.NavigateTo(PathToConnections);
+            NavigationManager.NavigateTo($"{PathToConnection}/{newConnection.Name}");
         }
 
         Connection GetConnection()

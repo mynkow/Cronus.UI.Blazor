@@ -41,10 +41,6 @@ namespace Elders.Cronus.Dashboard.Components
             App.OnAutoConnect += OnConnectionSelected;
             App.OnTenantChanged += OnAutoTenantChanged;
             App.OnDisconnect += Disconenct;
-            App.OnConnectionChanged += async (Connection connection) =>
-            {
-                await OnConnectionSelected(new List<Connection>() { connection });
-            };
             App.OnChange += () => StateHasChanged();
 
             TenantName = App.oAuth?.Tenant ?? "Select Tenant...";
