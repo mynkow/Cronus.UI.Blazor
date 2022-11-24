@@ -1,7 +1,5 @@
 ﻿@page "/connection/{Name}"
 @inherits ConnectionBase
-@inject AppState App
-@inject CronusClient Cronus
 
 <h1>Edit Connection</h1>
 
@@ -28,6 +26,7 @@
         <MudTh>Authority Address</MudTh>
         <MudTh>Client</MudTh>
         <MudTh>Scope</MudTh>
+        <MudTh>Audience</MudTh>
         <MudTh>Actions</MudTh>
     </HeaderContent>
     <RowTemplate>
@@ -35,6 +34,7 @@
         <MudTd>@context.ServerEndpoint</MudTd>
         <MudTd>@context.Client</MudTd>
         <MudTd>@context.Scope</MudTd>
+        <MudTd>@context.Audience</MudTd>
         <MudTd>
             <MudButton Variant="Variant.Outlined" Color="Color.Success" EndIcon="@Icons.TwoTone.GetApp" OnClick="@(async () => await @GetToken(context))" Class="mr-2">Get Token</MudButton>
             <MudButton Variant="Variant.Outlined" Color="Color.Success" EndIcon="@Icons.Filled.Edit" Link="@($"/connection/{@Name}/{context.Tenant}")" Class="mr-2">Edit</MudButton>
@@ -54,7 +54,3 @@
 
     </RowTemplate>
 </MudTable>
-
-
-
-

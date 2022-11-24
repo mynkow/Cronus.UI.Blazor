@@ -27,6 +27,11 @@ namespace Elders.Cronus.Dashboard.Models
                 Dictionary<string, string> parameters = new Dictionary<string, string>();
                 parameters.Add("grant_type", "client_credentials");
 
+                if (string.IsNullOrEmpty(connection.oAuth.Audience) == false)
+                {
+                    parameters.Add("audience", connection.oAuth.Audience);
+                }
+
                 parameters.Add("scope", connection.oAuth.Scope);
 
                 getTokenRequest.Content = new FormUrlEncodedContent(parameters);

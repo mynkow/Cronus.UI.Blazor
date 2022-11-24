@@ -34,6 +34,9 @@ namespace Elders.Cronus.Dashboard.Components
         public string Tenant { get; set; }
 
         [Parameter]
+        public string Audience { get; set; }
+
+        [Parameter]
         public string ServerEndpoint { get; set; }
 
         [Parameter]
@@ -68,12 +71,14 @@ namespace Elders.Cronus.Dashboard.Components
                 Log.LogInformation(oAuth.Secret);
                 Log.LogInformation(oAuth.Scope);
                 Log.LogInformation(oAuth.ServerEndpoint);
+                Log.LogInformation(oAuth.Audience);
                 Log.LogInformation(oAuth.Tenant);
 
                 ServerEndpoint = oAuth.ServerEndpoint;
                 Client = oAuth.Client;
                 Secret = oAuth.Secret;
                 Scope = oAuth.Scope;
+                Audience = oAuth.Audience;
             }
 
             return true;
@@ -111,7 +116,7 @@ namespace Elders.Cronus.Dashboard.Components
 
         private oAuth GetoAuth()
         {
-            return new oAuth(ServerEndpoint, Client, Secret, Scope, Tenant);
+            return new oAuth(ServerEndpoint, Client, Secret, Scope, Audience, Tenant);
         }
     }
 }

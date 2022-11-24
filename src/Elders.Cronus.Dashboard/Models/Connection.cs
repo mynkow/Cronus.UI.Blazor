@@ -43,13 +43,14 @@ namespace Elders.Cronus.Dashboard.Models
     {
         public oAuth() { }
 
-        public oAuth(string serverEndpoint, string client, string secret, string scope, string tenant)
+        public oAuth(string serverEndpoint, string client, string secret, string scope, string audience, string tenant)
         {
             ServerEndpoint = serverEndpoint;
             Client = client;
             Secret = secret;
             Scope = scope;
             Tenant = tenant;
+            Audience = audience;
         }
 
         [JsonPropertyName("serverEndpoint")]
@@ -63,6 +64,9 @@ namespace Elders.Cronus.Dashboard.Models
 
         [JsonPropertyName("scope")]
         public string Scope { get; set; }
+
+        [JsonPropertyName("audience")]
+        public string Audience { get; set; }
 
         [JsonPropertyName("tenant")]
         public string Tenant { get; set; }
