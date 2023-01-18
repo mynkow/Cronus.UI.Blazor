@@ -80,7 +80,7 @@ namespace Elders.Cronus.Dashboard.Components
             using var streamReaded = new StreamReader(stream);
 
             var json = await streamReaded.ReadToEndAsync();
-            var connections = JsonSerializer.Deserialize<List<Connection>>(json, new JsonSerializerOptions
+            connections = JsonSerializer.Deserialize<List<Connection>>(json, new JsonSerializerOptions
             {
                 WriteIndented = true,
                 DefaultIgnoreCondition = JsonIgnoreCondition.WhenWritingNull
