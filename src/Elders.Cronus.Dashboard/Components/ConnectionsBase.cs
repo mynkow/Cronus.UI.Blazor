@@ -59,7 +59,7 @@ namespace Elders.Cronus.Dashboard.Components
             });
 
             byte[] file = Encoding.UTF8.GetBytes(json);
-            string fileName = $"cronus dashboard connections ({DateTimeOffset.Now.ToString("o")}).json";
+            string fileName = $"cronus dashboard connections ({DateTimeOffset.Now.ToString("yyyy-MM-ddTHH:mm:ssK")}).json";
             string contentType = "application/json";
 
             // Check if the IJSRuntime is the WebAssembly implementation of the JSRuntime
