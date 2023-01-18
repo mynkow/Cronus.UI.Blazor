@@ -1,0 +1,134 @@
+﻿@inject AppState App
+@inject CronusClient Cronus
+@inject ILogger<ProjectionsTable> Logger;
+
+<MudTable Items="@projections" FixedHeader="true" Dense="true">
+    <ColGroup>
+        <col  />
+        <col />
+        <col  />
+        <col style="width:200px;" />
+        <col style="width:300px;" />
+    </ColGroup>
+    <HeaderContent>
+        <MudTh>Name</MudTh>
+        <MudTh>Version</MudTh>
+        <MudTh>Actions</MudTh>
+        <MudTh>Other</MudTh>
+        <MudTh>Id</MudTh>
+    </HeaderContent>
+    <RowTemplate>
+        <MudTd DataLabel="Nr">@context.ProjectionName</MudTd>
+        <MudTd DataLabel="Name">
+                <ProjectionVersionBadge Projection="@context" Version="@context.LatestVersion" LiveVersion="@context.LiveVersion" AllVersions="@context.Versions"></ProjectionVersionBadge>
+        </MudTd>
+        <MudTd DataLabel="Position">
+
+                @if (@context.LatestVersion.Status != ProjectionStatus.Building && @context.LatestVersion.Status != ProjectionStatus.Replaying && @context.LiveVersion?.Hash != "ver")//api should return if the projection is repl
+                {
+                    <MudIconButton Icon="@Icons.Material.Filled.PlayArrow" Color="Color.Success" ToolTip="Replays the projection and creates a new version. You should use this when your projection contains events you do not want." OnClick="@(async () => await ReplayAsync(@context))"></MudIconButton>
+                }
+
+                @if (@context.IsReplayable && @context.LatestVersion.Status != ProjectionStatus.Building)//API does not return if the projection is replayable
+                {
+                    <MudIconButton Icon="@Icons.Material.Filled.Loop" Color="Color.Success" ToolTip="Rebuilds the projection version. You should use this when there are missing events." OnClick="@(async () => await RebuildAsync(@context))" Class="mr-2"></MudIconButton>
+                }
+
+                @if (@context.LatestVersion.Status == ProjectionStatus.Building || @context.LatestVersion.Status == ProjectionStatus.Rebuilding || @context.LatestVersion.Status == ProjectionStatus.Replaying)
+                {
+                    <span class="d-inline"><MudIconButton Icon="@Icons.Material.Filled.Stop" Color="Color.Success" ToolTip="Cancel" OnClick="@(async () => await CancelAsync(@context,@context.LatestVersion))"></MudIconButton></span>
+                }
+
+                @if (@context.LatestVersion.Status == ProjectionStatus.NotPresent)
+                {
+                    <a href="/projections/@context.ProjectionContractId" style="pointer-events: none"><MudIcon Icon="@Icons.Material.Filled.Search"></MudIcon></a>
+                }
+                else
+                {
+                    <a href="/projections/@context.ProjectionContractId"><MudIcon Icon="@Icons.Material.Filled.Search"></MudIcon></a>
+                }
+
+        </MudTd>
+        <MudTd DataLabel="Other">
+            @if (@context.LatestVersion.Status == ProjectionStatus.Replaying)
+            {
+                <ProjectionProgressBar Projection="@context" Color="Color.Warning"></ProjectionProgressBar>
+            }
+            else if (@context.RebuildingVersion?.Status == ProjectionStatus.Building || @context.RebuildingVersion?.Status == ProjectionStatus.Rebuilding)
+            {
+                <ProjectionProgressBar Projection="@context" Color="Color.Primary"></ProjectionProgressBar>
+            }
+        </MudTd>
+        <MudTd DataLabel="ProjectionContractId">
+            <MudText style="font-size:small" Font-Size="Size.Small" Typo="Typo.body2" Color="Color.Primary"><cite>@context.ProjectionContractId</cite></MudText>
+        </MudTd>
+    </RowTemplate>
+    <PagerContent>
+        <MudTablePager PageSizeOptions="new int[]{50, 100}" />
+    </PagerContent>
+</MudTable>
+
+@code {
+    [Parameter]
+    public ProjectionVersion SelectedVersion { get; set; }
+
+    List<Projection> projections = new List<Projection>();
+
+    protected override async Task OnInitializedAsync()
+    {
+        App.OnChange += StateHasChanged;
+        App.OnConnectionChanged += GetProjectionsListAsync;
+        App.OnVersionSelected += SelectVersion;
+
+        await GetProjectionsListAsync(App.Connection);
+    }
+
+    protected async Task GetProjectionsListAsync(Connection connection)
+    {
+        try
+        {
+            projections = new List<Projection>();
+
+            if (App.Connection is null == false || connection is null == false)
+            {
+                Response<ProjectionCollection> result = await Cronus.GetProjectionsAsync(connection ?? App.Connection);
+                projections = result.Result.Projections;
+            }
+        }
+        finally
+        {
+            StateHasChanged();
+        }
+    }
+
+    private Task SelectVersion(ProjectionVersion version)
+    {
+        SelectedVersion = version;
+        Logger.LogInformation(SelectedVersion.ToString());
+        return Task.CompletedTask;
+    }
+
+    public Task RebuildAsync(Projection projection)
+    {
+        //LatestVersionStatus = ProjectionStatus.Rebuilding;
+        return Cronus.RebuildProjectionAsync(App.Connection, projection);
+    }
+
+    public Task ReplayAsync(Projection projection)
+    {
+        //LatestVersionStatus = ProjectionStatus.Replaying;
+        return Cronus.ReplayProjectionAsync(App.Connection, projection);
+    }
+
+    public Task CancelAsync(Projection projection, ProjectionVersion version)
+    {
+        //LatestVersionStatus = ProjectionStatus.Canceled;
+        return Cronus.CancelSpecificProjectionAsync(App.Connection, projection, version);
+    }
+
+    public Task FinalizeAsync(Projection projection, ProjectionVersion version)
+    {
+        StateHasChanged();
+        return Cronus.FinalizeProjectionAsync(App.Connection, projection, version);
+    }
+}

@@ -2,8 +2,11 @@
 @inject CronusClient Cronus
 @inject ILogger<Projection> _logger
 
-<div style="font-size:xx-small">@progressString</div>
-<MudProgressLinear Color="@Color" Rounded="true" Size="Size.Medium" Value="@progress" />
+<div>
+    <div style="font-size:xx-small">@progressString</div>
+    <MudProgressLinear Color="@Color" Rounded="true" Size="Size.Large" Value="@progress" />
+    <div style="text-align:right">@TimeSpan.FromSeconds(@timeLeft).ToString()</div>
+</div>
 
 @code {
     [Parameter]
@@ -14,10 +17,17 @@
 
     private double progress = 0;
     private string progressString = "0 %";
+    private long timeLeft = 0;
 
     protected override Task OnInitializedAsync()
     {
         App.OnChange += StateHasChanged;
+
+        long processBase = 0;
+        long processPace = 0; // Because the server sends very second we could calculate how many records are received per second. It will be cool if the server sends the refresh interval
+        int receivedNotifications = 0;
+        long lastCalculatedTimeLeft = 0;
+        int sanityCounter = 0;
 
         App.HubConnection.On<string, long, long>("RebuildProgress", (projectionTypeId, processed, total) =>
             {
@@ -30,6 +40,37 @@
                     progressString = $"{percentage} % ( {processed} / {total} )";
                     progress = processed * 100 / total;
                 }
+
+                receivedNotifications++;
+                if (processBase > 0)
+                {
+                    processPace = (processed - processBase) / receivedNotifications;
+                    lastCalculatedTimeLeft = (total - processed) / processPace;
+                    if (lastCalculatedTimeLeft < timeLeft || timeLeft == 0)
+                    {
+                        timeLeft = lastCalculatedTimeLeft;
+                        sanityCounter = 0;
+                    }
+                    else
+                    {
+                        sanityCounter++;
+                        if (sanityCounter > 10)
+                        {
+                            timeLeft++;
+                        }
+                        else
+                        {
+                            timeLeft--;
+                        }
+                        
+                    }
+                }
+                else
+                {
+                    receivedNotifications--;
+                    processBase = processed;
+                }
+
 
                 StateHasChanged();
             });
