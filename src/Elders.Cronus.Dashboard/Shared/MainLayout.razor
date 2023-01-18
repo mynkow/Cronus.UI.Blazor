@@ -19,19 +19,19 @@
         <MudDrawer @bind-Open="_drawerOpen" ClipMode="DrawerClipMode.Always" Elevation="2" Style="@($"top: 86px")">
             @*NavMenu*@
             <MudNavMenu Color="Color.Success">
-                <MudNavLink Href="connections" Icon="@Icons.Filled.Bolt">Connections</MudNavLink>
+                <MudNavLink Href="connections" Icon="@Icons.Material.Filled.Bolt">Connections</MudNavLink>
                 <MudDivider />
-                <MudNavGroup Icon="@Icons.Filled.WbSunny" Title="Domain" Expanded="true">
+                <MudNavGroup Icon="@Icons.Material.Filled.WbSunny" Title="Domain" Expanded="true">
                     <MudNavLink Href="/domain-aggregates">Aggregates</MudNavLink>
                     <MudNavLink Href="/domain-gateways">Gateways</MudNavLink>
                     <MudNavLink Href="/domain-ports">Ports</MudNavLink>
                     <MudNavLink Href="/domain-projections">Projections</MudNavLink>
                     <MudNavLink Href="/domain-sagas">Sagas</MudNavLink>
                 </MudNavGroup>
-                <MudNavLink Href="eventstore" Icon="@Icons.Filled.Book">Event Store</MudNavLink>
-                <MudNavLink Href="indices" Icon="@Icons.Filled.Rowing">Indices</MudNavLink>
-                <MudNavLink Href="projections" Icon="@Icons.Filled.Dashboard">Projections</MudNavLink>
-                <MudNavLink Href="replay-public" Icon="@Icons.Filled.Publish">Replay Public Event</MudNavLink>
+                <MudNavLink Href="eventstore" Icon="@Icons.Material.Filled.Book">Event Store</MudNavLink>
+                <MudNavLink Href="indices" Icon="@Icons.Material.Filled.Rowing">Indices</MudNavLink>
+                <MudNavLink Href="projections" Icon="@Icons.Material.Filled.Dashboard">Projections</MudNavLink>
+                <MudNavLink Href="replay-public" Icon="@Icons.Material.Filled.Publish">Replay Public Event</MudNavLink>
             </MudNavMenu>
         </MudDrawer>
         <MudMainContent Style="@($"top: 86px")">

@@ -6,7 +6,7 @@
 <fieldset>
     <MudTextField @bind-Value="@Name" Label="Name" FullWidth="true" Required="true"></MudTextField>
     <MudTextField @bind-Value="@CronusEndpoint" Label="Cronus Endpoint" FullWidth="true" Required="true"></MudTextField>
-    <MudButton Variant="Variant.Outlined" Color="Color.Success" EndIcon="@Icons.Filled.Check" OnClick="@CheckConnection" Class="mb-2 mt-2 mr-2">Check</MudButton>
+    <MudButton Variant="Variant.Outlined" Color="Color.Success" EndIcon="@Icons.Material.Filled.Check" OnClick="@CheckConnection" Class="mb-2 mt-2 mr-2">Check</MudButton>
     @if (IsEndpointValid)
     {
         <span class="badge rounded-pill bg-success">@DisplayMessage</span>
@@ -18,4 +18,4 @@
 </fieldset>
 
 @*<MatButton Outlined="true" OnClick="@GetToken">Get Token</MatButton>*@
-<MudButton Variant="Variant.Outlined" Color="Color.Success" EndIcon="@Icons.Filled.Save" OnClick="@AddConnection">Add Connection</MudButton>
+<MudButton Variant="Variant.Outlined" Color="Color.Success" EndIcon="@Icons.Material.Filled.Save" OnClick="@AddConnection">Add Connection</MudButton>

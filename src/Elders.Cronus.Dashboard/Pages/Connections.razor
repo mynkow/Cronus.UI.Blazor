@@ -22,13 +22,13 @@
             @context.Name
             @if (context.IsAutoConnected)
             {
-                <MudIcon Icon="@Icons.Filled.AutoAwesome" Color="Color.Primary" Title="Auto-connect" />
+                <MudIcon Icon="@Icons.Material.Filled.AutoAwesome" Color="Color.Primary" Title="Auto-connect" />
             }
         </MudTd>
         <MudTd>@context.CronusEndpoint</MudTd>
         <MudTd>
-            <MudButton Variant="Variant.Outlined" EndIcon="@Icons.Filled.Edit" Color="Color.Success" Link="@($"/connection/{@context.Name}")">Edit</MudButton>
-            <MudButton Variant="Variant.Outlined" EndIcon="@Icons.Filled.Delete" Color="Color.Success" OnClick="@(async () => await OnDeleteAsync(context))" Class="mt-2">Delete</MudButton>
+            <MudButton Variant="Variant.Outlined" EndIcon="@Icons.Material.Filled.Edit" Color="Color.Success" Link="@($"/connection/{@context.Name}")">Edit</MudButton>
+            <MudButton Variant="Variant.Outlined" EndIcon="@Icons.Material.Filled.Delete" Color="Color.Success" OnClick="@(async () => await OnDeleteAsync(context))" Class="mt-2">Delete</MudButton>
         </MudTd>
     </RowTemplate>
 </MudTable>

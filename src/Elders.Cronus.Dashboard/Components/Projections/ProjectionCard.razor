@@ -33,26 +33,26 @@
                 <div class="text-right col-lg-5">
                     @if (Projection.LatestVersion.Status != ProjectionStatus.Building && Projection.LatestVersion.Status != ProjectionStatus.Replaying && Projection.LiveVersion?.Hash != "ver")//api should return if the projection is repl
                     {
-                        <MudIconButton Icon="@Icons.Filled.PlayArrow" Color="Color.Success" ToolTip="Replays the projection and creates a new version. You should use this when your projection contains events you do not want." OnClick="@(async () => await ReplayAsync(Projection))"></MudIconButton>
+                        <MudIconButton Icon="@Icons.Material.Filled.PlayArrow" Color="Color.Success" ToolTip="Replays the projection and creates a new version. You should use this when your projection contains events you do not want." OnClick="@(async () => await ReplayAsync(Projection))"></MudIconButton>
                     }
 
                     @if (Projection.IsReplayable && Projection.LatestVersion.Status != ProjectionStatus.Building)//API does not return if the projection is replayable
                     {
-                        <MudIconButton Icon="@Icons.Filled.Loop" Color="Color.Success" ToolTip="Rebuilds the projection version. You should use this when there are missing events." OnClick="@(async () => await RebuildAsync(Projection))" Class="mr-2"></MudIconButton>
+                        <MudIconButton Icon="@Icons.Material.Filled.Loop" Color="Color.Success" ToolTip="Rebuilds the projection version. You should use this when there are missing events." OnClick="@(async () => await RebuildAsync(Projection))" Class="mr-2"></MudIconButton>
                     }
 
                     @if (Projection.LatestVersion.Status == ProjectionStatus.Building || Projection.LatestVersion.Status == ProjectionStatus.Rebuilding || Projection.LatestVersion.Status == ProjectionStatus.Replaying)
                     {
-                        <span class="d-inline"><MudIconButton Icon="@Icons.Filled.Stop" Color="Color.Success" ToolTip="Cancel" OnClick="@(async () => await CancelAsync(Projection,Projection.LatestVersion))"></MudIconButton></span>
+                        <span class="d-inline"><MudIconButton Icon="@Icons.Material.Filled.Stop" Color="Color.Success" ToolTip="Cancel" OnClick="@(async () => await CancelAsync(Projection,Projection.LatestVersion))"></MudIconButton></span>
                     }
 
                     @if(Projection.LatestVersion.Status == ProjectionStatus.NotPresent)
                     {
-                        <a href="/projections/@Projection.ProjectionContractId" style="pointer-events: none"><MudIcon Icon="@Icons.Filled.Search"></MudIcon></a>
+                        <a href="/projections/@Projection.ProjectionContractId" style="pointer-events: none"><MudIcon Icon="@Icons.Material.Filled.Search"></MudIcon></a>
                     }
                     else
                     {
-                         <a href="/projections/@Projection.ProjectionContractId"><MudIcon Icon="@Icons.Filled.Search"></MudIcon></a>
+                         <a href="/projections/@Projection.ProjectionContractId"><MudIcon Icon="@Icons.Material.Filled.Search"></MudIcon></a>
                     }      
 
                       

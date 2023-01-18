@@ -8,8 +8,8 @@
     <MudTextField @bind-Value="@Name" Label="Name" FullWidth="true" Required="true"></MudTextField>
     <MudTextField @bind-Value="@CronusEndpoint" Label="Cronus Endpoint" FullWidth="true" Required="true" Class="mb-3"></MudTextField>
     <MudCheckBox @bind-Checked="@IsAutoConnected" Label="Auto-connect" Color="Color.Primary" Disabled="@IsAutoConnectionAlreadySet()"></MudCheckBox>
-    <MudButton Variant="Variant.Outlined" Color="Color.Success" EndIcon="@Icons.Filled.Check" OnClick="@GetTenants">Check</MudButton>
-    <MudButton Variant="Variant.Outlined" Color="Color.Success" EndIcon="@Icons.Filled.Save" OnClick="@(async () => await EditConnection())" Class="mr-2">Update Connection</MudButton>
+    <MudButton Variant="Variant.Outlined" Color="Color.Success" EndIcon="@Icons.Material.Filled.Check" OnClick="@GetTenants">Check</MudButton>
+    <MudButton Variant="Variant.Outlined" Color="Color.Success" EndIcon="@Icons.Material.Filled.Save" OnClick="@(async () => await EditConnection())" Class="mr-2">Update Connection</MudButton>
     @if (IsEndpointValid)
     {
         <span class="badge rounded-pill bg-success">Correct Endpoint</span>
@@ -37,7 +37,7 @@
         <MudTd>@context.Audience</MudTd>
         <MudTd>
             <MudButton Variant="Variant.Outlined" Color="Color.Success" EndIcon="@Icons.TwoTone.GetApp" OnClick="@(async () => await @GetToken(context))" Class="mr-2">Get Token</MudButton>
-            <MudButton Variant="Variant.Outlined" Color="Color.Success" EndIcon="@Icons.Filled.Edit" Link="@($"/connection/{@Name}/{context.Tenant}")" Class="mr-2">Edit</MudButton>
+            <MudButton Variant="Variant.Outlined" Color="Color.Success" EndIcon="@Icons.Material.Filled.Edit" Link="@($"/connection/{@Name}/{context.Tenant}")" Class="mr-2">Edit</MudButton>
             @if (AccessToken == string.Empty)
             {
                 <span class="badge badge-light " style="display:none"></span>
