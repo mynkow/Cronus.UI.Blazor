@@ -1,9 +1,9 @@
-﻿using Elders.Cronus.Dashboard;
-using MudBlazor.Services;
-using Blazored.LocalStorage;
+﻿using Blazored.LocalStorage;
+using Elders.Cronus.Dashboard;
 using Elders.Cronus.Dashboard.Models;
 using Microsoft.AspNetCore.Components.Web;
 using Microsoft.AspNetCore.Components.WebAssembly.Hosting;
+using MudBlazor.Services;
 using Toolbelt.Blazor.Extensions.DependencyInjection;
 
 

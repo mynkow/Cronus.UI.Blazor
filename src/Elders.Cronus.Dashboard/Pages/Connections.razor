@@ -2,10 +2,14 @@
 @inherits ConnectionsBase
 
 <h1>Connections</h1>
-<div>
-    <NavLink href="connection/new">
+<div class="d-flex">
+    <NavLink href="connection/new" class="mr-auto">
         <span class="oi oi-plus mb-5 mt-5 ml-3 mr-1" style="color:#1AED97">New Connection</span>
     </NavLink>
+
+    <MudButton Variant="Variant.Outlined" EndIcon="@Icons.Filled.CloudDownload" Color="Color.Success" OnClick="@(async () => await ExportAsync())">Export</MudButton>
+    <MudButton HtmlTag="label" Variant="Variant.Outlined" Color="Color.Success" StartIcon="@Icons.Filled.CloudUpload" for="fileInput">Import</MudButton>
+    <InputFile id="fileInput" OnChange="ImportAsync" hidden accept=".json" />
 </div>
 <MudTable Items="@connections" LoadInitialData="true" FilterByColumnName="Name" PageSize="9999" ShowPaging="false" Striped="false" AllowSelection="true" class="mat-elevation-z5">
     <HeaderContent>
@@ -15,7 +19,7 @@
     </HeaderContent>
     <RowTemplate>
         <MudTd>
-            @context.Name  
+            @context.Name
             @if (context.IsAutoConnected)
             {
                 <MudIcon Icon="@Icons.Filled.AutoAwesome" Color="Color.Primary" Title="Auto-connect" />
