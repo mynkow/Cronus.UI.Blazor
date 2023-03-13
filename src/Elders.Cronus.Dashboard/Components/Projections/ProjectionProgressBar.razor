@@ -24,7 +24,7 @@
         App.OnChange += StateHasChanged;
 
         long processBase = 0;
-        long processPace = 0; // Because the server sends very second we could calculate how many records are received per second. It will be cool if the server sends the refresh interval
+        long processPace = 0; // Because the server sends every second we could calculate how many records are received per second. It will be cool if the server sends the refresh interval
         int receivedNotifications = 0;
         long lastCalculatedTimeLeft = 0;
         int sanityCounter = 0;
@@ -70,7 +70,6 @@
                     receivedNotifications--;
                     processBase = processed;
                 }
-
 
                 StateHasChanged();
             });
