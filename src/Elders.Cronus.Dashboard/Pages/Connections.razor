@@ -7,8 +7,8 @@
         <span class="oi oi-plus mb-5 mt-5 ml-3 mr-1" style="color:#1AED97">New Connection</span>
     </NavLink>
 
-    <MudButton Variant="Variant.Outlined" EndIcon="@Icons.Filled.CloudDownload" Color="Color.Success" OnClick="@(async () => await ExportAsync())">Export</MudButton>
-    <MudButton HtmlTag="label" Variant="Variant.Outlined" Color="Color.Success" StartIcon="@Icons.Filled.CloudUpload" for="fileInput">Import</MudButton>
+    <MudButton Variant="Variant.Outlined" EndIcon=@Icons.Material.Filled.CloudDownload Color="Color.Success" OnClick=@(async () => await ExportAsync())>Export</MudButton>
+    <MudButton HtmlTag="label" Variant=Variant.Outlined Color="Color.Success" StartIcon=@Icons.Material.Filled.CloudUpload for="fileInput">Import</MudButton>
     <InputFile id="fileInput" OnChange="ImportAsync" hidden accept=".json" />
 </div>
 <MudTable Items="@connections" LoadInitialData="true" FilterByColumnName="Name" PageSize="9999" ShowPaging="false" Striped="false" AllowSelection="true" class="mat-elevation-z5">
@@ -22,13 +22,13 @@
             @context.Name
             @if (context.IsAutoConnected)
             {
-                <MudIcon Icon="@Icons.Material.Filled.AutoAwesome" Color="Color.Primary" Title="Auto-connect" />
+                <MudIcon Icon=@Icons.Material.Filled.AutoAwesome Color=Color.Primary Title="Auto-connect" />
             }
         </MudTd>
         <MudTd>@context.CronusEndpoint</MudTd>
         <MudTd>
-            <MudButton Variant="Variant.Outlined" EndIcon="@Icons.Material.Filled.Edit" Color="Color.Success" Link="@($"/connection/{@context.Name}")">Edit</MudButton>
-            <MudButton Variant="Variant.Outlined" EndIcon="@Icons.Material.Filled.Delete" Color="Color.Success" OnClick="@(async () => await OnDeleteAsync(context))" Class="mt-2">Delete</MudButton>
+            <MudButton Variant=Variant.Outlined EndIcon=@Icons.Material.Filled.Edit Color=Color.Success Href=@($"/connection/{@context.Name}")>Edit</MudButton>
+            <MudButton Variant=Variant.Outlined EndIcon=@Icons.Material.Filled.Delete Color=Color.Success OnClick=@(async () => await OnDeleteAsync(context)) Class="mt-2">Delete</MudButton>
         </MudTd>
     </RowTemplate>
 </MudTable>
