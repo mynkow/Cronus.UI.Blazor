@@ -4,18 +4,22 @@
 @inject IJSRuntime JSRuntime
 @inject ILogger<EventStore> Log
 
-
 <div class="pin">
     <MudGrid>
-        <MudItem xs="12" sm="8">
-            <MudTextField @bind-Value="@AggregateId" Label="Aggregate ID"></MudTextField>
-        </MudItem>
-        <MudItem xs="12" sm="1">
-            <MudIconButton Icon="@Icons.Material.Filled.Search" OnClick="@(async ()=> await GetAggregateAsync())" Style="@("margin-top:10px")"></MudIconButton>
+        <MudItem xs="11">
+            <MudAutocomplete T="string" Label="Aggregate ID" @bind-Text=@AggregateId SearchFunc=@FilterSampleAsync
+                             CoerceValue=false
+                             CoerceText=false
+                             Strict=false
+                             AdornmentIcon=@Icons.Material.Filled.Search
+                             SelectOnClick=false
+                             AutoFocus=true
+                             TextUpdateSuppression=false
+                             OnAdornmentClick=@(async ()=> await GetAggregateAsync())
+                             OnKeyUp=@(async (args)=> await OnKeyPressAsync(args))></MudAutocomplete>
         </MudItem>
     </MudGrid>
 </div>
-
 
 <MudExpansionPanels Elevation="3">
     @foreach (var commit in commits)
@@ -93,8 +97,9 @@
 
 
 @code {
-
     string AggregateId { get; set; }
+
+    IEnumerable<string> AggregateRootIdSamples { get; set; }
 
     List<AggregateCommitDto> commits = new List<AggregateCommitDto>();
 
@@ -126,8 +131,43 @@
         StateHasChanged();
     }
 
+    protected override async Task OnInitializedAsync()
+    {
+        await GetAggregateRootIdSamplesAsync();
+    }
+
+    protected override Task OnAfterRenderAsync(bool firstRender)
+    {
+        return base.OnAfterRenderAsync(firstRender);
+    }
+
+    async Task GetAggregateRootIdSamplesAsync()
+    {
+        var samples = await Cronus.GetAggregateRootIdSamples(App.Connection);
+        AggregateRootIdSamples = samples;
+    }
+
+    private async Task<IEnumerable<string>> FilterSampleAsync(string value)
+    {
+        await Task.Delay(5);
+
+        if (string.IsNullOrEmpty(value))
+            return new string[0];
+        return AggregateRootIdSamples.Where(x => x.Contains(value, StringComparison.InvariantCultureIgnoreCase));
+    }
+
+    public async Task OnKeyPressAsync(KeyboardEventArgs args)
+    {
+        if (args.Code == "Enter" || args.Code == "NumpadEnter")
+        {
+            await GetAggregateAsync();
+        }
+    }
+
     public async Task<string> FormatJsonAsync(object data)
     {
         return await JSRuntime.InvokeAsync<string>("JSON.stringify", data, null, 4);
     }
+
+
 }

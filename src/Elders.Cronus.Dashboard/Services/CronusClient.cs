@@ -1,4 +1,7 @@
-﻿namespace Elders.Cronus.Dashboard.Models
+﻿using Elders.Cronus.Dashboard.Pages;
+using System;
+
+namespace Elders.Cronus.Dashboard.Models
 {
     public class CronusClient : HttpClientBase
     {
@@ -405,11 +408,28 @@
 
             return true;
         }
+
+        public async Task<IEnumerable<string>> GetAggregateRootIdSamples(Connection connection)
+        {
+            string resource = connection.CronusEndpoint + $"/domain/AggregateRootIdSamples/?tenant={connection.oAuth.Tenant}";
+            HttpRequestMessage request = new HttpRequestMessage(HttpMethod.Get, resource);
+            if (string.IsNullOrEmpty(connection.oAuth.ServerEndpoint) == false)
+            {
+                var accessToken = await token.GetAccessTokenAsync(connection);
+                request.Headers.Authorization = new System.Net.Http.Headers.AuthenticationHeaderValue("bearer", accessToken);
+            }
+
+            var (response, data) = await ExecuteRequestAsync<DomainDto>(request).ConfigureAwait(false);
+
+            return data.AggregateIdSamples.Select(x => x.IdSample);
+        }
     }
 
     public class DomainDto
     {
         public List<DomainAggregateDto> Aggregates { get; set; }
+
+        public List<DomainAggregateIdSampleDto> AggregateIdSamples { get; set; }
 
         public List<DomainGatewayDto> Gateways { get; set; }
 
@@ -456,6 +476,11 @@
 
         public List<DomainCommandDto> Commands { get; set; }
         public List<DomainEventDto> Events { get; set; }
+    }
+
+    public class DomainAggregateIdSampleDto
+    {
+        public string IdSample { get; set; }
     }
 
 
