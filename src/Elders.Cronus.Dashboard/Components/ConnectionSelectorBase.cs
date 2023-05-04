@@ -73,7 +73,6 @@ namespace Elders.Cronus.Dashboard.Components
             OAuth = oAuth;
             TenantName = oAuth.Tenant;
             NavManager.NavigateTo("/");
-            NavManager.NavigateTo("/projections");
 
             StateHasChanged();
         }
@@ -82,7 +81,7 @@ namespace Elders.Cronus.Dashboard.Components
         {
             OAuth = oAuth;
             TenantName = oAuth.Tenant;
-            NavManager.NavigateTo("/projections");
+
             StateHasChanged();
 
             return Task.CompletedTask;
