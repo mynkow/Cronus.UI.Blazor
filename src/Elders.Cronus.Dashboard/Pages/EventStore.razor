@@ -7,106 +7,91 @@
 <div class="pin">
     <MudGrid>
         <MudItem xs="11">
-            <MudAutocomplete T="string" Label="Aggregate ID" @bind-Text=@AggregateId SearchFunc=@FilterSampleAsync
+            <MudAutocomplete T="string" Value="@theValue" Label="Aggregate ID" @bind-Text=@AggregateId SearchFunc=@FilterSampleAsync
                              CoerceValue=false
                              CoerceText=false
                              Strict=false
                              AdornmentIcon=@Icons.Material.Filled.Search
                              SelectOnClick=false
                              AutoFocus=true
-                             TextUpdateSuppression=false
                              OnAdornmentClick=@(async ()=> await GetAggregateAsync())
                              OnKeyUp=@(async (args)=> await OnKeyPressAsync(args))></MudAutocomplete>
         </MudItem>
     </MudGrid>
 </div>
 
-<MudExpansionPanels Elevation="3">
-    @foreach (var commit in commits)
-    {
-        <MudExpansionPanels>
-            <MudExpansionPanel>
-                <TitleContent>
-                    <h5 class="mat-subtitle1">Commit revision @commit.AggregateRootRevision - @commit.Timestamp.ToString("MMM d'th' yyyy, hh:mm:ss.fff")</h5>
-                </TitleContent>
-                <ChildContent>
-                    <MudExpansionPanels>
-                        @foreach (var theEvent in commit.Events)
-                        {
-                            @if (@theEvent.IsEntityEvent)
-                            {
-                                <MudExpansionPanel>
-                                    <TitleContent>
-                                        <span style="color:aqua;">
-                                            @theEvent.EventPosition
-                                            <MudIcon Icon="@Icons.Material.Filled.Bookmark" />
-                                            @theEvent?.EventName
-                                        </span>
-                                    </TitleContent>
-                                    <ChildContent>
-                                        <RepublishEvent AggregateId="@AggregateId" Event="@theEvent" AggregateCommit="commit"></RepublishEvent>
-                                        <div class="json-box">
-                                            <pre Style="@($"color:{Colors.LightGreen.Accent3};")">@theEvent.EventData</pre>
-                                        </div>
-                                    </ChildContent>
-                                </MudExpansionPanel>
-                            }
-                            else if (@theEvent.IsPublicEvent)
-                            {
-                                <MudExpansionPanel>
-                                    <TitleContent>
-                                        <span style="color:royalblue;">
-                                            @theEvent.EventPosition
-                                            <MudIcon Icon="@Icons.Material.Filled.Bookmark" />
-                                            @theEvent?.EventName
-                                        </span>
-                                    </TitleContent>
-                                    <ChildContent>
-                                        <RepublishEvent AggregateId="@AggregateId" Event="@theEvent" AggregateCommit="commit"></RepublishEvent>
-                                        <div class="json-box">
-                                            <pre Style="@($"color:{Colors.LightGreen.Accent3};")">@theEvent.EventData</pre>
-                                        </div>
-                                    </ChildContent>
-                                </MudExpansionPanel>
-                            }
-                            else
-                            {
-                                <MudExpansionPanel>
-                                    <TitleContent>
-                                        <span style="color:forestgreen;">
-                                            @theEvent.EventPosition
-                                            <MudIcon Icon="@Icons.Material.Filled.Bookmark" />
-                                            @theEvent?.EventName
-                                        </span>
-                                    </TitleContent>
-                                    <ChildContent>
-                                        <RepublishEvent AggregateId="@AggregateId" Event="@theEvent" AggregateCommit="commit"></RepublishEvent>
-                                        <div class="json-box">
-                                            <pre Style="@($"color:{Colors.LightGreen.Accent3};")">@theEvent.EventData</pre>
-                                        </div>
-                                    </ChildContent>
-                                </MudExpansionPanel>
-                            }
-                        }
-                    </MudExpansionPanels>
-                </ChildContent>
-            </MudExpansionPanel>
-        </MudExpansionPanels>
-    }
-</MudExpansionPanels>
+<MudGrid >
+    <MudItem xs="5">
+        <MudPaper Outlined=true Style="max-height: 80vh;overflow: auto;">
+                <MudTable Items="@commits" FixedHeader=true Dense=true>
+                    <ColGroup>
+                        <col style="width:200px;"  />
+                        <col style="width:70px;" />
+                        <col  />
+                    </ColGroup>
+                    <HeaderContent>
+                        <MudTh>Timestamp</MudTh>
+                        <MudTh>Rev</MudTh>
+                        <MudTh>Events</MudTh>
+                    </HeaderContent>
+                    <RowTemplate>
+                        <MudTd DataLabel="Timestamp">
+                            <MudList Clickable="true" Dense=true>
+                                <MudListItem Text="@context.Timestamp.ToString("MMM d'th' yyyy")" />
+                                <MudListItem Text="@context.Timestamp.ToString("hh:mm:ss.fff")" />
+                            </MudList>            
+                        </MudTd>
+                        <MudTd DataLabel="Rev">@context.AggregateRootRevision</MudTd>
+                        <MudTd DataLabel="Events">
+                            <MudList Clickable="true" Dense=true>
+                                @foreach (var theEvent in @context.Events)
+                                {
+                                    @if (@theEvent.IsEntityEvent)
+                                    {
+                                    <MudListItem style="color:orange;" Text="@theEvent.EventName" Icon="@Icons.Material.Filled.Event" OnClick=@(async ()=> SelectedEvent = @theEvent) />
+                                    }
+                                    else if (@theEvent.IsPublicEvent)
+                                    {
+                                    <MudListItem style="color:royalblue;" Text="@theEvent.EventName" Icon="@Icons.Material.Filled.Public" OnClick=@(async ()=> SelectedEvent = @theEvent) />
+                                    }
+                                    else
+                                    {
+                                    <MudListItem style="color:forestgreen;" Text="@theEvent.EventName" Icon="@Icons.Material.Filled.Event" OnClick=@(async ()=> SelectedEvent = @theEvent) />
+                                    }
+                                }
+                            </MudList>
+                        </MudTd>
+                    </RowTemplate>
+                </MudTable>
 
+        </MudPaper>
+    </MudItem>
+    <MudItem xs="7">
+        <MudPaper Outlined=true Style="max-height: 80vh;overflow: auto;">
+            <MudText Typo="Typo.caption">@SelectedEvent.Timestamp.ToString("MMM d'th' yyyy hh:mm:ss.fff")</MudText>
+            <MudText Typo="Typo.h6">@SelectedEvent.EventName - @SelectedEvent.Id</MudText>
+            <div class="json-box">
+                <pre Style="@($"color:{Colors.LightGreen.Accent3}")">@SelectedEvent.EventData</pre>
+            </div>
+        </MudPaper>
+    </MudItem>
+</MudGrid>
 
 @code {
     string AggregateId { get; set; }
-
+    string theValue { get; set; } = "urn:pruvit:inventory:profile:675";
     IEnumerable<string> AggregateRootIdSamples { get; set; }
-
+    EventDto SelectedEvent { get; set; }
     List<AggregateCommitDto> commits = new List<AggregateCommitDto>();
 
     string details = string.Empty;
 
     async Task GetAggregateAsync()
     {
+        commits.Clear();
+        SelectedEvent = null;
+        StateHasChanged();
+
         AggregateDto ar = await Cronus.GetAggregate(App.Connection, AggregateId);
         if (ar is null == false && ar.Commits is null == false)
         {
@@ -168,6 +153,4 @@
     {
         return await JSRuntime.InvokeAsync<string>("JSON.stringify", data, null, 4);
     }
-
-
 }

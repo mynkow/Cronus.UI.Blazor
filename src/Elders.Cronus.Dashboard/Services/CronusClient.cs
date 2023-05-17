@@ -282,7 +282,7 @@ namespace Elders.Cronus.Dashboard.Models
             if (string.IsNullOrEmpty(aggregateId)) throw new ArgumentNullException(nameof(aggregateId));
             log.LogDebug($"GetAggregate({aggregateId})");
 
-            HttpRequestMessage request = new HttpRequestMessage(HttpMethod.Get, connection.CronusEndpoint + $"/EventStore/Explore?id={aggregateId}");
+            HttpRequestMessage request = new HttpRequestMessage(HttpMethod.Get, connection.CronusEndpoint + $"/EventStore/Explore?id={aggregateId}&metaOnly=false");
             if (string.IsNullOrEmpty(connection.oAuth.ServerEndpoint) == false)
             {
                 var accessToken = await token.GetAccessTokenAsync(connection);
