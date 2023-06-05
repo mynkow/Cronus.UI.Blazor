@@ -5,6 +5,7 @@
         public Projection()
         {
             Versions = new List<ProjectionVersion>();
+            ReplayOptions = new PlayerOptions();
         }
 
         public Projection(string projectionContractId, string projectionName, ProjectionVersion version)
@@ -13,6 +14,7 @@
             ProjectionContractId = projectionContractId;
             ProjectionName = projectionName;
             Versions.Add(version);
+            ReplayOptions = new PlayerOptions();
         }
 
         public string ProjectionContractId { get; set; }
@@ -22,6 +24,8 @@
         public bool IsReplayable { get; set; } = true;
 
         public List<ProjectionVersion> Versions { get; set; }
+
+        public PlayerOptions ReplayOptions { get; set; }
 
         public ProjectionVersion LiveVersion => Versions.Where(x => x.Status.Equals(ProjectionStatus.Live)).LastOrDefault();
 

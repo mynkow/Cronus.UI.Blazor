@@ -109,7 +109,8 @@ namespace Elders.Cronus.Dashboard.Models
             var rebuildRequest = new RebuildRequest()
             {
                 ProjectionContractId = projection.ProjectionContractId,
-                Hash = projection.LatestVersion.Hash
+                Hash = projection.LatestVersion.Hash,
+                PlayerOptions = projection.ReplayOptions
             };
 
             HttpRequestMessage request = CreateJsonPostRequest(rebuildRequest, resource);
@@ -133,7 +134,8 @@ namespace Elders.Cronus.Dashboard.Models
             var rebuildRequest = new RebuildRequest()
             {
                 ProjectionContractId = projection.ProjectionContractId,
-                Hash = projection.LatestVersion.Hash
+                Hash = projection.LatestVersion.Hash,
+
             };
 
             HttpRequestMessage request = CreateJsonPostRequest(rebuildRequest, resource);
@@ -601,6 +603,8 @@ namespace Elders.Cronus.Dashboard.Models
         public string ProjectionContractId { get; set; }
 
         public string Hash { get; set; }
+
+        public PlayerOptions PlayerOptions { get; set; }
     }
 
     public class CancelProjectionRebuildRequest

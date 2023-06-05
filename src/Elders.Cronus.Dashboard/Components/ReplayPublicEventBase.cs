@@ -71,7 +71,7 @@ namespace Elders.Cronus.Dashboard.Components
         {
             DateTimeOffset? replayAfter = null;
             if (validationModel.ReplayAfter.HasValue)
-                replayAfter = new DateTimeOffset(validationModel.ReplayAfter.Value);
+                replayAfter = new DateTimeOffset(validationModel.ReplayAfter.Value, TimeSpan.Zero);
 
             var model = new ReplayPublicEventRequest()
             {

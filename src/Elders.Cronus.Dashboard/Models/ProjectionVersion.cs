@@ -21,4 +21,13 @@
             return $"{Status}-{Hash}-{Revision}";
         }
     }
+
+    public class PlayerOptions
+    {
+        public DateTime? After { get; set; }
+
+        public DateTime? Before { get; set; }
+
+        public int? MaxDegreeOfParallelism { get; set; }
+    }
 }

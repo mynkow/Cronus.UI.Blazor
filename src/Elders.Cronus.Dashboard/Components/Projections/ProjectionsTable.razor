@@ -13,16 +13,22 @@
     <HeaderContent>
         <MudTh>Name</MudTh>
         <MudTh>Version</MudTh>
+        <MudTh>Action Options</MudTh>
         <MudTh>Actions</MudTh>
         <MudTh>Other</MudTh>
         <MudTh>Id</MudTh>
     </HeaderContent>
     <RowTemplate>
-        <MudTd DataLabel="Nr">@context.ProjectionName</MudTd>
-        <MudTd DataLabel="Name">
+        <MudTd DataLabel="Name">@context.ProjectionName</MudTd>
+        <MudTd DataLabel="Version">
                 <ProjectionVersionBadge Projection="@context" Version="@context.LatestVersion" LiveVersion="@context.LiveVersion" AllVersions="@context.Versions"></ProjectionVersionBadge>
         </MudTd>
-        <MudTd DataLabel="Position">
+        <MudTd DataLabel="Action Options">
+            <MudNumericField @bind-Value="@context.ReplayOptions.MaxDegreeOfParallelism" Label="MaxDegreeOfParallelism" Variant="Variant.Outlined" Step="1" Clearable=true Max="100" />
+            <MudDatePicker Label="After" @bind-Date="@context.ReplayOptions.After" EnableTime="true"></MudDatePicker>
+            <MudDatePicker Label="Before" @bind-Date="@context.ReplayOptions.Before" EnableTime="true"></MudDatePicker>
+        </MudTd>
+        <MudTd DataLabel="Actions">
 
                 @if (@context.LatestVersion.Status != ProjectionStatus.Building && @context.LatestVersion.Status != ProjectionStatus.Replaying && @context.LiveVersion?.Hash != "ver")//api should return if the projection is repl
                 {
@@ -47,7 +53,6 @@
                 {
                     <a href="/projections/@context.ProjectionContractId"><MudIcon Icon="@Icons.Material.Filled.Search"></MudIcon></a>
                 }
-
         </MudTd>
         <MudTd DataLabel="Other">
             @if (@context.LatestVersion.Status == ProjectionStatus.Replaying)
@@ -59,7 +64,7 @@
                 <ProjectionProgressBar Projection="@context" Color="Color.Primary"></ProjectionProgressBar>
             }
         </MudTd>
-        <MudTd DataLabel="ProjectionContractId">
+        <MudTd DataLabel="Id">
             <MudText style="font-size:small" Font-Size="Size.Small" Typo="Typo.body2" Color="Color.Primary"><cite>@context.ProjectionContractId</cite></MudText>
         </MudTd>
     </RowTemplate>
