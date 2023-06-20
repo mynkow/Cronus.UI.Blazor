@@ -1,11 +1,9 @@
 ﻿@page "/eventstore"
 @using Elders.Cronus.Dashboard.Services;
-@using Microsoft.Extensions.Caching.Memory;
 @inject AppState App
 @inject CronusClient Cronus
 @inject IJSRuntime JSRuntime
 @inject ILogger<EventStore> Log
-@inject CacheService MemoryCache
 
 <MudGrid>
     <MudItem xs="11">
@@ -87,7 +85,6 @@
     private MudTable<RawEventDto> table;
     public bool _isOpen;
     private string _jsonData;
-    private int selectedRowNumber = -1;
 
     public void ToggleOpen()
     {
@@ -153,23 +150,5 @@
         if (string.IsNullOrEmpty(value))
             return new string[0];
         return AggregateRootIdSamples.Where(x => x.Contains(value, StringComparison.InvariantCultureIgnoreCase));
-    }
-
-    private string SelectedRowClassFunc(RawEventDto element, int rowNumber)
-    {
-        if (selectedRowNumber == rowNumber)
-        {
-            selectedRowNumber = -1;
-            return string.Empty;
-        }
-        else if (table.SelectedItem != null && table.SelectedItem.Equals(element))
-        {
-            selectedRowNumber = rowNumber;
-            return "selected";
-        }
-        else
-        {
-            return string.Empty;
-        }
     }
 }
