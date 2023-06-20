@@ -1,120 +1,119 @@
 ﻿@page "/eventstore"
+@using Elders.Cronus.Dashboard.Services;
+@using Microsoft.Extensions.Caching.Memory;
 @inject AppState App
 @inject CronusClient Cronus
 @inject IJSRuntime JSRuntime
 @inject ILogger<EventStore> Log
+@inject CacheService MemoryCache
 
-<div class="pin">
-    <MudGrid>
-        <MudItem xs="11">
-            <MudAutocomplete T="string" Value="@theValue" Label="Aggregate ID" @bind-Text=@AggregateId SearchFunc=@FilterSampleAsync
-                             CoerceValue=false
-                             CoerceText=false
-                             Strict=false
-                             AdornmentIcon=@Icons.Material.Filled.Search
-                             SelectOnClick=false
-                             AutoFocus=true
-                             OnAdornmentClick=@(async ()=> await GetAggregateAsync())
-                             OnKeyUp=@(async (args)=> await OnKeyPressAsync(args))></MudAutocomplete>
-        </MudItem>
-    </MudGrid>
-</div>
-
-<MudGrid >
-    <MudItem xs="5">
-        <MudPaper Outlined=true Style="max-height: 80vh;overflow: auto;">
-                <MudTable Items="@commits" FixedHeader=true Dense=true>
-                    <ColGroup>
-                        <col style="width:200px;"  />
-                        <col style="width:70px;" />
-                        <col  />
-                    </ColGroup>
-                    <HeaderContent>
-                        <MudTh>Timestamp</MudTh>
-                        <MudTh>Rev</MudTh>
-                        <MudTh>Events</MudTh>
-                    </HeaderContent>
-                    <RowTemplate>
-                        <MudTd DataLabel="Timestamp">
-                            <MudList Clickable="true" Dense=true>
-                                <MudListItem Text="@context.Timestamp.ToString("MMM d'th' yyyy")" />
-                                <MudListItem Text="@context.Timestamp.ToString("hh:mm:ss.fff")" />
-                            </MudList>            
-                        </MudTd>
-                        <MudTd DataLabel="Rev">@context.AggregateRootRevision</MudTd>
-                        <MudTd DataLabel="Events">
-                            <MudList Clickable="true" Dense=true>
-                                @foreach (var theEvent in @context.Events)
-                                {
-                                    @if (@theEvent.IsEntityEvent)
-                                    {
-                                    <MudListItem style="color:orange;" Text="@theEvent.EventName" Icon="@Icons.Material.Filled.Event" OnClick=@(async ()=> SelectedEvent = @theEvent) />
-                                    }
-                                    else if (@theEvent.IsPublicEvent)
-                                    {
-                                    <MudListItem style="color:royalblue;" Text="@theEvent.EventName" Icon="@Icons.Material.Filled.Public" OnClick=@(async ()=> SelectedEvent = @theEvent) />
-                                    }
-                                    else
-                                    {
-                                    <MudListItem style="color:forestgreen;" Text="@theEvent.EventName" Icon="@Icons.Material.Filled.Event" OnClick=@(async ()=> SelectedEvent = @theEvent) />
-                                    }
-                                }
-                            </MudList>
-                        </MudTd>
-                    </RowTemplate>
-                </MudTable>
-
-        </MudPaper>
+<MudGrid>
+    <MudItem xs="11">
+        <MudAutocomplete T="string" Label="Aggregate ID" @bind-Text=@AggregateId SearchFunc=@FilterSampleAsync
+                         CoerceValue=false
+                         CoerceText=false
+                         Strict=false
+                         AdornmentIcon=@Icons.Material.Filled.Search
+                         SelectOnClick=false
+                         AutoFocus=true
+                         TextUpdateSuppression=false
+                         OnAdornmentClick=@(async ()=> await SearchAggregateEventsAsync())
+                         OnKeyUp=@(async (args)=> await OnKeyPressAsync(args))></MudAutocomplete>
     </MudItem>
-    <MudItem xs="7">
+</MudGrid>
+
+<MudTable OnRowClick="RowClickEvent" T="RawEventDto" ServerData="@(new Func<TableState, Task<TableData<RawEventDto>>>(ServerReload))"
+          Dense="true" Hover="true" @ref="table">
+    <HeaderContent>
+        <MudTd>Timestamp</MudTd>
+        <MudTd>Rev</MudTd>
+        <MudTd>Pos</MudTd>
+        <MudTd>Events</MudTd>
+        <MudTd></MudTd>
+    </HeaderContent>
+    <RowTemplate>
+        <MudTd DataLabel="Timestamp">@context.Timestamp.ToString("MMM d'th' yyyy, hh:mm:ss.fff")</MudTd>
+        <MudTd DataLabel="Rev">@context.EventRevision</MudTd>
+        <MudTd DataLabel="Pos">@context.EventPosition</MudTd>
+        <MudTd DataLabel="Events">
+            @if (@context.IsEntityEvent)
+            {
+                <MudListItem style="color:orange;" Text="@context.EventName" Icon="@Icons.Material.Filled.Event" />
+            }
+            else if (@context.IsPublicEvent)
+            {
+                <MudListItem style="color:royalblue;" Text="@context.EventName" Icon="@Icons.Material.Filled.Public" />
+            }
+            else
+            {
+                <MudListItem style="color:forestgreen;" Text="@context.EventName" Icon="@Icons.Material.Filled.Event" />
+            }
+        </MudTd>
+        <MudTd>
+            <MudListItem><RepublishEventNew AggregateId="@AggregateId" Event="@context"></RepublishEventNew></MudListItem>
+        </MudTd>
+    </RowTemplate>
+    <NoRecordsContent>
+        <MudText>No matching records found</MudText>
+    </NoRecordsContent>
+    <LoadingContent>
+        <MudText>Loading...</MudText>
+    </LoadingContent>
+    <PagerContent>
+        <MudTablePager PageSizeOptions="new int[] { 10, 25, 50, 100 }" HorizontalAlignment="HorizontalAlignment.Left">
+        </MudTablePager>
+    </PagerContent>
+</MudTable>
+
+    <MudPopover AnchorOrigin = "Origin.CenterLeft" Open="@_isOpen" Class="px-5 pt-5">
         <MudPaper Outlined=true Style="max-height: 80vh;overflow: auto;">
             <MudText Typo="Typo.caption">@SelectedEvent.Timestamp.ToString("MMM d'th' yyyy hh:mm:ss.fff")</MudText>
             <MudText Typo="Typo.h6">@SelectedEvent.EventName - @SelectedEvent.Id</MudText>
             <div class="json-box">
-                <pre Style="@($"color:{Colors.LightGreen.Accent3}")">@SelectedEvent.EventData</pre>
+                <pre Style="@($"color:{Colors.LightGreen.Accent3};")">@_jsonData</pre>
             </div>
         </MudPaper>
-    </MudItem>
-</MudGrid>
+        <MudButton OnClick="@ToggleOpen" Class="ml-auto mr-n3 mb-1" Color="Color.Error">Close</MudButton>
+    </MudPopover>
 
 @code {
+    public RawEventTableManager RawEventTableManager = new RawEventTableManager();
+
     string AggregateId { get; set; }
-    string theValue { get; set; } = "urn:pruvit:inventory:profile:675";
+    string theValue { get; set; } = "urn:pruvit:comprofile:account:1000000015";
+    RawEventDto SelectedEvent { get; set; }
     IEnumerable<string> AggregateRootIdSamples { get; set; }
-    EventDto SelectedEvent { get; set; }
     List<AggregateCommitDto> commits = new List<AggregateCommitDto>();
+    private MudTable<RawEventDto> table;
+    public bool _isOpen;
+    private string _jsonData;
+    private int selectedRowNumber = -1;
 
-    string details = string.Empty;
-
-    async Task GetAggregateAsync()
+    public void ToggleOpen()
     {
-        commits.Clear();
-        SelectedEvent = null;
-        StateHasChanged();
-
-        AggregateDto ar = await Cronus.GetAggregate(App.Connection, AggregateId);
-        if (ar is null == false && ar.Commits is null == false)
-        {
-            foreach (var commit in ar.Commits)
-            {
-                foreach (var evnt in commit.Events)
-                {
-                    evnt.EventData = await FormatJsonAsync(evnt.EventData);
-                }
-                commit.Events = commit.Events.OrderByDescending(e => e.EventPosition).ToList();
-            }
-
-            commits = ar.Commits.OrderByDescending(commit => commit.AggregateRootRevision).ToList();
-
-            StateHasChanged();
-        }
+        if (_isOpen)
+            _isOpen = false;
         else
-        {
-            commits.Clear();
-        }
-
-        StateHasChanged();
+            _isOpen = true;
     }
+
+    private async Task<TableData<RawEventDto>> ServerReload(TableState state)
+    {
+        return await RawEventTableManager.ServerReload(state, AggregateId, async (int take) => await Cronus.GetAggregateEventsWithPaging(App.Connection, AggregateId, RawEventTableManager.Token, take));
+    }
+
+    private async Task SearchAggregateEventsAsync()
+    {
+        await table.ReloadServerData();
+    }
+
+    private async Task RowClickEvent(TableRowClickEventArgs<RawEventDto> tableRowClickEventArgs)
+    {
+        SelectedEvent = tableRowClickEventArgs.Item;
+        _jsonData = await FormatJsonAsync();
+        _isOpen = true;
+    }
+
 
     protected override async Task OnInitializedAsync()
     {
@@ -132,6 +131,21 @@
         AggregateRootIdSamples = samples;
     }
 
+    public async Task OnKeyPressAsync(KeyboardEventArgs args)
+    {
+        if (args.Code == "Enter" || args.Code == "NumpadEnter")
+        {
+            await SearchAggregateEventsAsync();
+        }
+    }
+
+    public async Task<string> FormatJsonAsync()
+    {
+        var result = await JSRuntime.InvokeAsync<string>("JSON.stringify", SelectedEvent.EventData, null, 4);
+
+        return result;
+    }
+
     private async Task<IEnumerable<string>> FilterSampleAsync(string value)
     {
         await Task.Delay(5);
@@ -141,16 +155,21 @@
         return AggregateRootIdSamples.Where(x => x.Contains(value, StringComparison.InvariantCultureIgnoreCase));
     }
 
-    public async Task OnKeyPressAsync(KeyboardEventArgs args)
+    private string SelectedRowClassFunc(RawEventDto element, int rowNumber)
     {
-        if (args.Code == "Enter" || args.Code == "NumpadEnter")
+        if (selectedRowNumber == rowNumber)
         {
-            await GetAggregateAsync();
+            selectedRowNumber = -1;
+            return string.Empty;
         }
-    }
-
-    public async Task<string> FormatJsonAsync(object data)
-    {
-        return await JSRuntime.InvokeAsync<string>("JSON.stringify", data, null, 4);
+        else if (table.SelectedItem != null && table.SelectedItem.Equals(element))
+        {
+            selectedRowNumber = rowNumber;
+            return "selected";
+        }
+        else
+        {
+            return string.Empty;
+        }
     }
 }

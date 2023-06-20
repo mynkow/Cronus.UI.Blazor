@@ -1,0 +1,112 @@
+﻿@inject AppState App
+@inject CronusClient Cronus
+@inject IJSRuntime JSRuntime
+@inject ILogger<RepublishEvent> Log
+
+<MudButton @onclick="OpenDialog" Variant="Variant.Outlined" Color="Color.Success" class="ml-2">REPUBLISH</MudButton>
+
+<MudDialog @bind-IsVisible="@dialogIsOpen">
+    <TitleContent>
+        @if (Event.IsPublicEvent)
+        {
+            <span>Public Event</span>
+        }
+        else
+        {
+            <span>Select Handlers</span>
+        }
+    </TitleContent>
+    <DialogContent>
+        @if (Event.IsPublicEvent)
+        {
+            <p>You are about to republish a public event. It will be re-delivered to all connected services/BCs interested in that event!</p>
+        }
+        else
+        {
+            <p>You are about to republish an event. Please select which handlers may handle the event:</p>
+            @foreach (var element in selectElements)
+            {
+                <MudCheckBox Value="@element.Selected"
+                             CheckedChanged="@((bool value) => OnValueChanged(element, value))"
+                             ValueExpression="@(() => element.Selected)"
+                             Label="@element.DisplayName">
+                </MudCheckBox>
+                <br />
+            }
+        }
+
+    </DialogContent>
+    <DialogActions>
+        <MudButton OnClick="@(e => { dialogIsOpen = false; })" Variant="Variant.Outlined" Color="Color.Success">Cancel</MudButton>
+        <MudButton OnClick="@(async () => { await RepublishEventAsync(); dialogIsOpen = false; })" Variant="Variant.Outlined" Color="Color.Success">REPUBLISH</MudButton>
+    </DialogActions>
+</MudDialog>
+
+@code {
+    private bool dialogIsOpen = false;
+
+    private readonly List<SelectableElement> selectElements = new List<SelectableElement>();
+
+    [Parameter]
+    public string AggregateId { get; set; }
+
+    [Parameter]
+    public RawEventDto Event { get; set; }
+
+    async Task RepublishEventAsync()
+    {
+        var handlers = string.Join(',', selectElements.Where(x => x.Selected).Select(x => x.Id));
+
+        Log.LogInformation($"Republishing:{Environment.NewLine}\tID-Revision-Position: {AggregateId} - {Event.EventRevision} - {Event.EventPosition}{Environment.NewLine}\tHandlers: {handlers}");
+        if (Event.EventRevision > 0 && Event.EventPosition >= 0)
+            await Cronus.RepublishEventNewAsync(App.Connection, AggregateId, Event.EventRevision, Event.EventPosition, selectElements.Where(x => x.Selected).Select(x => x.Id).ToArray(), Event.IsPublicEvent, Event.Id, Event.Timestamp.ToFileTime());
+    }
+
+    public async Task<string> FormatJsonAsync(object data)
+    {
+        return await JSRuntime.InvokeAsync<string>("JSON.stringify", data, null, 4);
+    }
+
+    Task OnValueChanged(SelectableElement element, bool s)
+    {
+        element.Selected = s;
+
+        return Task.CompletedTask;
+    }
+
+    async Task OpenDialog()
+    {
+        selectElements.Clear();
+
+        DomainDto domain = await Cronus.GetDomainAsync(@App.Connection);
+
+        List<IMessageHandlerDto> handlerCandidates = domain.FindHandlers(new DomainEventDto() { Id = Event.Id }).ToList();
+        foreach (var handler in handlerCandidates)
+        {
+            selectElements.Add(new SelectableElement(false, handler.Id, handler.Name, handler.Type));
+        }
+
+        dialogIsOpen = true;
+    }
+
+    class SelectableElement
+    {
+        public bool Selected { get; set; }
+
+        public string Id { get; }
+
+        public string Name { get; set; }
+
+        public string Type { get; set; }
+
+        public string DisplayName => $"{Name} | {Type}";
+
+        public SelectableElement(bool selected, string id, string name, string type)
+        {
+            Selected = selected;
+            Id = id;
+            Name = name;
+            Type = type;
+        }
+    }
+}
