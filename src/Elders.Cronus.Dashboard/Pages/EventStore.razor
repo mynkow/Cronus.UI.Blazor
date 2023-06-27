@@ -5,23 +5,13 @@
 @inject IJSRuntime JSRuntime
 @inject ILogger<EventStore> Log
 
-<MudGrid>
-    <MudItem xs="11">
-        <MudAutocomplete T="string" Label="Aggregate ID" @bind-Text=@AggregateId SearchFunc=@FilterSampleAsync
-                         CoerceValue=false
-                         CoerceText=false
-                         Strict=false
-                         AdornmentIcon=@Icons.Material.Filled.Search
-                         SelectOnClick=false
-                         AutoFocus=true
-                         TextUpdateSuppression=false
-                         OnAdornmentClick=@(async ()=> await SearchAggregateEventsAsync())
-                         OnKeyUp=@(async (args)=> await OnKeyPressAsync(args))></MudAutocomplete>
-    </MudItem>
-</MudGrid>
-
 <MudTable OnRowClick="RowClickEvent" T="RawEventDto" ServerData="@(new Func<TableState, Task<TableData<RawEventDto>>>(ServerReload))"
           Dense="true" Hover="true" @ref="table">
+    <ToolBarContent>
+        <MudText Typo="Typo.h6">Aggregate Events</MudText>
+        <MudSpacer />
+        <MudTextField T="string" ValueChanged="@(s=>SearchAggregateEvents(s))" Placeholder="Search" Adornment="Adornment.Start" AdornmentIcon="@Icons.Material.Filled.Search" IconSize="Size.Medium" Class="mt-0"></MudTextField>
+    </ToolBarContent>
     <HeaderContent>
         <MudTd>Timestamp</MudTd>
         <MudTd>Rev</MudTd>
@@ -78,10 +68,8 @@
     public RawEventTableManager RawEventTableManager = new RawEventTableManager();
 
     string AggregateId { get; set; }
-    string theValue { get; set; } = "urn:pruvit:comprofile:account:1000000015";
     RawEventDto SelectedEvent { get; set; }
     IEnumerable<string> AggregateRootIdSamples { get; set; }
-    List<AggregateCommitDto> commits = new List<AggregateCommitDto>();
     private MudTable<RawEventDto> table;
     public bool _isOpen;
     private string _jsonData;
@@ -96,12 +84,17 @@
 
     private async Task<TableData<RawEventDto>> ServerReload(TableState state)
     {
-        return await RawEventTableManager.ServerReload(state, AggregateId, async (int take) => await Cronus.GetAggregateEventsWithPaging(App.Connection, AggregateId, RawEventTableManager.Token, take));
+        var func = (int take) => Cronus.GetAggregateEventsWithPaging(App.Connection, AggregateId, RawEventTableManager.Token, take);
+        return await RawEventTableManager.ServerReload(state, AggregateId, func);
     }
 
-    private async Task SearchAggregateEventsAsync()
+    private void SearchAggregateEvents(string id)
     {
-        await table.ReloadServerData();
+        AggregateId = id;
+        RawEventTableManager = new RawEventTableManager();
+
+        StateHasChanged();
+        table.ReloadServerData();
     }
 
     private async Task RowClickEvent(TableRowClickEventArgs<RawEventDto> tableRowClickEventArgs)
@@ -126,14 +119,6 @@
     {
         var samples = await Cronus.GetAggregateRootIdSamples(App.Connection);
         AggregateRootIdSamples = samples;
-    }
-
-    public async Task OnKeyPressAsync(KeyboardEventArgs args)
-    {
-        if (args.Code == "Enter" || args.Code == "NumpadEnter")
-        {
-            await SearchAggregateEventsAsync();
-        }
     }
 
     public async Task<string> FormatJsonAsync()
