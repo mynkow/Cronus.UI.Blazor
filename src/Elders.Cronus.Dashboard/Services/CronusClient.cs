@@ -135,7 +135,7 @@ namespace Elders.Cronus.Dashboard.Models
             {
                 ProjectionContractId = projection.ProjectionContractId,
                 Hash = projection.LatestVersion.Hash,
-
+                PlayerOptions = projection.ReplayOptions
             };
 
             HttpRequestMessage request = CreateJsonPostRequest(rebuildRequest, resource);

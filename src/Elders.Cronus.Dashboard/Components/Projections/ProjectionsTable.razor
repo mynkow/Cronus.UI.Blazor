@@ -40,10 +40,7 @@
                     <MudIconButton Icon="@Icons.Material.Filled.Loop" Color="Color.Success" ToolTip="Rebuilds the projection version. You should use this when there are missing events." OnClick="@(async () => await RebuildAsync(@context))" Class="mr-2"></MudIconButton>
                 }
 
-                @if (@context.LatestVersion.Status == ProjectionStatus.Building || @context.LatestVersion.Status == ProjectionStatus.Rebuilding || @context.LatestVersion.Status == ProjectionStatus.Replaying)
-                {
-                    <span class="d-inline"><MudIconButton Icon="@Icons.Material.Filled.Stop" Color="Color.Success" ToolTip="Cancel" OnClick="@(async () => await CancelAsync(@context,@context.LatestVersion))"></MudIconButton></span>
-                }
+                <span class="d-inline"><MudIconButton Icon="@Icons.Material.Filled.Stop" Color="Color.Success" ToolTip="Cancel" OnClick="@(async () => await CancelAsync(@context,@context.LatestVersion))"></MudIconButton></span>
 
                 @if (@context.LatestVersion.Status == ProjectionStatus.NotPresent)
                 {
