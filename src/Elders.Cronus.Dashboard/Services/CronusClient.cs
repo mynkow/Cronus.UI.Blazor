@@ -1,4 +1,4 @@
-﻿using Elders.Cronus.Dashboard.Pages;
+using Elders.Cronus.Dashboard.Pages;
 using Elders.Cronus.Dashboard.Services;
 using System;
 using System.ComponentModel.DataAnnotations;
@@ -653,7 +653,7 @@ namespace Elders.Cronus.Dashboard.Models
 
         public List<EventDto> Events { get; set; }
 
-        public DateTime Timestamp { get; set; }
+        public DateTimeOffset Timestamp { get; set; }
     }
 
     public class EventDto
