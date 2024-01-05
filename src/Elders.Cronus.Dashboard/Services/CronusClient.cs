@@ -1,7 +1,4 @@
-﻿using Elders.Cronus.Dashboard.Pages;
-using System;
-
-namespace Elders.Cronus.Dashboard.Models
+﻿namespace Elders.Cronus.Dashboard.Models
 {
     public class CronusClient : HttpClientBase
     {
@@ -578,7 +575,7 @@ namespace Elders.Cronus.Dashboard.Models
 
         public List<EventDto> Events { get; set; }
 
-        public DateTime Timestamp { get; set; }
+        public DateTimeOffset Timestamp { get; set; }
     }
 
     public class EventDto
