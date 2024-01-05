@@ -53,10 +53,8 @@ namespace Elders.Cronus.Dashboard.Components
 
             await Task.WhenAll(domainTask, servicesTask, tenantsTask);
 
-            const string onlyPublic = "_Public";
-
             DomainDto domainResult = domainTask.Result;
-            Events.AddRange(domainTask.Result.Events.Where(x => x.Name.Contains(onlyPublic)).Distinct());
+            Events.AddRange(domainTask.Result.Events.Where(x => x.IsPublicEvent));
 
             StateHasChanged();
         }

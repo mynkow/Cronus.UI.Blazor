@@ -1,4 +1,5 @@
-﻿using System.Text.Json;
+﻿using System.Net.Mime;
+using System.Text.Json;
 
 namespace Elders.Cronus.Dashboard.Models
 {
@@ -53,14 +54,9 @@ namespace Elders.Cronus.Dashboard.Models
 
         protected HttpRequestMessage CreateJsonPostRequest<T>(T model, string resource)
         {
-            var httpRequestMessage = new HttpRequestMessage(HttpMethod.Post, resource) { Content = new StringContent(JsonSerializer.Serialize(model), System.Text.Encoding.UTF8, ContentType.Json) };
+            var httpRequestMessage = new HttpRequestMessage(HttpMethod.Post, resource) { Content = new StringContent(JsonSerializer.Serialize(model), System.Text.Encoding.UTF8, MediaTypeNames.Application.Json) };
 
             return httpRequestMessage;
-        }
-
-        internal static class ContentType
-        {
-            public static string Json = "application/json";
         }
     }
 }
