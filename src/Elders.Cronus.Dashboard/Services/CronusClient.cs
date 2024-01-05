@@ -1,4 +1,9 @@
-﻿namespace Elders.Cronus.Dashboard.Models
+using Elders.Cronus.Dashboard.Pages;
+using Elders.Cronus.Dashboard.Services;
+using System;
+using System.ComponentModel.DataAnnotations;
+
+namespace Elders.Cronus.Dashboard.Models
 {
     public class CronusClient : HttpClientBase
     {
@@ -132,7 +137,7 @@
             {
                 ProjectionContractId = projection.ProjectionContractId,
                 Hash = projection.LatestVersion.Hash,
-
+                PlayerOptions = projection.ReplayOptions
             };
 
             HttpRequestMessage request = CreateJsonPostRequest(rebuildRequest, resource);
@@ -319,6 +324,34 @@
             await ExecuteRequestAsync<object>(request);
         }
 
+        public async Task RepublishEventNewAsync(Connection connection, string aggregateId, int commitRevision, int eventPosition, string[] recipientHandlers, bool isPublicEvent, string eventContarct, long timestamp)
+        {
+            log.LogInformation("Republishing event request...");
+
+            string resource = connection.CronusEndpoint + "/EventStore/RepublishNew";
+
+            var requestModel = new RepublishEventRequestNew()
+            {
+                Id = aggregateId,
+                CommitRevision = commitRevision,
+                EventPosition = eventPosition,
+                RecipientHandlers = recipientHandlers,
+                IsPublicEvent = isPublicEvent,
+                EventContract = eventContarct,
+                Timestamp = timestamp,
+            };
+
+            HttpRequestMessage request = CreateJsonPostRequest(requestModel, resource);
+
+            if (string.IsNullOrEmpty(connection.oAuth.ServerEndpoint) == false)
+            {
+                var accessToken = await token.GetAccessTokenAsync(connection);
+                request.Headers.Authorization = new System.Net.Http.Headers.AuthenticationHeaderValue("bearer", accessToken);
+            }
+
+            await ExecuteRequestAsync<object>(request);
+        }
+
         public async Task<ProjectionStateDto> GetProjectionAsync(Connection connection, string projectionName, string projectionId)
         {
             if (string.IsNullOrEmpty(projectionName)) throw new ArgumentNullException(nameof(projectionName));
@@ -422,6 +455,50 @@
 
             return data.AggregateIdSamples.Select(x => x.IdSample);
         }
+
+        public async Task<TableResult<RawEventDto, byte[]>> GetAggregateEventsWithPaging(Connection connection, string aggregateId, byte[] paginationToken, int take)
+        {
+            if (string.IsNullOrEmpty(aggregateId))
+                throw new ArgumentNullException(nameof(aggregateId));
+
+            string resource = connection.CronusEndpoint + $"/EventStore/ExploreWithPaging";
+
+            var requestModel = new ExploreEventStoreWithPagingRequestModel()
+            {
+                Id = aggregateId,
+                PaginationToken = paginationToken,
+                Take = take
+            };
+
+            HttpRequestMessage request = CreateJsonPostRequest(requestModel, resource);
+
+            if (string.IsNullOrEmpty(connection.oAuth.ServerEndpoint) == false)
+            {
+                var accessToken = await token.GetAccessTokenAsync(connection);
+                request.Headers.Authorization = new System.Net.Http.Headers.AuthenticationHeaderValue("bearer", accessToken);
+            }
+
+            var result = await ExecuteRequestAsync<Response<ExploreWithPagingResponse>>(request);
+
+            var Raw = new RawEventTableManager();
+            return new TableResult<RawEventDto, byte[]>(result.Data.Result.Events.ToHashSet(), result.Data.Result.PaginationToken, take);
+        }
+    }
+
+    public class TableResult<TableData, PaginationToken>
+    {
+        public TableResult(ISet<TableData> items, PaginationToken paginationToken, int take)
+        {
+            Items = items;
+            Token = paginationToken;
+            Take = take;
+        }
+
+        public ISet<TableData> Items { get; set; }
+
+        public PaginationToken Token { get; set; }
+
+        public int Take { get; set; }
     }
 
     public class DomainDto
@@ -487,6 +564,7 @@
     {
         public string Id { get; set; }
         public string Name { get; set; }
+        public bool IsPublicEvent { get; set; }
     }
 
     public class DomainPortDto : IMessageHandlerDto
@@ -595,6 +673,43 @@
         public DateTimeOffset Timestamp { get; set; }
     }
 
+    public class RawEventDto
+    {
+        public string Id { get; set; }
+
+        public string EventName { get; set; }
+
+        public object EventData { get; set; }
+
+        public bool IsEntityEvent { get; set; }
+
+        public bool IsPublicEvent { get; set; }
+
+        public string EntityId { get; set; }
+
+        public int EventPosition { get; set; }
+
+        public int EventRevision { get; set; }
+
+        public DateTimeOffset Timestamp { get; set; }
+    }
+
+    public class ExploreWithPagingResponse
+    {
+        public List<RawEventDto> Events { get; set; }
+
+        public byte[] PaginationToken { get; set; }
+    }
+
+    public class ExploreEventStoreWithPagingRequestModel
+    {
+        public string Id { get; set; }
+
+        public byte[] PaginationToken { get; set; }
+
+        public int Take { get; set; }
+    }
+
     public class RebuildRequest
     {
         public string ProjectionContractId { get; set; }
@@ -643,6 +758,23 @@
         public string[] RecipientHandlers { get; set; }
 
         public bool IsPublicEvent { get; set; }
+    }
+
+    public class RepublishEventRequestNew
+    {
+        public string Id { get; set; }
+
+        public int CommitRevision { get; set; }
+
+        public int EventPosition { get; set; }
+
+        public string[] RecipientHandlers { get; set; }
+
+        public bool IsPublicEvent { get; set; }
+
+        public string EventContract { get; set; }
+
+        public long Timestamp { get; set; }
     }
 
     public class ReplayPublicEventRequest
