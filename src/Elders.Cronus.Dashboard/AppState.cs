@@ -105,7 +105,8 @@ namespace Elders.Cronus.Dashboard
             {
                 HubConnection = new HubConnectionBuilder()
                   .WithUrl(Connection.CronusEndpoint + "/hub/projections")
-                  .WithAutomaticReconnect().Build();
+                  .WithAutomaticReconnect()
+                  .Build();
 
                 await HubConnection.StartAsync();
 
