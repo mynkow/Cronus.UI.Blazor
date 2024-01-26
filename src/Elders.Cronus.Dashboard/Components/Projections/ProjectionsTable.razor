@@ -2,32 +2,45 @@
 @inject CronusClient Cronus
 @inject ILogger<ProjectionsTable> Logger;
 
-<MudTable Items="@projections" FixedHeader="true" Dense="true">
+<MudTable Items="@projections" FixedHeader="true" Dense="true" >
     <ColGroup>
+        <col style="width:400px;" />
         <col />
         <col />
-        <col />
-        <col style="width:200px;" />
         <col style="width:300px;" />
-        <col />
+        <col style="width:300px;" />
     </ColGroup>
     <HeaderContent>
         <MudTh>Name</MudTh>
         <MudTh>Version</MudTh>
         <MudTh>Action Options</MudTh>
         <MudTh>Actions</MudTh>
-        <MudTh>Other</MudTh>
-        <MudTh>Id</MudTh>
+        <MudTh>Progress</MudTh>
     </HeaderContent>
     <RowTemplate>
-        <MudTd DataLabel="Name">@context.ProjectionName</MudTd>
+        <MudTd DataLabel="Name">
+            <MudText style="font-size:large; user-select: all;" Font-Size="Size.Large"><cite>@context.ProjectionName</cite></MudText>
+            <MudText style="font-size:small; user-select: all;" Font-Size="Size.Small" Typo="Typo.body2" Color="Color.Primary"><cite>@context.ProjectionContractId</cite></MudText>
+        </MudTd>
         <MudTd DataLabel="Version">
-                <ProjectionVersionBadge Projection="@context" Version="@context.LatestVersion" LiveVersion="@context.LiveVersion" AllVersions="@context.Versions"></ProjectionVersionBadge>
+            <ProjectionVersionBadge Projection="@context" Version="@context.LatestVersion" LiveVersion="@context.LiveVersion" AllVersions="@context.Versions"></ProjectionVersionBadge>
         </MudTd>
         <MudTd DataLabel="Action Options">
-            <MudNumericField @bind-Value="@context.ReplayOptions.MaxDegreeOfParallelism" Label="MaxDegreeOfParallelism" Variant="Variant.Outlined" Step="1" Clearable=true Max="100" />
-            <MudDatePicker Label="After" @bind-Date="@context.ReplayOptions.After" EnableTime="true"></MudDatePicker>
-            <MudDatePicker Label="Before" @bind-Date="@context.ReplayOptions.Before" EnableTime="true"></MudDatePicker>
+            <MudGrid Justify="Justify.FlexEnd">
+                <MudItem xs="12" lg="4">
+                    <MudTooltip Text="Amount of parallel tasks running.">
+                        <MudNumericField @bind-Value="@context.ReplayOptions.MaxDegreeOfParallelism" Label="Max DoP" Step="1" Clearable=true FullWidth=true />
+                    </MudTooltip>
+                </MudItem>
+                <MudItem xs="12" lg="4">
+                    <MudDatePicker Label="After" @bind-Date="@context.ReplayOptions.After" EnableTime="true"></MudDatePicker>
+                </MudItem>
+                <MudItem xs="12" lg="4">
+                    <MudDatePicker Label="Before" @bind-Date="@context.ReplayOptions.Before" EnableTime="true"></MudDatePicker>
+                </MudItem>
+            </MudGrid>
+
+
         </MudTd>
         <MudTd DataLabel="Actions">
 
@@ -55,9 +68,6 @@
         <MudTd DataLabel="Other">
             <ProjectionProgressBar Projection="@context"></ProjectionProgressBar>
         </MudTd>
-        <MudTd DataLabel="Id">
-            <MudText style="font-size:small" Font-Size="Size.Small" Typo="Typo.body2" Color="Color.Primary"><cite>@context.ProjectionContractId</cite></MudText>
-        </MudTd>
     </RowTemplate>
     <PagerContent>
         <MudTablePager PageSizeOptions="new int[]{50, 100}" />
@@ -69,6 +79,8 @@
     public ProjectionVersion SelectedVersion { get; set; }
 
     List<Projection> projections = new List<Projection>();
+
+    public string gg { get; set; } = "none";
 
     protected override async Task OnInitializedAsync()
     {
@@ -87,6 +99,7 @@
         App.HubConnection.On<string>("RebuildFinished", async (projectionTypeId) =>
         {
             await GetProjectionsListAsync(App.Connection);
+            gg = "block";
             StateHasChanged();
         });
     }
