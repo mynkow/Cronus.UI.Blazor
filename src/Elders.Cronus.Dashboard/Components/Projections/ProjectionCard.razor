@@ -80,7 +80,7 @@
     public Task ReplayAsync(Projection projection)
     {
         LatestVersionStatus = ProjectionStatus.Replaying;
-        return Cronus.ReplayProjectionAsync(App.Connection, Projection);
+        return Cronus.NewProjectionVersionAsync(App.Connection, Projection);
     }
 
     public Task CancelAsync(Projection projection, ProjectionVersion version)

@@ -27,6 +27,18 @@ else if (Version.Status == ProjectionStatus.Canceled)
 {
     <MudChip Size="Size.Small" Variant="Variant.Outlined">@GetDisplayName(Version)</MudChip>
 }
+else if (Version.Status == ProjectionStatus.New)
+{
+    <MudChip Size="Size.Small" Color="Color.Primary">@GetDisplayName(Version)</MudChip>
+} 
+else if (Version.Status == ProjectionStatus.Fixing)
+{
+    <MudChip Size="Size.Small" Color="Color.Primary">@GetDisplayName(Projection.RebuildingVersion)</MudChip>
+}
+else if (LiveVersion is null)
+{
+    <MudChip Size="Size.Small" Color="Color.Dark">@GetDisplayName(Version)</MudChip>
+}
 
 @code {
     // Put all versions and display only the ones that are rebuilding/building/replaying

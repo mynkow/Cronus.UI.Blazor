@@ -31,33 +31,33 @@
         </MudTd>
         <MudTd DataLabel="Actions">
 
-            @if (@context.LatestVersion.Status != ProjectionStatus.Fixing && @context.LatestVersion.Status != ProjectionStatus.New && @context.LiveVersion?.Hash != "ver")//api should return if the projection is repl
-            {
-                <MudIconButton Icon="@Icons.Material.Filled.PlayArrow" Color="Color.Success" ToolTip="Creates a new projection version. You should use this when your projection contains events you do not want." OnClick="@(async () => await NewProjectionVersionAsync(@context))"></MudIconButton>
-            }
+                @if (@context.LatestVersion.Status != ProjectionStatus.Building && @context.LatestVersion.Status != ProjectionStatus.Replaying && @context.LiveVersion?.Hash != "ver")//api should return if the projection is repl
+                {
+                    <MudIconButton Icon="@Icons.Material.Filled.PlayArrow" Color="Color.Success" ToolTip="Replays the projection and creates a new version. You should use this when your projection contains events you do not want." OnClick="@(async () => await ReplayAsync(@context))"></MudIconButton>
+                }
 
-            @if (@context.IsReplayable && @context.LatestVersion.Status != ProjectionStatus.Fixing)//API does not return if the projection is replayable
-            {
-                <MudIconButton Icon="@Icons.Material.Filled.Loop" Color="Color.Success" ToolTip="Fixing the projection version. You should use this when there are missing events." OnClick="@(async () => await RebuildAsync(@context))" Class="mr-2"></MudIconButton>
-            }
+                @if (@context.IsReplayable && @context.LatestVersion.Status != ProjectionStatus.Building)//API does not return if the projection is replayable
+                {
+                    <MudIconButton Icon="@Icons.Material.Filled.Loop" Color="Color.Success" ToolTip="Rebuilds the projection version. You should use this when there are missing events." OnClick="@(async () => await RebuildAsync(@context))" Class="mr-2"></MudIconButton>
+                }
 
-            <span class="d-inline"><MudIconButton Icon="@Icons.Material.Filled.Pause" Color="Color.Success" ToolTip="Pause" OnClick="@(async () => await PauseAsync(@context,@context.LatestVersion))"></MudIconButton></span>
+                <span class="d-inline"><MudIconButton Icon="@Icons.Material.Filled.Stop" Color="Color.Success" ToolTip="Cancel" OnClick="@(async () => await CancelAsync(@context,@context.LatestVersion))"></MudIconButton></span>
 
-            @if (@context.LatestVersion.Status == ProjectionStatus.NotPresent)
-            {
-                <a href="/projections/@context.ProjectionContractId" style="pointer-events: none"><MudIcon Icon="@Icons.Material.Filled.Search"></MudIcon></a>
-            }
-            else
-            {
-                <a href="/projections/@context.ProjectionContractId"><MudIcon Icon="@Icons.Material.Filled.Search"></MudIcon></a>
-            }
+                @if (@context.LatestVersion.Status == ProjectionStatus.NotPresent)
+                {
+                    <a href="/projections/@context.ProjectionContractId" style="pointer-events: none"><MudIcon Icon="@Icons.Material.Filled.Search"></MudIcon></a>
+                }
+                else
+                {
+                    <a href="/projections/@context.ProjectionContractId"><MudIcon Icon="@Icons.Material.Filled.Search"></MudIcon></a>
+                }
         </MudTd>
         <MudTd DataLabel="Other">
-            @if (@context.LatestVersion.Status == ProjectionStatus.New)
+            @if (@context.LatestVersion.Status == ProjectionStatus.Replaying)
             {
                 <ProjectionProgressBar Projection="@context" Color="Color.Warning"></ProjectionProgressBar>
             }
-            else if (@context.RebuildingVersion?.Status == ProjectionStatus.Fixing)
+            else if (@context.RebuildingVersion?.Status == ProjectionStatus.Building || @context.RebuildingVersion?.Status == ProjectionStatus.Rebuilding)
             {
                 <ProjectionProgressBar Projection="@context" Color="Color.Primary"></ProjectionProgressBar>
             }
@@ -113,17 +113,20 @@
 
     public Task RebuildAsync(Projection projection)
     {
+        //LatestVersionStatus = ProjectionStatus.Rebuilding;
         return Cronus.RebuildProjectionAsync(App.Connection, projection);
     }
 
-    public Task NewProjectionVersionAsync(Projection projection)
+    public Task ReplayAsync(Projection projection)
     {
+        //LatestVersionStatus = ProjectionStatus.Replaying;
         return Cronus.NewProjectionVersionAsync(App.Connection, projection);
     }
 
-    public Task PauseAsync(Projection projection, ProjectionVersion version)
+    public Task CancelAsync(Projection projection, ProjectionVersion version)
     {
-        return Cronus.PauseSpecificProjectionAsync(App.Connection, projection, version);
+        //LatestVersionStatus = ProjectionStatus.Canceled;
+        return Cronus.CancelSpecificProjectionAsync(App.Connection, projection, version);
     }
 
     public Task FinalizeAsync(Projection projection, ProjectionVersion version)
