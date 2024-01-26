@@ -53,14 +53,7 @@
             }
         </MudTd>
         <MudTd DataLabel="Other">
-            @if (@context.LatestVersion.Status == ProjectionStatus.New)
-            {
-                <ProjectionProgressBar Projection="@context" Color="Color.Warning"></ProjectionProgressBar>
-            }
-            else if (@context.RebuildingVersion?.Status == ProjectionStatus.Fixing)
-            {
-                <ProjectionProgressBar Projection="@context" Color="Color.Primary"></ProjectionProgressBar>
-            }
+            <ProjectionProgressBar Projection="@context"></ProjectionProgressBar>
         </MudTd>
         <MudTd DataLabel="Id">
             <MudText style="font-size:small" Font-Size="Size.Small" Typo="Typo.body2" Color="Color.Primary"><cite>@context.ProjectionContractId</cite></MudText>
@@ -84,6 +77,18 @@
         App.OnVersionSelected += SelectVersion;
 
         await GetProjectionsListAsync(App.Connection);
+
+        App.HubConnection.On<string>("RebuildStarted", async (projectionTypeId) =>
+        {
+            await GetProjectionsListAsync(App.Connection);
+            StateHasChanged();
+        });
+
+        App.HubConnection.On<string>("RebuildFinished", async (projectionTypeId) =>
+        {
+            await GetProjectionsListAsync(App.Connection);
+            StateHasChanged();
+        });
     }
 
     protected async Task GetProjectionsListAsync(Connection connection)
