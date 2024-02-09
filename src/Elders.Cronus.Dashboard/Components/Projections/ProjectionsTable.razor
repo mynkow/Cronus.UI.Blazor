@@ -2,7 +2,7 @@
 @inject CronusClient Cronus
 @inject ILogger<ProjectionsTable> Logger;
 
-<MudTable Items="@projections" FixedHeader="true" Dense="true" >
+<MudTable Items="@projections" FixedHeader="true" Dense="true">
     <ColGroup>
         <col style="width:400px;" />
         <col />
@@ -28,7 +28,7 @@
         <MudTd DataLabel="Action Options">
             <MudGrid Justify="Justify.FlexEnd">
                 <MudItem xs="12" lg="4">
-                    <MudTooltip Text="Amount of parallel tasks running.">
+                    <MudTooltip Text="Amount of parallel tasks running simultaneously.">
                         <MudNumericField @bind-Value="@context.ReplayOptions.MaxDegreeOfParallelism" Label="Max DoP" Step="1" Clearable=true FullWidth=true />
                     </MudTooltip>
                 </MudItem>
