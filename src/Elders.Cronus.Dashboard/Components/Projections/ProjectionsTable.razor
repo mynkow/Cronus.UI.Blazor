@@ -28,7 +28,7 @@
         <MudTd DataLabel="Action Options">
             <MudGrid Justify="Justify.FlexEnd">
                 <MudItem xs="12" lg="4">
-                    <MudTooltip Text="Amount of parallel tasks running simultaneously.">
+                    <MudTooltip Text="Amount of parallel tasks running simultaneously (default: 2).">
                         <MudNumericField @bind-Value="@context.ReplayOptions.MaxDegreeOfParallelism" Label="Max DoP" Step="1" Clearable=true FullWidth=true />
                     </MudTooltip>
                 </MudItem>
