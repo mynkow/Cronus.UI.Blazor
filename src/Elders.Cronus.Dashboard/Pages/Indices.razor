@@ -11,17 +11,23 @@
     <HeaderContent>
         <MudTh>Name</MudTh>
         <MudTh>Status</MudTh>
+        <MudTh>Action Options</MudTh>
         <MudTh>Actions</MudTh>
     </HeaderContent>
     <RowTemplate>
         <MudTd>@context.IndexName</MudTd>
-        <MudTd>@context.Status</MudTd>
-        <MudTd>
-            <MudButton Label="Rebuild" Variant="Variant.Outlined" Color="Color.Success" OnClick="@(async () => await RebuildIndex(context.IndexContractId))">Rebuild</MudButton>
-            <MudButton Label="Finalize" Variant="Variant.Outlined" Color="Color.Success" OnClick="@(async () => await FinalizeIndex(context.IndexContractId))">Finalize</MudButton>
-        </MudTd>
-    </RowTemplate>
-</MudTable>
+            <MudTd>@context.Status</MudTd>
+            <MudTd>
+                <MudTooltip Text="Amount of parallel tasks running simultaneously.">
+                    <MudNumericField @bind-Value="@context.MaxDegreeOfParallelism" Label="Max DoP" Step="1" Clearable=true FullWidth=true></MudNumericField>
+                </MudTooltip>
+            </MudTd>
+            <MudTd>
+                <MudButton Label="Rebuild" Variant="Variant.Outlined" Color="Color.Success" OnClick="@(async () => await RebuildIndex(context))">Rebuild</MudButton>
+                <MudButton Label="Finalize" Variant="Variant.Outlined" Color="Color.Success" OnClick="@(async () => await FinalizeIndex(context.IndexContractId))">Finalize</MudButton>
+            </MudTd>
+        </RowTemplate>
+    </MudTable>
 
     @*<p>
     <MatButton Label="Menu" OnClick="@OnClick2" @ref="asd"></MatButton>
@@ -65,7 +71,7 @@
     </div>
     </div>*@
 
-@code {
+    @code {
 
     IndexCollection IndexCollection { get; set; }
 
@@ -92,8 +98,8 @@
         await Cronus.FinalizeIndexRebuildAsync(@App.Connection, indexId);
     }
 
-    protected async Task RebuildIndex(string indexId)
+    protected async Task RebuildIndex(Models.Index index)
     {
-        await Cronus.RebuildIndexAsync(@App.Connection, indexId);
+        await Cronus.RebuildIndexAsync(@App.Connection, index.IndexContractId, index.MaxDegreeOfParallelism);
     }
 }

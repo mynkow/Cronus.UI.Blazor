@@ -1,6 +1,4 @@
-﻿using System.Collections.Generic;
-
-namespace Elders.Cronus.Dashboard.Models
+﻿namespace Elders.Cronus.Dashboard.Models
 {
     public class IndexCollection
     {
@@ -19,5 +17,7 @@ namespace Elders.Cronus.Dashboard.Models
         public string IndexName { get; set; }
 
         public string Status { get; set; }
+
+        public int? MaxDegreeOfParallelism { get; set; }
     }
 }

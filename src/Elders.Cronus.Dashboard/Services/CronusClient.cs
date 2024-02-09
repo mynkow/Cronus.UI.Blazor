@@ -1,7 +1,4 @@
-using Elders.Cronus.Dashboard.Pages;
 using Elders.Cronus.Dashboard.Services;
-using System;
-using System.ComponentModel.DataAnnotations;
 
 namespace Elders.Cronus.Dashboard.Models
 {
@@ -199,7 +196,7 @@ namespace Elders.Cronus.Dashboard.Models
             return true;
         }
 
-        public async Task<bool> RebuildIndexAsync(Connection connection, string indexContractId)
+        public async Task<bool> RebuildIndexAsync(Connection connection, string indexContractId, int? maxDegreeOfParallelism)
         {
             log.LogInformation("Rebuild index!");
 
@@ -207,7 +204,8 @@ namespace Elders.Cronus.Dashboard.Models
 
             var rebuildRequest = new RebuildIndex()
             {
-                Id = indexContractId
+                Id = indexContractId,
+                MaxDegreeOfParallelism = maxDegreeOfParallelism
             };
 
             HttpRequestMessage request = CreateJsonPostRequest(rebuildRequest, resource);
@@ -785,6 +783,7 @@ namespace Elders.Cronus.Dashboard.Models
     public class RebuildIndex
     {
         public string Id { get; set; }
+        public int? MaxDegreeOfParallelism { get; set; }
     }
 
     public class RepublishEventRequest
