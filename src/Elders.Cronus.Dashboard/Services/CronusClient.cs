@@ -485,6 +485,25 @@ namespace Elders.Cronus.Dashboard.Models
             return data.AggregateIdSamples.Select(x => x.IdSample);
         }
 
+        public async Task<bool> RequestPortEventsAsync(Connection connection, RequestPortEventsRequest model)
+        {
+            log.LogInformation($"Request public events for {model.RecipientHandler}");
+
+            string resource = connection.CronusEndpoint + "/RequestPortEvents";
+
+            HttpRequestMessage request = CreateJsonPostRequest(model, resource);
+
+            if (string.IsNullOrEmpty(connection.oAuth.ServerEndpoint) == false)
+            {
+                var accessToken = await token.GetAccessTokenAsync(connection);
+                request.Headers.Authorization = new System.Net.Http.Headers.AuthenticationHeaderValue("bearer", accessToken);
+            }
+
+            var result = await ExecuteRequestAsync<object>(request);
+
+            return result.Response.IsSuccessStatusCode;
+        }
+
         public async Task<TableResult<RawEventDto, byte[]>> GetAggregateEventsWithPaging(Connection connection, string aggregateId, byte[] paginationToken, int take)
         {
             if (string.IsNullOrEmpty(aggregateId))
@@ -827,6 +846,19 @@ namespace Elders.Cronus.Dashboard.Models
         public string SourceEventTypeId { get; set; }
 
         public DateTimeOffset? ReplayAfter { get; set; }
+    }
+
+    public class RequestPortEventsRequest
+    {
+        [Required]
+        public string Tenant { get; set; }
+
+        [Required]
+        public string RecipientHandler { get; set; } // The port id/name
+
+        public DateTimeOffset? ReplayAfter { get; set; }
+
+        public DateTimeOffset? ReplayBefore { get; set; }
     }
 
     public class Response<T>

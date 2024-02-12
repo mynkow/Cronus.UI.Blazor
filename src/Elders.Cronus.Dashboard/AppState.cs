@@ -87,7 +87,12 @@ namespace Elders.Cronus.Dashboard
 
         private Task NotifyConnectionChanged(Connection connection) => OnConnectionChanged?.Invoke(connection);
 
-        private Task NotifyTenantChanged(oAuth tenant) => OnTenantChanged?.Invoke(tenant);
+        private Task NotifyTenantChanged(oAuth tenant)
+        {
+            Tenant = tenant.Tenant;
+
+            return OnTenantChanged?.Invoke(tenant);
+        }
 
         private Task NotifyConnectionsUpdated(List<Connection> connections) => OnConnectionsUpdated?.Invoke(connections);
 

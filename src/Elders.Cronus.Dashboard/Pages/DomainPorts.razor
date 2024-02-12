@@ -32,10 +32,18 @@
                     <MudTd>@context.Name</MudTd>
                     <MudTd><i>@context.Id</i></MudTd>
                     <MudTd>
-                        <MudButton Variant="Variant.Outlined" EndIcon="@Icons.Material.Filled.Delete" Color="Color.Success" OnClick="@(async () => await OnGG())">Request all public event</MudButton>
+                        
                     </MudTd>
                 </RowTemplate>
             </MudTable>
+
+            @if (Port is not null)
+            {
+                <MudTextField T="DateTime?" Format="s" Label="After UTC" InputType="InputType.DateTimeLocal" ValueChanged="@OnAfterValueChanged" />
+                <MudTextField T="DateTime?" Format="s" Label="Before UTC" InputType="InputType.DateTimeLocal" ValueChanged="@OnBeforeValueChanged" />
+                <MudButton Variant="Variant.Outlined" EndIcon="@Icons.Material.Filled.Delete" Color="Color.Success" OnClick="@(async () => await OnRequestAllEvents())">Request all events.</MudButton>
+            }
+
         </div>
     </div>
 </div>
@@ -45,15 +53,38 @@
 
     DomainPortDto Port { get; set; }
 
+    public DateTimeOffset? After { get; set; }
+    public DateTimeOffset? Before { get; set; }
+
+    protected void OnAfterValueChanged(DateTime? dateTime)
+    {
+        After = new DateTimeOffset(dateTime.Value, TimeSpan.Zero);
+    }
+
+    protected void OnBeforeValueChanged(DateTime? dateTime)
+    {
+        Before = new DateTimeOffset(dateTime.Value, TimeSpan.Zero);
+    }
+
     protected override async Task OnInitializedAsync()
     {
-        Domain = await Cronus.GetDomainAsync(@App.Connection);
+        Domain = await Cronus.GetDomainAsync(App.Connection);
         this.StateHasChanged();
     }
 
-    protected async Task OnGG()
+    protected async Task OnRequestAllEvents()
     {
-        Log.LogInformation("GG");
+        Log.LogInformation("OnRequestAllEvents");
+
+        var request = new RequestPortEventsRequest()
+        {
+            ReplayAfter = After,
+            ReplayBefore = Before,
+            Tenant= App.Tenant,
+            RecipientHandler = Port.Id
+        };
+
+        await Cronus.RequestPortEventsAsync(App.Connection, request);
 
         StateHasChanged();
     }
