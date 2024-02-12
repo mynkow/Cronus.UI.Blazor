@@ -2,11 +2,22 @@
 @inject CronusClient Cronus
 @inject ILogger<Projection> _logger
 
-<div>
-    <div style="font-size:xx-small">@progressString</div>
-    <MudProgressLinear Color="@Color" Rounded="true" Size="Size.Large" Value="@progress" />
-    <div style="text-align:right">@TimeSpan.FromSeconds(@timeLeft).ToString()</div>
-</div>
+@if (@Projection.LatestVersion.Status == ProjectionStatus.New)
+{
+    <div>
+        <div style="font-size:xx-small">@progressString</div>
+        <MudProgressLinear Color="@Color.Warning" Rounded="true" Size="Size.Large" Value="@progress" />
+        <div style="text-align:right">@TimeSpan.FromSeconds(@timeLeft).ToString()</div>
+    </div>
+}
+else if (@Projection.RebuildingVersion?.Status == ProjectionStatus.Fixing)
+{
+    <div>
+        <div style="font-size:xx-small">@progressString</div>
+        <MudProgressLinear Color="@Color.Primary" Rounded="true" Size="Size.Large" Value="@progress" />
+        <div style="text-align:right">@TimeSpan.FromSeconds(@timeLeft).ToString()</div>
+    </div>
+}
 
 @code {
     [Parameter]
@@ -30,71 +41,48 @@
         int sanityCounter = 0;
 
         App.HubConnection.On<string, long, long>("RebuildProgress", (projectionTypeId, processed, total) =>
+        {
+            if (Projection.ProjectionContractId.Equals(projectionTypeId, StringComparison.OrdinalIgnoreCase) == false)
+                return;
+
+            unchecked
             {
-                if (Projection.ProjectionContractId.Equals(projectionTypeId, StringComparison.OrdinalIgnoreCase) == false)
-                    return;
+                double percentage = (processed * 100) / total;
+                progressString = $"{percentage} % ( {processed} / {total} )";
+                progress = processed * 100 / total;
+            }
 
-                unchecked
+            receivedNotifications++;
+            if (processBase > 0)
+            {
+                processPace = (processed - processBase) / receivedNotifications;
+                lastCalculatedTimeLeft = (total - processed) / processPace;
+                if (lastCalculatedTimeLeft < timeLeft || timeLeft == 0)
                 {
-                    double percentage = (processed * 100) / total;
-                    progressString = $"{percentage} % ( {processed} / {total} )";
-                    progress = processed * 100 / total;
-                }
-
-                receivedNotifications++;
-                if (processBase > 0)
-                {
-                    processPace = (processed - processBase) / receivedNotifications;
-                    lastCalculatedTimeLeft = (total - processed) / processPace;
-                    if (lastCalculatedTimeLeft < timeLeft || timeLeft == 0)
-                    {
-                        timeLeft = lastCalculatedTimeLeft;
-                        sanityCounter = 0;
-                    }
-                    else
-                    {
-                        sanityCounter++;
-                        if (sanityCounter > 10)
-                        {
-                            timeLeft++;
-                        }
-                        else
-                        {
-                            timeLeft--;
-                        }
-                        
-                    }
+                    timeLeft = lastCalculatedTimeLeft;
+                    sanityCounter = 0;
                 }
                 else
                 {
-                    receivedNotifications--;
-                    processBase = processed;
+                    sanityCounter++;
+                    if (sanityCounter > 10)
+                    {
+                        timeLeft++;
+                    }
+                    else
+                    {
+                        timeLeft--;
+                    }
+                        
                 }
-
-                StateHasChanged();
-            });
-
-        App.HubConnection.On<string>("RebuildStarted", (projectionTypeId) =>
-        {
-            if (Projection.ProjectionContractId.Equals(projectionTypeId, StringComparison.OrdinalIgnoreCase) == false)
-                return;
-
-            progressString = $"0 % ( {0} / -- )";
-            progress = 0;
+            }
+            else
+            {
+                receivedNotifications--;
+                processBase = processed;
+            }
 
             StateHasChanged();
-
-        });
-
-        App.HubConnection.On<string>("RebuildFinished", (projectionTypeId) =>
-        {
-            if (Projection.ProjectionContractId.Equals(projectionTypeId, StringComparison.OrdinalIgnoreCase) == false)
-                return;
-
-            progress = 100;
-
-            StateHasChanged();
-
         });
 
         return Task.CompletedTask;

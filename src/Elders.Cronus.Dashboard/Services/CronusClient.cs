@@ -1,7 +1,4 @@
-using Elders.Cronus.Dashboard.Pages;
 using Elders.Cronus.Dashboard.Services;
-using System;
-using System.ComponentModel.DataAnnotations;
 
 namespace Elders.Cronus.Dashboard.Models
 {
@@ -127,11 +124,11 @@ namespace Elders.Cronus.Dashboard.Models
             return true;
         }
 
-        public async Task<bool> ReplayProjectionAsync(Connection connection, Projection projection)
+        public async Task<bool> NewProjectionVersionAsync(Connection connection, Projection projection)
         {
-            log.LogInformation("Replaying...");
+            log.LogInformation("NewProjectionVersion...");
 
-            string resource = connection.CronusEndpoint + "/projection/replay";
+            string resource = connection.CronusEndpoint + "/projection/replay"; // At some point, when the Ukrain/Rissia war is over, replace replay with `new`
 
             var rebuildRequest = new RebuildRequest()
             {
@@ -170,6 +167,11 @@ namespace Elders.Cronus.Dashboard.Models
             return await CancelProjectionAsync(connection, projection, version);
         }
 
+        public async Task<bool> PauseSpecificProjectionAsync(Connection connection, Projection projection, ProjectionVersion version)
+        {
+            return await PauseProjectionAsync(connection, projection, version);
+        }
+
         public async Task<bool> FinalizeIndexRebuildAsync(Connection connection, string indexContractId)
         {
             log.LogInformation("Finalizing index request...");
@@ -194,7 +196,7 @@ namespace Elders.Cronus.Dashboard.Models
             return true;
         }
 
-        public async Task<bool> RebuildIndexAsync(Connection connection, string indexContractId)
+        public async Task<bool> RebuildIndexAsync(Connection connection, string indexContractId, int? maxDegreeOfParallelism)
         {
             log.LogInformation("Rebuild index!");
 
@@ -202,7 +204,8 @@ namespace Elders.Cronus.Dashboard.Models
 
             var rebuildRequest = new RebuildIndex()
             {
-                Id = indexContractId
+                Id = indexContractId,
+                MaxDegreeOfParallelism = maxDegreeOfParallelism
             };
 
             HttpRequestMessage request = CreateJsonPostRequest(rebuildRequest, resource);
@@ -395,6 +398,32 @@ namespace Elders.Cronus.Dashboard.Models
             log.LogInformation($"Canceling... {version}");
 
             string resource = connection.CronusEndpoint + "/projection/cancel";
+
+            var rebuildRequest = new CancelProjectionRebuildRequest()
+            {
+                ProjectionContractId = projection.ProjectionContractId,
+                Version = version,
+
+            };
+
+            HttpRequestMessage request = CreateJsonPostRequest(rebuildRequest, resource);
+
+            if (string.IsNullOrEmpty(connection.oAuth.ServerEndpoint) == false)
+            {
+                var accessToken = await token.GetAccessTokenAsync(connection);
+                request.Headers.Authorization = new System.Net.Http.Headers.AuthenticationHeaderValue("bearer", accessToken);
+            }
+
+            await ExecuteRequestAsync<object>(request);
+
+            return true;
+        }
+
+        private async Task<bool> PauseProjectionAsync(Connection connection, Projection projection, ProjectionVersion version)
+        {
+            log.LogInformation($"Pausing... {version}");
+
+            string resource = connection.CronusEndpoint + "/projection/pause";
 
             var rebuildRequest = new CancelProjectionRebuildRequest()
             {
@@ -719,6 +748,15 @@ namespace Elders.Cronus.Dashboard.Models
         public PlayerOptions PlayerOptions { get; set; }
     }
 
+    public class PauseProjectionVersionRequest
+    {
+        public string ProjectionContractId { get; set; }
+
+        public ProjectionVersion Version { get; set; }
+
+        public string Reason { get; set; } = "Cause I can";
+    }
+
     public class CancelProjectionRebuildRequest
     {
         public string ProjectionContractId { get; set; }
@@ -745,6 +783,7 @@ namespace Elders.Cronus.Dashboard.Models
     public class RebuildIndex
     {
         public string Id { get; set; }
+        public int? MaxDegreeOfParallelism { get; set; }
     }
 
     public class RepublishEventRequest
