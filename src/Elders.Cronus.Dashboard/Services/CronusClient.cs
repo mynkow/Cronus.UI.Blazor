@@ -1,3 +1,4 @@
+using Elders.Cronus.Dashboard.Extensions;
 using Elders.Cronus.Dashboard.Services;
 
 namespace Elders.Cronus.Dashboard.Models
@@ -355,14 +356,21 @@ namespace Elders.Cronus.Dashboard.Models
             await ExecuteRequestAsync<object>(request);
         }
 
-        public async Task<ProjectionStateDto> GetProjectionAsync(Connection connection, string projectionName, string projectionId)
+        public async Task<ProjectionStateDto> GetProjectionAsync(Connection connection, string projectionName, string projectionId, DateTimeOffset? asOfTimestamp)
         {
             if (string.IsNullOrEmpty(projectionName)) throw new ArgumentNullException(nameof(projectionName));
             if (string.IsNullOrEmpty(projectionId)) throw new ArgumentNullException(nameof(projectionId));
 
             log.LogDebug($"{projectionName}({projectionId})");
 
-            HttpRequestMessage request = new HttpRequestMessage(HttpMethod.Get, connection.CronusEndpoint + $"/Projection/Explore?projectionName={projectionName}&id={projectionId}");
+            string resource = $"/Projection/Explore?projectionName={projectionName}&id={projectionId}";
+            if (asOfTimestamp.HasValue)
+            {
+                resource = resource + $"&asOf={asOfTimestamp.Value.ToIso8601()}";
+            }
+
+            HttpRequestMessage request = new HttpRequestMessage(HttpMethod.Get, connection.CronusEndpoint + resource);
+
             if (string.IsNullOrEmpty(connection.oAuth.ServerEndpoint) == false)
             {
                 var accessToken = await token.GetAccessTokenAsync(connection);
@@ -374,14 +382,20 @@ namespace Elders.Cronus.Dashboard.Models
             return result.Data.Result;
         }
 
-        public async Task<ProjectionCommitsDto> GetProjectionEventsAsync(Connection connection, string projectionName, string projectionId)
+        public async Task<ProjectionCommitsDto> GetProjectionEventsAsync(Connection connection, string projectionName, string projectionId, DateTimeOffset? asOfTimestamp)
         {
             if (string.IsNullOrEmpty(projectionName)) throw new ArgumentNullException(nameof(projectionName));
             if (string.IsNullOrEmpty(projectionId)) throw new ArgumentNullException(nameof(projectionId));
 
             log.LogDebug($"{projectionName}({projectionId})");
 
-            HttpRequestMessage request = new HttpRequestMessage(HttpMethod.Get, connection.CronusEndpoint + $"/Projection/ExploreEvents?projectionName={projectionName}&id={projectionId}");
+            string resource = $"/Projection/ExploreEvents?projectionName={projectionName}&id={projectionId}";
+            if (asOfTimestamp.HasValue)
+            {
+                resource = resource + $"&asOf={asOfTimestamp.Value.ToIso8601()}";
+            }
+            HttpRequestMessage request = new HttpRequestMessage(HttpMethod.Get, connection.CronusEndpoint + resource);
+
             if (string.IsNullOrEmpty(connection.oAuth.ServerEndpoint) == false)
             {
                 var accessToken = await token.GetAccessTokenAsync(connection);
