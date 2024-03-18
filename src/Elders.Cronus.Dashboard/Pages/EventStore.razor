@@ -1,4 +1,5 @@
 ﻿@page "/eventstore"
+@using Elders.Cronus.Dashboard.Extensions
 @using Elders.Cronus.Dashboard.Services;
 @inject AppState App
 @inject CronusClient Cronus
@@ -20,7 +21,7 @@
         <MudTd></MudTd>
     </HeaderContent>
     <RowTemplate>
-        <MudTd DataLabel="Timestamp">@context.Timestamp.ToString("MMM d'th' yyyy, hh:mm:ss.fff")</MudTd>
+        <MudTd DataLabel="Timestamp">@context.Timestamp.ToIso8601()</MudTd>
         <MudTd DataLabel="Rev">@context.EventRevision</MudTd>
         <MudTd DataLabel="Pos">@context.EventPosition</MudTd>
         <MudTd DataLabel="Events">
@@ -55,7 +56,7 @@
 
     <MudPopover AnchorOrigin = "Origin.CenterLeft" Open="@_isOpen" Class="px-5 pt-5">
         <MudPaper Outlined=true Style="max-height: 80vh;overflow: auto;">
-            <MudText Typo="Typo.caption">@SelectedEvent.Timestamp.ToString("MMM d'th' yyyy hh:mm:ss.fff")</MudText>
+            <MudText Typo="Typo.caption">@SelectedEvent.Timestamp.ToIso8601()</MudText>
             <MudText Typo="Typo.h6">@SelectedEvent.EventName - @SelectedEvent.Id</MudText>
             <div class="json-box">
                 <pre Style="@($"color:{Colors.LightGreen.Accent3};")">@_jsonData</pre>
