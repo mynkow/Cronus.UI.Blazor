@@ -22,6 +22,19 @@ else
                 Events
             </MudButton>
         </form>
+
+        <form class="form-inline" style="align-items: flex-start">
+            <MudItem xs="5" lg="3">
+                <MudDatePicker Label="As of date in UTC" @bind-Date="@asOfDateTime" EnableTime="true"></MudDatePicker>
+            </MudItem>
+            <MudItem xs="5" lg="3">
+                <MudTimePicker Label="As of time" @bind-Time="@asOfTimespan" EnableTime="true"></MudTimePicker>
+            </MudItem>
+            <MudButton Variant="Variant.Outlined" Color="Color.Success" OnClick="@(() =>ClearDatePicker())" Class="ml-3">
+                Clear Date Picker
+            </MudButton>
+        </form>
+
     </div>
     <hr class="solid">
     <div class="row">
@@ -107,6 +120,9 @@ else
     string state = "";
     string details = string.Empty;
     string eventsLabel = "Events";
+    DateTime? asOfDateTime = null;
+    TimeSpan? asOfTimespan = null;
+
     protected override Task OnInitializedAsync()
     {
         App.OnChange += StateHasChanged;
@@ -127,7 +143,8 @@ else
     {
         if (projectionId != string.Empty)
         {
-            ProjectionStateDto projection = await Cronus.GetProjectionAsync(App.Connection, Projection.ProjectionContractId, projectionId);
+            var timestamp = ConstructAsOfTimestamp();
+            ProjectionStateDto projection = await Cronus.GetProjectionAsync(App.Connection, Projection.ProjectionContractId, projectionId, timestamp);
             if (projection is null == false && projection.State is null == false)
             {
                 state = await JSRuntime.InvokeAsync<string>("JSON.stringify", projection.State, null, 4);
@@ -144,7 +161,8 @@ else
     }
     async Task GetProjectionEventsAsync()
     {
-        ProjectionCommitsDto projection = await Cronus.GetProjectionEventsAsync(App.Connection, Projection.ProjectionContractId, projectionId);
+        var timestamp = ConstructAsOfTimestamp();
+        ProjectionCommitsDto projection = await Cronus.GetProjectionEventsAsync(App.Connection, Projection.ProjectionContractId, projectionId, timestamp);
         if (projection is null == false && projection.Commits is null == false)
         {
             foreach (var commit in projection.Commits)
@@ -164,8 +182,34 @@ else
             commits.Clear();
         }
     }
+
     public async Task<string> FormatJsonAsync(object data)
     {
         return await JSRuntime.InvokeAsync<string>("JSON.stringify", data, null, 4);
+    }
+
+    private DateTimeOffset? ConstructAsOfTimestamp()
+    {
+        if (asOfDateTime.HasValue)
+        {
+            DateTimeOffset timestamp;
+            if (asOfTimespan.HasValue)
+            {
+                DateTime dateTime = asOfDateTime.Value.AddHours(asOfTimespan.Value.Hours).AddMinutes(asOfTimespan.Value.Minutes);
+                timestamp = new DateTimeOffset(dateTime, TimeSpan.Zero);
+            }
+            else
+            {
+                timestamp = new DateTimeOffset(asOfDateTime.Value, TimeSpan.Zero);
+            }
+            return timestamp;
+        }
+        return null;
+    }
+
+    private void ClearDatePicker()
+    {
+        asOfDateTime = null;
+        asOfTimespan = null;
     }
 }
